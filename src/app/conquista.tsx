@@ -9,6 +9,7 @@ import { irPara } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
 import { Botao } from '@/components/ui';
+import { temaDaFase } from '@/content/fases';
 import { idadeDe } from '@/domain/idade';
 import { fasesDaTrilha, missoesParaIdade, montarTrilha } from '@/domain/missoes';
 import { useApp } from '@/state/app';
@@ -53,9 +54,23 @@ export default function Conquista() {
   function seguir() {
     irPara(router, desbloqueou ? { pathname: '/trilha', params: { desbloqueou } } : '/trilha');
   }
+  function conhecerProxima() {
+    if (proxima) irPara(router, { pathname: '/fase/[numero]', params: { numero: String(proxima.numero) } });
+  }
 
   return (
-    <Tela rodape={<Botao titulo={proxima ? 'Ver a próxima fase' : 'Ver a trilha'} onPress={seguir} />}>
+    <Tela
+      rodape={
+        proxima ? (
+          <View style={{ gap: 2 }}>
+            <Botao titulo={`Conhecer a fase ${proxima.numero}`} onPress={conhecerProxima} />
+            <Botao variante="texto" titulo="Ver a trilha" onPress={seguir} />
+          </View>
+        ) : (
+          <Botao titulo="Ver a trilha" onPress={seguir} />
+        )
+      }
+    >
       <View style={s.palco} onLayout={(e) => setLargura(e.nativeEvent.layout.width)}>
         <Animated.View style={[s.halo, estiloBrilho]} />
         <Animated.View style={estiloMedalha} accessibilityRole="image" accessibilityLabel={`Medalha ${fase.medalha.nome}`}>
@@ -72,7 +87,7 @@ export default function Conquista() {
           Medalha {fase.medalha.nome}!
         </Texto>
         <Texto style={{ textAlign: 'center' }}>
-          {nome} completou as {fase.itens.length} missões da fase {fase.numero}. Cada brincadeira juntos conta muito.
+          {nome} completou as {fase.itens.length} missões da fase {fase.numero}, {temaDaFase(fase.numero).titulo.toLowerCase()}. Cada brincadeira juntos conta muito.
         </Texto>
       </Animated.View>
 
@@ -90,7 +105,7 @@ export default function Conquista() {
         </View>
         {proxima ? (
           <Texto variante="legenda" style={{ textAlign: 'center' }}>
-            Próxima: medalha {proxima.medalha.nome}, na fase {proxima.numero}.
+            Próxima: fase {proxima.numero}, {temaDaFase(proxima.numero).titulo.toLowerCase()} (medalha {proxima.medalha.nome}).
           </Texto>
         ) : null}
       </Animated.View>

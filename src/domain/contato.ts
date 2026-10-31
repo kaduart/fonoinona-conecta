@@ -51,3 +51,8 @@ export function linkWhatsAppGeral(motivo: 'geral' | 'missoes' = 'geral', idade =
   const texto = motivo === 'missoes' ? MENSAGEM_MISSOES.replace('{idade}', idade) : MENSAGEM_GERAL;
   return `https://wa.me/${numero.replace(/\D/g, '')}?text=${encodeURIComponent(texto)}`;
 }
+
+/** Link do WhatsApp da clínica com um texto já montado (ex.: resumo do Diário, que o responsável vê antes). */
+export function linkWhatsAppTexto(texto: string, numero = numeroClinica()): string {
+  return `https://wa.me/${numero.replace(/\D/g, '')}?text=${encodeURIComponent(texto)}`;
+}

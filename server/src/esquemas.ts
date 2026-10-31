@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 const Id = z.string().regex(/^[a-z0-9-]{6,40}$/i, 'id inválido');
 const FaixaId = z.enum(['f0-5m', 'f6-11m', 'f12-17m', 'f18-23m', 'f2a', 'f3a', 'f4a', 'f5a']);
-const OrigemContato = z.enum(['resultado', 'missoes', 'geral']);
+const OrigemContato = z.enum(['resultado', 'missoes', 'geral', 'diario']);
 
 export const Evento = z.discriminatedUnion('tipo', [
   z.object({ id: Id, em: z.iso.datetime(), tipo: z.literal('app_aberto') }),
@@ -17,6 +17,9 @@ export const Evento = z.discriminatedUnion('tipo', [
     como: z.enum(['facil', 'com_ajuda', 'dificil']),
   }),
   z.object({ id: Id, em: z.iso.datetime(), tipo: z.literal('whatsapp_aberto'), origem: OrigemContato }),
+  // Diário: só o contexto. A nota, as áreas e o humor ficam no aparelho.
+  z.object({ id: Id, em: z.iso.datetime(), tipo: z.literal('diario_registro'), contexto: z.enum(['casa', 'escola', 'terapia']) }),
+  z.object({ id: Id, em: z.iso.datetime(), tipo: z.literal('kit_interesse'), fase: z.number().int().min(1).max(10) }),
 ]);
 export type Evento = z.infer<typeof Evento>;
 

@@ -49,7 +49,8 @@ function diaLocal(d: Date): string {
 }
 
 /** Dias seguidos com pelo menos uma missão, terminando hoje ou ontem. */
-export function diasSeguidos(conclusoes: Conclusao[], hoje: Date): number {
+/** Dias seguidos com atividade. Aceita conclusões de missão e marcas do Diário (qualquer coisa com `em`). */
+export function diasSeguidos(conclusoes: { em: string }[], hoje: Date): number {
   const dias = new Set(conclusoes.map((c) => diaLocal(new Date(c.em))));
   const cursor = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate());
   if (!dias.has(diaLocal(cursor))) cursor.setDate(cursor.getDate() - 1);
@@ -61,8 +62,8 @@ export function diasSeguidos(conclusoes: Conclusao[], hoje: Date): number {
   return n;
 }
 
-/** Quais dos últimos 7 dias (do mais antigo para hoje) tiveram missão. */
-export function semana(conclusoes: Conclusao[], hoje: Date): { dia: Date; feito: boolean }[] {
+/** Quais dos últimos 7 dias (do mais antigo para hoje) tiveram missão ou Diário. */
+export function semana(conclusoes: { em: string }[], hoje: Date): { dia: Date; feito: boolean }[] {
   const dias = new Set(conclusoes.map((c) => diaLocal(new Date(c.em))));
   return Array.from({ length: 7 }, (_, i) => {
     const dia = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate() - (6 - i));

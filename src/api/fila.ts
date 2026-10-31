@@ -4,7 +4,11 @@ export type EventoApp =
   | { id: string; em: string; tipo: 'app_aberto' }
   | { id: string; em: string; tipo: 'triagem_concluida'; faixaId: string }
   | { id: string; em: string; tipo: 'missao_concluida'; missaoId: string; como: 'facil' | 'com_ajuda' | 'dificil' }
-  | { id: string; em: string; tipo: 'whatsapp_aberto'; origem: 'resultado' | 'missoes' | 'geral' };
+  | { id: string; em: string; tipo: 'whatsapp_aberto'; origem: 'resultado' | 'missoes' | 'geral' | 'diario' }
+  /** só o contexto: nunca a nota, as áreas ou o humor */
+  | { id: string; em: string; tipo: 'diario_registro'; contexto: 'casa' | 'escola' | 'terapia' }
+  /** interesse no kit da fase (lista de espera anônima) */
+  | { id: string; em: string; tipo: 'kit_interesse'; fase: number };
 
 export type Fila = { eventos: EventoApp[]; tentativas: number; proximaTentativaEm: number };
 

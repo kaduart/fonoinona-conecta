@@ -68,6 +68,30 @@ describe('POST /v1/eventos', () => {
     await request(app).post('/v1/eventos').send(corpo).expect(202);
   });
 
+  it('aceita Diário (só o contexto) e interesse no kit, sem levar a nota', async () => {
+    const corpo = {
+      ...lote(['ev-000001']),
+      eventos: [
+        { id: 'ev-000010', em: '2026-10-31T10:00:00.000Z', tipo: 'diario_registro', contexto: 'escola', nota: 'falou água', humor: 'dificil' },
+        { id: 'ev-000011', em: '2026-10-31T10:00:00.000Z', tipo: 'kit_interesse', fase: 2 },
+      ],
+    };
+    const gravados: unknown[] = [];
+    const original = repos.eventos.inserir;
+    repos.eventos.inserir = async (inst, versao, lista) => {
+      gravados.push(...lista);
+      return original(inst, versao, lista);
+    };
+    await request(app).post('/v1/eventos').send(corpo).expect(202);
+    expect(gravados).toHaveLength(2);
+    expect(JSON.stringify(gravados)).not.toContain('falou');
+    expect(JSON.stringify(gravados)).not.toContain('dificil');
+    await request(app)
+      .post('/v1/eventos')
+      .send({ ...corpo, eventos: [{ id: 'ev-000012', em: '2026-10-31T10:00:00.000Z', tipo: 'diario_registro', contexto: 'praia' }] })
+      .expect(400);
+  });
+
   it('recusa lote com mais de 50 eventos', async () => {
     const ids = Array.from({ length: 51 }, (_, i) => `ev-${String(i).padStart(6, '0')}`);
     await request(app).post('/v1/eventos').send(lote(ids)).expect(400);
