@@ -7,7 +7,7 @@ import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
 import { Botao, BotaoVoltar, Card, Chip } from '@/components/ui';
 import { IlustracaoViva } from '@/components/animacao';
-import { chaveDaArea, ilustracaoDaArea, PROPORCAO } from '@/content/ilustracoes';
+import { chaveDaArea, ilustracaoDaArea, PROPORCAO, videoDaArea } from '@/content/ilustracoes';
 import { MISSOES } from '@/content/missoes';
 import { formatarIdade, idadeDe } from '@/domain/idade';
 import { useApp } from '@/state/app';
@@ -90,7 +90,7 @@ export default function MissaoTela() {
       }
     >
       <View style={s.capa}>
-        <IlustracaoViva fonte={ilustracaoDaArea(missao.areas[0])} proporcao={PROPORCAO[chaveDaArea(missao.areas[0])]} style={{ marginTop: 40 }} />
+        <IlustracaoViva fonte={ilustracaoDaArea(missao.areas[0])} proporcao={PROPORCAO[chaveDaArea(missao.areas[0])]} video={videoDaArea(missao.areas[0])} style={{ marginTop: 40 }} />
         <View style={[s.capaTopo]}>
           <BotaoVoltar onPress={() => (router.canGoBack() ? router.back() : router.replace('/inicio'))} />
           <Cronometro total={segundosDe(missao.duracao)} />

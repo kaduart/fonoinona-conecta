@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Image, type ImageSourcePropType, type StyleProp, View, type ViewStyle } from 'react-native';
+import { useVideoPlayer, VideoView } from 'expo-video';
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -109,7 +110,36 @@ export function CelebracaoConquista({ tamanho = 260 }: { tamanho?: number }) {
 }
 
 /** Ilustração que entra subindo e depois "respira" devagar. */
-export function IlustracaoViva({ fonte, proporcao, style, rotulo, confete = true }: { fonte: ImageSourcePropType; proporcao: number; style?: StyleProp<ViewStyle>; rotulo?: string; confete?: boolean }) {
+/** Vídeo em loop, mudo, por cima da imagem parada (que fica como pôster e reserva). */
+function VideoLoop({ fonte }: { fonte: number }) {
+  const player = useVideoPlayer(fonte, (p) => {
+    p.loop = true;
+    p.muted = true;
+    p.play();
+  });
+  useEffect(() => {
+    // No web o play() do setup pode ocorrer antes do <video> existir.
+    const t = setTimeout(() => player.play(), 300);
+    return () => clearTimeout(t);
+  }, [player]);
+  return <VideoView player={player} style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: '100%' }} contentFit="contain" nativeControls={false} pointerEvents="none" />;
+}
+
+export function IlustracaoViva({
+  fonte,
+  proporcao,
+  style,
+  rotulo,
+  confete = true,
+  video,
+}: {
+  fonte: ImageSourcePropType;
+  proporcao: number;
+  style?: StyleProp<ViewStyle>;
+  rotulo?: string;
+  confete?: boolean;
+  video?: number | null;
+}) {
   const [largura, setLargura] = useState(0);
   const reduzir = useReducedMotion();
   const entrada = useSharedValue(reduzir ? 1 : 0);
@@ -127,6 +157,7 @@ export function IlustracaoViva({ fonte, proporcao, style, rotulo, confete = true
     <View style={[{ width: '100%', aspectRatio: proporcao }, style]} onLayout={(e) => setLargura(e.nativeEvent.layout.width)}>
       <Animated.View style={[{ width: '100%', height: '100%' }, estilo]}>
         <Image source={fonte} style={{ width: '100%', height: '100%' }} resizeMode="contain" accessibilityLabel={rotulo} accessibilityIgnoresInvertColors />
+        {video && !reduzir ? <VideoLoop fonte={video} /> : null}
       </Animated.View>
       {confete ? <ConfeteAoRedor largura={largura} altura={largura / proporcao} /> : null}
     </View>

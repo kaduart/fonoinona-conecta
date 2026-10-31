@@ -7,7 +7,7 @@ import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
 import { Botao, Card } from '@/components/ui';
 import { IlustracaoViva } from '@/components/animacao';
-import { chaveDaArea, ilustracaoDaArea, PROPORCAO } from '@/content/ilustracoes';
+import { chaveDaArea, ilustracaoDaArea, PROPORCAO, videoDaArea } from '@/content/ilustracoes';
 import { ROTULO_AREA } from '@/content/perguntas';
 import { formatarDataCurta, proximaTriagem } from '@/domain/acompanhamento';
 import { linkWhatsAppGeral } from '@/domain/contato';
@@ -72,7 +72,7 @@ export default function Inicio() {
 
       {doDia ? (
         <View style={s.heroi}>
-          <IlustracaoViva fonte={ilustracaoDaArea(doDia.areas[0])} proporcao={PROPORCAO[chaveDaArea(doDia.areas[0])]} style={{ marginTop: 18 }} />
+          <IlustracaoViva fonte={ilustracaoDaArea(doDia.areas[0])} proporcao={PROPORCAO[chaveDaArea(doDia.areas[0])]} video={videoDaArea(doDia.areas[0])} style={{ marginTop: 18 }} />
           <View style={[s.selo, { left: 14 }]}>
             <Icone nome="estrela" cor={cores.marca} tamanho={12} cheio />
             <Texto style={{ fontFamily: fonte.semi, fontSize: 11.5, color: cores.marca }}>Missão do dia</Texto>

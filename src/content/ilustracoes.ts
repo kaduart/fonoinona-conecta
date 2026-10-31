@@ -29,3 +29,12 @@ export function chaveDaArea(area: Area | undefined): keyof typeof ILUSTRACOES {
 export function ilustracaoDaArea(area: Area | undefined): ImageSourcePropType {
   return ILUSTRACOES[chaveDaArea(area)];
 }
+
+/** Cenas com vídeo em loop (mudo). As demais usam só a imagem animada. */
+export const VIDEOS: Partial<Record<keyof typeof ILUSTRACOES, number>> = {
+  imitar: require('../../assets/videos/espelho.mp4'),
+};
+
+export function videoDaArea(area: Area | undefined) {
+  return VIDEOS[chaveDaArea(area)] ?? null;
+}
