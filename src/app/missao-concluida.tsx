@@ -2,6 +2,7 @@ import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { registrarEvento } from '@/api/cliente';
 import { Icone, irPara } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
@@ -39,6 +40,7 @@ export default function MissaoConcluida() {
     setSalvando(true);
     try {
       await repositorio.salvarConclusao({ ...nova, como });
+      registrarEvento({ tipo: 'missao_concluida', missaoId: missao!.id, como });
       irPara(router, '/inicio');
     } catch (e) {
       console.error('[missao-concluida] falha ao salvar', e);

@@ -11,6 +11,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
+import { atualizarConteudo, registrarEvento } from '@/api/cliente';
 import { AppProvider, useApp } from '@/state/app';
 import { cores } from '@/theme/tokens';
 
@@ -22,7 +23,11 @@ function Navegacao() {
   const pronto = fontesProntas && !carregando;
 
   useEffect(() => {
-    if (pronto) SplashScreen.hideAsync();
+    if (!pronto) return;
+    SplashScreen.hideAsync();
+    // em segundo plano: nada aqui bloqueia o app
+    registrarEvento({ tipo: 'app_aberto' });
+    atualizarConteudo();
   }, [pronto]);
 
   if (!pronto) return null;

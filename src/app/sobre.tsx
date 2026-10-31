@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
 import { Linking, StyleSheet, View } from 'react-native';
 
+import { registrarEvento } from '@/api/cliente';
 import { Icone } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
@@ -47,7 +48,10 @@ export default function Sobre() {
         <Botao
           titulo="Falar com a clínica"
           icone={<Icone nome="chat" cor="#fff" tamanho={20} />}
-          onPress={() => Linking.openURL(linkWhatsAppGeral()).catch((e) => console.error('[sobre] WhatsApp', e))}
+          onPress={() => {
+            registrarEvento({ tipo: 'whatsapp_aberto', origem: 'geral' });
+            Linking.openURL(linkWhatsAppGeral()).catch((e) => console.error('[sobre] WhatsApp', e));
+          }}
         />
       }
     >

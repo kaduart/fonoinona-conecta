@@ -1,6 +1,7 @@
 import { Redirect, useRouter } from 'expo-router';
 import { Linking, Pressable, StyleSheet, View } from 'react-native';
 
+import { registrarEvento } from '@/api/cliente';
 import { Avatar, BarraInferior, Icone, irPara } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
@@ -104,7 +105,10 @@ export default function Inicio() {
           <Botao
             variante="texto"
             titulo="Conversar com a equipe"
-            onPress={() => Linking.openURL(linkWhatsAppGeral('missoes', formatarIdade(meses))).catch((e) => console.error('[inicio] WhatsApp', e))}
+            onPress={() => {
+              registrarEvento({ tipo: 'whatsapp_aberto', origem: 'missoes' });
+              Linking.openURL(linkWhatsAppGeral('missoes', formatarIdade(meses))).catch((e) => console.error('[inicio] WhatsApp', e));
+            }}
           />
         </Card>
       ) : null}

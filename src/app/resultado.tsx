@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Linking, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
+import { registrarEvento, registrarLead } from '@/api/cliente';
 import { Medidor } from '@/components/medidor';
 import { irPara } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
@@ -39,7 +40,10 @@ export default function ResultadoTela() {
   const idade = formatarIdade(triagem.idadeMeses);
 
   function abrirWhatsApp() {
-    const url = linkWhatsApp(resultado.nivel, idade, codigoContato(triagem!.id));
+    const codigo = codigoContato(triagem!.id);
+    const url = linkWhatsApp(resultado.nivel, idade, codigo);
+    registrarEvento({ tipo: 'whatsapp_aberto', origem: 'resultado' });
+    registrarLead(codigo, 'resultado', triagem!.faixaId);
     Linking.openURL(url).catch((e) => console.error('[resultado] não abriu o WhatsApp', e));
   }
 

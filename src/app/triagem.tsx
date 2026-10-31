@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 
+import { registrarEvento } from '@/api/cliente';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
 import { Botao, BotaoVoltar, Card, Chip, Segmentos, SetaDireita } from '@/components/ui';
@@ -137,6 +138,7 @@ export default function Triagem() {
         resultado,
         criadaEm: new Date().toISOString(),
       });
+      registrarEvento({ tipo: 'triagem_concluida', faixaId: faixa.id });
       router.replace({ pathname: '/resultado', params: { id } });
     } catch (e) {
       console.error('[triagem] falha ao concluir', e);

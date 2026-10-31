@@ -8,7 +8,8 @@ App gratuito da Clínica Fono Inova (Anápolis) para pais de crianças de 0 a 6 
 
 - Expo SDK 58 + React Native + TypeScript
 - expo-router (navegação por arquivos em `src/app`)
-- AsyncStorage (dados ficam só no celular nesta fase)
+- Dados só no celular, cifrados (XChaCha20-Poly1305, chave no Keychain/Keystore)
+- API opcional em `server/` (Express + MongoDB) para conteúdo, eventos anônimos e leads
 - Jest (`jest-expo`) para o motor de regras
 
 ## Como rodar
@@ -20,11 +21,14 @@ npm test              # testes do motor de regras
 npm run typecheck     # checagem de tipos
 ```
 
-Variável de ambiente (crie um `.env`, que não vai para o Git):
+Variáveis de ambiente: copie `.env.example` para `.env` (que não vai para o Git).
 
 ```
 EXPO_PUBLIC_WHATSAPP_CLINICA=5562XXXXXXXXX
+EXPO_PUBLIC_API_URL=            # vazio = app 100% offline
 ```
+
+A API fica em [`server/`](server/README.md).
 
 ## Estrutura
 
@@ -34,7 +38,9 @@ EXPO_PUBLIC_WHATSAPP_CLINICA=5562XXXXXXXXX
 | `src/content` | Perguntas por faixa etária e textos de resultado (versionados) |
 | `src/domain` | Regras: idade corrigida, cálculo do resultado, código CONECTA |
 | `src/components` | Componentes visuais da v3 (verde #1F7A6B) |
-| `src/storage` | Repositório local no celular |
+| `src/storage` | Repositório local cifrado |
+| `src/api` | Cliente da API com fila e reenvio |
+| `server` | API (Express + MongoDB) |
 | `src/theme` | Tokens de design |
 
 ## Regra do resultado
@@ -49,5 +55,5 @@ Prematuros (< 37 semanas) usam idade corrigida até 24 meses. A mensagem do What
 
 1. **Sprint 1** — base, triagem por idade e resultado ✅
 2. **Sprint 2** — missões, evolução, várias crianças ✅
-3. **Sprint 3** — backend (MongoDB Atlas) e armazenamento criptografado
+3. **Sprint 3** — backend (MongoDB Atlas) e armazenamento criptografado ✅
 4. **Sprint 4** — beta nas lojas
