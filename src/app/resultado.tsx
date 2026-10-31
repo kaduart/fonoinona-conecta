@@ -18,7 +18,6 @@ import {
   CTA_RESULTADO,
   DESCRICAO_AREA,
   DICA_AREA,
-  equipeOnline,
   PONTE_CLINICA,
   RESPONSAVEL_TECNICA,
   TEXTOS_RESULTADO,
@@ -119,11 +118,11 @@ function CardFoco({ a }: { a: ResultadoArea }) {
 }
 
 /** CTA: degradê vivo verde → azul, ícone do WhatsApp e micro-texto dentro do botão. */
-function BotaoWhatsApp({ titulo, onPress }: { titulo: string; onPress: () => void }) {
+function BotaoWhatsApp({ titulo, apoio, onPress }: { titulo: string; apoio: string; onPress: () => void }) {
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${titulo}. ${CTA_RESULTADO.apoio}`}
+      accessibilityLabel={`${titulo}. ${apoio}`}
       onPress={onPress}
       style={({ pressed }) => [s.cta, pressed && { transform: [{ scale: 0.985 }], opacity: 0.96 }]}
     >
@@ -149,7 +148,7 @@ function BotaoWhatsApp({ titulo, onPress }: { titulo: string; onPress: () => voi
       </View>
       <View style={{ flex: 1 }}>
         <Texto style={{ fontFamily: fonte.extra, fontSize: 16, lineHeight: 20, letterSpacing: -0.2, color: '#fff' }}>{titulo}</Texto>
-        <Texto style={{ fontFamily: fonte.media, fontSize: 12, lineHeight: 16, color: 'rgba(255,255,255,0.9)', marginTop: 2 }}>{CTA_RESULTADO.apoio}</Texto>
+        <Texto style={{ fontFamily: fonte.media, fontSize: 12, lineHeight: 16, color: 'rgba(255,255,255,0.9)', marginTop: 2 }}>{apoio}</Texto>
       </View>
     </Pressable>
   );
@@ -178,13 +177,12 @@ export default function ResultadoTela() {
   const chamada = CHAMADA_RESULTADO[resultado.nivel];
   const idade = formatarIdade(triagem.idadeMeses);
   const idadeCurta = triagem.idadeMeses < 24 ? idade : `${Math.floor(triagem.idadeMeses / 12)} anos`;
-  const online = equipeOnline();
   const tituloCta = personalizar(CTA_RESULTADO.titulo, vars);
   const codigo = codigoContato(triagem.id);
+  const resumo = resumoTriagem(foco.map((a) => a.rotulo), habilidades.noEsperado, habilidades.total);
 
   function abrirWhatsApp() {
-    const resumo = incluirResumo ? resumoTriagem(foco.map((a) => a.rotulo), habilidades.noEsperado, habilidades.total) : undefined;
-    const url = linkWhatsApp(resultado.nivel, idade, codigo, undefined, resumo);
+    const url = linkWhatsApp(resultado.nivel, idade, codigo, undefined, incluirResumo ? resumo : undefined);
     registrarEvento({ tipo: 'whatsapp_aberto', origem: 'resultado' });
     registrarLead(codigo, 'resultado', triagem!.faixaId);
     Linking.openURL(url).catch((e) => console.error('[resultado] não abriu o WhatsApp', e));
@@ -194,7 +192,7 @@ export default function ResultadoTela() {
     <Tela
       rodape={
         <View style={{ gap: 6, alignItems: 'center' }}>
-          <BotaoWhatsApp titulo={tituloCta} onPress={abrirWhatsApp} />
+          <BotaoWhatsApp titulo={tituloCta} apoio={personalizar(CTA_RESULTADO.apoio, vars)} onPress={abrirWhatsApp} />
           <Botao variante="texto" titulo="Ver minhas missões" onPress={() => irPara(router, '/trilha')} />
         </View>
       }
@@ -282,14 +280,11 @@ export default function ResultadoTela() {
             <View style={s.rtAvatar}>
               <Texto style={{ fontFamily: fonte.extra, color: cores.marca, fontSize: 17 }}>LS</Texto>
             </View>
-            <View style={[s.luzAvatar, { backgroundColor: online ? '#22C55E' : '#C3CDCC' }]} />
           </View>
           <View style={{ flex: 1, gap: 2 }}>
             <Texto style={{ fontFamily: fonte.extra, fontSize: 15, letterSpacing: -0.2, color: cores.texto }}>{RESPONSAVEL_TECNICA.nome}</Texto>
             <Texto variante="legenda">Fonoaudióloga • {RESPONSAVEL_TECNICA.registro}</Texto>
-            <Texto style={{ fontFamily: fonte.semi, fontSize: 12, color: online ? '#15803D' : cores.texto3 }}>
-              {online ? 'Equipe disponível agora' : 'Responde em horário comercial'}
-            </Texto>
+            <Texto style={{ fontFamily: fonte.semi, fontSize: 12, color: cores.texto2 }}>{PONTE_CLINICA.horario}</Texto>
           </View>
         </View>
 
@@ -327,6 +322,12 @@ export default function ResultadoTela() {
             <Texto style={{ fontSize: 12, lineHeight: 17, color: cores.texto2 }}>{PONTE_CLINICA.opcaoApoio}</Texto>
           </View>
         </Pressable>
+        {incluirResumo ? (
+          <View style={s.previa}>
+            <Texto style={{ fontFamily: fonte.semi, fontSize: 12, color: cores.texto2 }}>{PONTE_CLINICA.previa}</Texto>
+            <Texto style={{ fontSize: 13, lineHeight: 19, color: cores.texto }}>{resumo}</Texto>
+          </View>
+        ) : null}
         <View style={s.privacidade}>
           <Svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke={cores.marca} strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">
             <Rect x={5} y={11} width={14} height={10} rx={2.5} />
@@ -370,6 +371,7 @@ const s = StyleSheet.create({
   opcaoAtiva: { borderColor: cores.marca, backgroundColor: '#F2FAF7' },
   caixa: { width: 22, height: 22, borderRadius: 7, borderWidth: 2, borderColor: '#B9C8C6', alignItems: 'center', justifyContent: 'center' },
   caixaAtiva: { backgroundColor: cores.marca, borderColor: cores.marca },
+  previa: { gap: 4, padding: 14, borderRadius: 14, backgroundColor: '#F2FAF7', borderLeftWidth: 3, borderLeftColor: cores.marca },
   privacidade: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#F4F8F7', borderRadius: 12, paddingVertical: 10, paddingHorizontal: 12 },
   rt: { flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: '#fff', borderRadius: 20, padding: 16, boxShadow: '0px 12px 30px rgba(44, 62, 63, 0.05)' },
   rtAvatar: { width: 50, height: 50, borderRadius: 17, backgroundColor: cores.marcaSuave, alignItems: 'center', justifyContent: 'center' },

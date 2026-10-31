@@ -56,8 +56,8 @@ export const CHAMADA_RESULTADO: Record<NivelResultado, { titulo: string; texto: 
 };
 
 export const CTA_RESULTADO = {
-  titulo: 'Agendar avaliação para {nome}',
-  apoio: 'Fale com a fono pelo WhatsApp',
+  titulo: 'Conversar com a equipe',
+  apoio: 'Sobre a avaliação de {nome}, pelo WhatsApp',
 };
 
 /**
@@ -66,16 +66,18 @@ export const CTA_RESULTADO = {
  */
 export const PONTE_CLINICA = {
   rotulo: 'Próximo passo',
-  titulo: 'Quem te responde é a equipe da fono',
+  titulo: 'Como funciona a conversa',
   passos: [
-    'Você envia o código da triagem de {nome} (e o resumo, se quiser)',
-    'A equipe da fono tira suas dúvidas',
+    'O código da triagem de {nome} já vai pronto na mensagem',
+    'Nossa equipe tira suas dúvidas',
     'Vocês combinam o melhor horário para a avaliação',
   ],
   opcao: 'Incluir o resumo da triagem na mensagem',
-  opcaoApoio: 'Só as habilidades ainda em desenvolvimento. Ajuda a fono a te orientar mais rápido.',
-  privacidade: 'As respostas da triagem ficam só no seu celular. Pelo WhatsApp vai apenas o código.',
-  privacidadeComResumo: 'Você vai ver o resumo na mensagem antes de enviar. Nada é enviado sem você tocar em enviar.',
+  opcaoApoio: 'Assim a equipe já sabe quais habilidades estão em desenvolvimento.',
+  previa: 'Vai junto na mensagem:',
+  privacidade: 'As respostas da triagem ficam no seu celular. O código só identifica a conversa: a clínica não consegue ver a triagem por ele.',
+  privacidadeComResumo: 'A clínica recebe só o que está na mensagem. Você revisa tudo no WhatsApp antes de enviar.',
+  horario: 'Atende de seg. a sex., 8h às 18h',
 };
 
 /** Horário em que a equipe responde no WhatsApp (seg–sex 8h–18h). Ajustar com a clínica. */
