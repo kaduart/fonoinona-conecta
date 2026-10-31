@@ -36,8 +36,11 @@ describe('GET /v1/conteudo', () => {
     await repos.conteudo.publicar(c);
     const r = await request(app).get('/v1/conteudo').expect(200);
     expect(r.body.versao).toBe(c.versao);
-    expect(r.body.dados.missoes).toHaveLength(18);
-    expect(r.body.dados.faixas).toHaveLength(8);
+    // Deriva do conteúdo publicado (fonte única), para não quebrar ao adicionar missões/faixas.
+    expect(r.body.dados.missoes).toHaveLength(c.dados.missoes.length);
+    expect(r.body.dados.missoes.length).toBeGreaterThanOrEqual(18);
+    expect(r.body.dados.faixas).toHaveLength(c.dados.faixas.length);
+    expect(r.body.dados.faixas.length).toBeGreaterThanOrEqual(8);
     await request(app).get('/v1/conteudo').set('If-None-Match', r.headers.etag).expect(304);
   });
 });
