@@ -51,3 +51,14 @@ export function mascararData(texto: string): string {
   if (n.length <= 4) return `${n.slice(0, 2)}/${n.slice(2)}`;
   return `${n.slice(0, 2)}/${n.slice(2, 4)}/${n.slice(4)}`;
 }
+
+/** Data de nascimento guardada como ISO yyyy-mm-dd, lida no fuso local. */
+export function lerIso(iso: string): Date {
+  const [a, m, d] = iso.split('-').map(Number);
+  return new Date(a, m - 1, d);
+}
+
+/** Idade da triagem (corrigida quando for o caso) de uma criança cadastrada. */
+export function idadeDe(c: { nascimento: string; semanasGestacao: number | null }, hoje: Date = new Date()): number {
+  return idadeParaTriagem(lerIso(c.nascimento), hoje, c.semanasGestacao);
+}

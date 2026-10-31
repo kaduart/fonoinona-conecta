@@ -1,12 +1,12 @@
 import type { ReactNode } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Switch, TextInput, View, type TextInputProps, type ViewStyle } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Switch, TextInput, View, type StyleProp, type TextInputProps, type ViewStyle } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import { Texto } from '@/components/texto';
 import type { NivelResultado } from '@/domain/triagem';
 import { cores, fonte, raio, sombra } from '@/theme/tokens';
 
-export function Card({ children, style, elevado }: { children: ReactNode; style?: ViewStyle; elevado?: boolean }) {
+export function Card({ children, style, elevado }: { children: ReactNode; style?: StyleProp<ViewStyle>; elevado?: boolean }) {
   return <View style={[s.card, elevado && { boxShadow: sombra.elevada }, style]}>{children}</View>;
 }
 

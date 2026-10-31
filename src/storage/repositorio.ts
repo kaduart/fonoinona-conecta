@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import type { Conclusao } from '@/domain/missoes';
 import type { Resposta, Resultado } from '@/domain/triagem';
 
 // Sprint 1: tudo fica no aparelho via AsyncStorage.
@@ -33,6 +34,8 @@ const CHAVES = {
   criancas: 'conecta:criancas:v1',
   consentimento: 'conecta:consentimento:v1',
   triagens: 'conecta:triagens:v1',
+  conclusoes: 'conecta:conclusoes:v1',
+  atual: 'conecta:crianca-atual:v1',
 } as const;
 
 async function ler<T>(chave: string, padrao: T): Promise<T> {
@@ -79,6 +82,34 @@ export const repositorio = {
   async lerTriagem(id: string) {
     const todas = await ler<TriagemSalva[]>(CHAVES.triagens, []);
     return todas.find((t) => t.id === id) ?? null;
+  },
+
+  lerAtual: () => ler<string | null>(CHAVES.atual, null),
+  salvarAtual: (id: string) => gravar(CHAVES.atual, id),
+
+  listarConclusoes: async (criancaId: string) => {
+    const todas = await ler<Conclusao[]>(CHAVES.conclusoes, []);
+    return todas.filter((c) => c.criancaId === criancaId).sort((a, b) => b.em.localeCompare(a.em));
+  },
+
+  async salvarConclusao(c: Conclusao) {
+    const todas = await ler<Conclusao[]>(CHAVES.conclusoes, []);
+    // idempotente pelo id
+    await gravar(CHAVES.conclusoes, [...todas.filter((x) => x.id !== c.id), c]);
+  },
+
+  /** Remove uma criança e tudo dela (triagens e missões). */
+  async removerCrianca(id: string) {
+    const [criancas, triagens, conclusoes] = await Promise.all([
+      repositorio.listarCriancas(),
+      ler<TriagemSalva[]>(CHAVES.triagens, []),
+      ler<Conclusao[]>(CHAVES.conclusoes, []),
+    ]);
+    await Promise.all([
+      gravar(CHAVES.criancas, criancas.filter((c) => c.id !== id)),
+      gravar(CHAVES.triagens, triagens.filter((t) => t.criancaId !== id)),
+      gravar(CHAVES.conclusoes, conclusoes.filter((c) => c.criancaId !== id)),
+    ]);
   },
 
   /** Direito de exclusão (LGPD): apaga tudo do aparelho. */

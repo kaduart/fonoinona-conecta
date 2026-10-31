@@ -48,6 +48,6 @@ Prematuros (< 37 semanas) usam idade corrigida até 24 meses. A mensagem do What
 ## Roadmap
 
 1. **Sprint 1** — base, triagem por idade e resultado ✅
-2. **Sprint 2** — missões, histórico, várias crianças
+2. **Sprint 2** — missões, evolução, várias crianças ✅
 3. **Sprint 3** — backend (MongoDB Atlas) e armazenamento criptografado
 4. **Sprint 4** — beta nas lojas

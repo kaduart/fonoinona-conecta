@@ -4,6 +4,7 @@ import { Linking, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import { Medidor } from '@/components/medidor';
+import { irPara } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
 import { Botao, Card, Chip } from '@/components/ui';
@@ -55,7 +56,7 @@ export default function ResultadoTela() {
               </Svg>
             }
           />
-          <Botao variante="texto" titulo="Refazer triagem" onPress={() => router.replace('/triagem')} />
+          <Botao variante="texto" titulo="Ver minhas missões" onPress={() => irPara(router, '/inicio')} />
         </View>
       }
     >

@@ -20,16 +20,24 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [atualId, setAtualId] = useState<string | null>(null);
 
   const recarregar = useCallback(async () => {
-    const [lista, cons] = await Promise.all([repositorio.listarCriancas(), repositorio.lerConsentimento()]);
+    const [lista, cons, salvo] = await Promise.all([repositorio.listarCriancas(), repositorio.lerConsentimento(), repositorio.lerAtual()]);
     setCriancas(lista);
     setConsentimento(cons);
-    setAtualId((id) => (id && lista.some((c) => c.id === id) ? id : (lista.at(-1)?.id ?? null)));
+    setAtualId((id) => {
+      const preferido = id ?? salvo;
+      return preferido && lista.some((c) => c.id === preferido) ? preferido : (lista.at(-1)?.id ?? null);
+    });
     setCarregando(false);
   }, []);
 
   useEffect(() => {
     recarregar();
   }, [recarregar]);
+
+  const selecionar = useCallback((id: string) => {
+    setAtualId(id);
+    repositorio.salvarAtual(id).catch((e) => console.warn('[app] não salvou a criança atual', e));
+  }, []);
 
   const valor = useMemo<Estado>(
     () => ({
@@ -38,9 +46,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
       consentimento,
       criancaAtual: criancas.find((c) => c.id === atualId) ?? null,
       recarregar,
-      selecionar: setAtualId,
+      selecionar,
     }),
-    [carregando, criancas, consentimento, atualId, recarregar],
+    [carregando, criancas, consentimento, atualId, recarregar, selecionar],
   );
 
   return <Ctx.Provider value={valor}>{children}</Ctx.Provider>;

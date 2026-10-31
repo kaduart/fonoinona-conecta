@@ -1,13 +1,16 @@
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
 import Svg, { Circle, Path, Rect, Text as SvgText } from 'react-native-svg';
 
+import { irPara } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
-import { Botao, Campo, Interruptor, SetaDireita } from '@/components/ui';
+import { Botao, BotaoVoltar, Campo, Interruptor, SetaDireita } from '@/components/ui';
 import { idadeParaTriagem, lerData, mascararData } from '@/domain/idade';
 import { faixaPara } from '@/domain/triagem';
+import { useApp } from '@/state/app';
+import { novoId, repositorio } from '@/storage/repositorio';
 import { cores, fonte } from '@/theme/tokens';
 
 function Ilustracao() {
@@ -31,13 +34,17 @@ function Ilustracao() {
 
 export default function BoasVindas() {
   const router = useRouter();
+  const { nova } = useLocalSearchParams<{ nova?: string }>();
+  const { consentimento, selecionar, recarregar } = useApp();
+  const adicionando = nova === '1' && !!consentimento;
+  const [salvando, setSalvando] = useState(false);
   const [apelido, setApelido] = useState('');
   const [nascimento, setNascimento] = useState('');
   const [prematuro, setPrematuro] = useState(false);
   const [semanas, setSemanas] = useState('');
   const [erro, setErro] = useState<string | null>(null);
 
-  function continuar() {
+  async function continuar() {
     const nome = apelido.trim();
     const data = lerData(nascimento);
     const sem = prematuro ? Number(semanas) : null;
@@ -47,18 +54,41 @@ export default function BoasVindas() {
     if (!faixaPara(idadeParaTriagem(data, new Date(), sem))) return setErro('O app é para crianças de 0 a 6 anos.');
     setErro(null);
     const iso = `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, '0')}-${String(data.getDate()).padStart(2, '0')}`;
-    router.push({ pathname: '/consentimento', params: { apelido: nome, nascimento: iso, semanas: sem ? String(sem) : '' } });
+    if (!adicionando) {
+      router.push({ pathname: '/consentimento', params: { apelido: nome, nascimento: iso, semanas: sem ? String(sem) : '' } });
+      return;
+    }
+    // termo já aceito: a nova criança vai direto para a triagem
+    setSalvando(true);
+    try {
+      const id = novoId();
+      await repositorio.salvarCrianca({ id, apelido: nome, nascimento: iso, semanasGestacao: sem, criadaEm: new Date().toISOString() });
+      selecionar(id);
+      await recarregar();
+      irPara(router, '/triagem');
+    } catch (e) {
+      console.error('[boas-vindas] falha ao salvar criança', e);
+      setErro('Não conseguimos salvar. Tente de novo.');
+      setSalvando(false);
+    }
   }
 
   return (
-    <Tela rodape={<Botao titulo="Começar gratuitamente" onPress={continuar} icone={<SetaDireita />} />}>
+    <Tela
+      topo={adicionando ? <BotaoVoltar onPress={() => (router.canGoBack() ? router.back() : router.replace('/perfil'))} /> : undefined}
+      rodape={<Botao titulo={adicionando ? 'Adicionar e fazer a triagem' : 'Começar gratuitamente'} onPress={continuar} carregando={salvando} icone={<SetaDireita />} />}
+    >
       <View style={{ alignItems: 'center', marginTop: 8 }}>
         <Ilustracao />
       </View>
       <View style={{ gap: 10 }}>
-        <Texto variante="titulo">
-          Acompanhe cada <Texto variante="titulo" style={{ color: cores.marca }}>conquista</Texto> do seu filho.
-        </Texto>
+        {adicionando ? (
+          <Texto variante="titulo">Quem mais vamos acompanhar?</Texto>
+        ) : (
+          <Texto variante="titulo">
+            Acompanhe cada <Texto variante="titulo" style={{ color: cores.marca }}>conquista</Texto> do seu filho.
+          </Texto>
+        )}
         <Texto>Triagem do desenvolvimento e brincadeiras diárias criadas por fonoaudiólogas.</Texto>
       </View>
       <View style={{ gap: 10 }}>
