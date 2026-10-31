@@ -1,6 +1,6 @@
 import { MISSOES } from '@/content/missoes';
 import { FAIXAS } from '@/content/perguntas';
-import { areasComDificuldade, ponteProposito, diasSeguidos, missaoDoDia, missoesParaIdade, montarTrilha, semana, type Conclusao } from '@/domain/missoes';
+import { areasComDificuldade, faseConquistada, fasesDaTrilha, missaoDesbloqueada, ponteProposito, diasSeguidos, missaoDoDia, missoesParaIdade, montarTrilha, semana, type Conclusao } from '@/domain/missoes';
 
 let seq = 0;
 function feita(missaoId: string, em: string, como: Conclusao['como'] = 'facil'): Conclusao {
@@ -148,4 +148,33 @@ describe('ponteProposito', () => {
 
 it('toda missão tem o que observar', () => {
   for (const m of MISSOES) expect(m.observar).toBeTruthy();
+});
+
+describe('gamificação', () => {
+  const missoes = missoesParaIdade(30);
+
+  it('divide a trilha em fases de 4 com medalhas em ordem', () => {
+    const fases = fasesDaTrilha(montarTrilha(missoes, []));
+    expect(fases[0].itens).toHaveLength(4);
+    expect(fases[0].medalha.nome).toBe('Primeiros Passos');
+    expect(fases[1].medalha.tom).toBe('prata');
+    expect(fases.every((f) => !f.completa)).toBe(true);
+  });
+
+  it('a 4ª missão feita conquista a medalha da fase 1, e só uma vez', () => {
+    const tres = missoes.slice(0, 3).map((m, i) => feita(m.id, `2026-10-2${i}T10:00:00Z`));
+    const quatro = [...tres, feita(missoes[3].id, '2026-10-24T10:00:00Z')];
+    const antes = montarTrilha(missoes, tres);
+    const depois = montarTrilha(missoes, quatro);
+    expect(faseConquistada(antes, depois)?.numero).toBe(1);
+    const cinco = [...quatro, feita(missoes[0].id, '2026-10-25T10:00:00Z')];
+    expect(faseConquistada(depois, montarTrilha(missoes, cinco))).toBeNull();
+  });
+
+  it('aponta a missão que acabou de abrir', () => {
+    const antes = montarTrilha(missoes, []);
+    const depois = montarTrilha(missoes, [feita(missoes[0].id, '2026-10-20T10:00:00Z')]);
+    expect(missaoDesbloqueada(antes, depois)?.id).toBe(missoes[1].id);
+    expect(missaoDesbloqueada(depois, depois)).toBeNull();
+  });
 });

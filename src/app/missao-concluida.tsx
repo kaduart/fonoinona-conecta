@@ -9,7 +9,7 @@ import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
 import { Botao, Card } from '@/components/ui';
 import { MISSOES, ROTULO_COMO_FOI, type ComoFoi } from '@/content/missoes';
-import { diasSeguidos, missoesParaIdade, ponteProposito, semana, type Conclusao } from '@/domain/missoes';
+import { diasSeguidos, faseConquistada, missaoDesbloqueada, missoesParaIdade, montarTrilha, ponteProposito, semana, type Conclusao } from '@/domain/missoes';
 import { idadeDe } from '@/domain/idade';
 import { useApp } from '@/state/app';
 import { useDadosCrianca } from '@/state/dados';
@@ -37,7 +37,8 @@ export default function MissaoConcluida() {
   const naSemana = semana(todas, agora).filter((d) => d.feito).length;
   const seguidos = diasSeguidos(todas, agora);
   const ultima = dados?.triagens[0] ?? null;
-  const ponte = ponteProposito(missao, criancaAtual.apelido, missoesParaIdade(idadeDe(criancaAtual), ultima?.resultado.areaFoco), todas);
+  const missoesIdade = missoesParaIdade(idadeDe(criancaAtual), ultima?.resultado.areaFoco);
+  const ponte = ponteProposito(missao, criancaAtual.apelido, missoesIdade, todas);
 
   async function salvar() {
     if (!como) return;
@@ -45,7 +46,15 @@ export default function MissaoConcluida() {
     try {
       await repositorio.salvarConclusao({ ...nova, como });
       registrarEvento({ tipo: 'missao_concluida', missaoId: missao!.id, como });
-      irPara(router, '/inicio');
+      const antes = montarTrilha(missoesIdade, dados?.conclusoes ?? []);
+      const depois = montarTrilha(missoesIdade, [{ ...nova, como }, ...(dados?.conclusoes ?? [])]);
+      const fase = faseConquistada(antes, depois);
+      const aberta = missaoDesbloqueada(antes, depois);
+      const params = aberta ? { desbloqueou: aberta.id } : {};
+      if (fase) {
+        irPara(router, { pathname: '/conquista', params: { fase: String(fase.numero), ...params } });
+      } else if (aberta) irPara(router, { pathname: '/trilha', params });
+      else irPara(router, '/inicio');
     } catch (e) {
       console.error('[missao-concluida] falha ao salvar', e);
       setSalvando(false);
@@ -53,7 +62,7 @@ export default function MissaoConcluida() {
   }
 
   return (
-    <Tela rodape={<Botao titulo="Salvar e voltar ao início" onPress={salvar} desabilitado={!como} carregando={salvando} />}>
+    <Tela rodape={<Botao titulo="Salvar e continuar" onPress={salvar} desabilitado={!como} carregando={salvando} />}>
       <CelebracaoConquista tamanho={250} />
 
       <View style={{ alignItems: 'center', gap: 6 }}>
