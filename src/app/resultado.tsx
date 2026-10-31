@@ -2,11 +2,13 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Image } from 'expo-image';
 import { useEffect, useState } from 'react';
 import { Linking, Pressable, StyleSheet, View } from 'react-native';
+import Animated, { FadeInUp, useAnimatedStyle, useSharedValue, withTiming, ZoomIn, Easing } from 'react-native-reanimated';
 import Svg, { Defs, LinearGradient, Path, RadialGradient, Rect, Stop } from 'react-native-svg';
 
 import { registrarEvento, registrarLead } from '@/api/cliente';
 import { CelebracaoConquista } from '@/components/animacao';
 import { Medidor } from '@/components/medidor';
+import { useProgresso } from '@/components/progresso';
 import { irPara } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
@@ -74,8 +76,9 @@ function Check({ cor = cores.marca, tamanho = 12 }: { cor?: string; tamanho?: nu
   );
 }
 
-function CardFoco({ a }: { a: ResultadoArea }) {
+function CardFoco({ a, animar = false, atraso = 0 }: { a: ResultadoArea; animar?: boolean; atraso?: number }) {
   const falta = Math.max(0, 100 - a.pontuacao);
+  const barra = useProgresso(animar, 900, atraso);
   return (
     <View style={s.foco}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
@@ -90,7 +93,7 @@ function CardFoco({ a }: { a: ResultadoArea }) {
       </View>
       <View style={{ gap: 8 }}>
         <View style={s.trilho} accessibilityLabel={`${a.rotulo}: ${a.pontuacao}% desenvolvido, faltam ${falta}%`}>
-          <Svg width={`${Math.max(6, a.pontuacao)}%`} height={8}>
+          <Svg width={`${Math.max(6, a.pontuacao) * barra}%`} height={8}>
             <Defs>
               <LinearGradient id={`b-${a.area}`} x1="0" y1="0" x2="1" y2="0">
                 <Stop offset="0" stopColor="#FFB27A" />
@@ -147,12 +150,26 @@ export default function ResultadoTela() {
   const [triagem, setTriagem] = useState<TriagemSalva | null>(null);
   const [incluirResumo, setIncluirResumo] = useState(false);
   // Comemoração de ter feito a triagem (não do resultado): só ao chegar direto da triagem.
-  const [intro, setIntro] = useState(novo === '1');
+  const revelar = novo === '1';
+  const [intro, setIntro] = useState(revelar);
+  // A estrela "voa" para o arco do medidor e some; aí o resultado se revela.
+  const voo = useSharedValue(0);
+  const estiloVoo = useAnimatedStyle(() => ({
+    opacity: 1 - voo.value,
+    transform: [{ translateY: -330 * voo.value }, { scale: 1 - 0.85 * voo.value }],
+  }));
+  const estiloTextoVoo = useAnimatedStyle(() => ({ opacity: 1 - Math.min(1, voo.value * 2) }));
   useEffect(() => {
     if (!intro) return;
-    const t = setTimeout(() => setIntro(false), 2600);
-    return () => clearTimeout(t);
-  }, [intro]);
+    const t1 = setTimeout(() => {
+      voo.value = withTiming(1, { duration: 520, easing: Easing.in(Easing.cubic) });
+    }, 2100);
+    const t2 = setTimeout(() => setIntro(false), 2620);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, [intro, voo]);
 
   useEffect(() => {
     if (id) repositorio.lerTriagem(id).then(setTriagem);
@@ -163,11 +180,15 @@ export default function ResultadoTela() {
   if (intro) {
     return (
       <Pressable style={s.intro} onPress={() => setIntro(false)} accessibilityRole="button" accessibilityLabel="Ver resultado">
-        <CelebracaoConquista tamanho={280} />
-        <Texto style={{ fontFamily: fonte.extra, fontSize: 26, letterSpacing: -0.6, color: cores.texto, textAlign: 'center' }}>Triagem concluída!</Texto>
-        <Texto style={{ fontSize: 15, lineHeight: 22, color: cores.texto2, textAlign: 'center', maxWidth: 300 }}>
-          Obrigado por dedicar esse tempo a {criancaAtual.apelido}. Preparando o resultado…
-        </Texto>
+        <Animated.View style={estiloVoo}>
+          <CelebracaoConquista tamanho={280} />
+        </Animated.View>
+        <Animated.View style={[{ alignItems: 'center', gap: 10 }, estiloTextoVoo]}>
+          <Texto style={{ fontFamily: fonte.extra, fontSize: 26, letterSpacing: -0.6, color: cores.texto, textAlign: 'center' }}>Triagem concluída!</Texto>
+          <Texto style={{ fontSize: 15, lineHeight: 22, color: cores.texto2, textAlign: 'center', maxWidth: 300 }}>
+            Obrigado por dedicar esse tempo a {criancaAtual.apelido}. Preparando o resultado…
+          </Texto>
+        </Animated.View>
       </Pressable>
     );
   }
@@ -232,29 +253,33 @@ export default function ResultadoTela() {
         </View>
 
         <View style={{ marginTop: 22, alignItems: 'center' }}>
-          <Medidor nivel={resultado.nivel} noEsperado={habilidades.noEsperado} total={habilidades.total} escuro />
-          <View style={{ marginTop: 8 }}>
+          <Medidor nivel={resultado.nivel} noEsperado={habilidades.noEsperado} total={habilidades.total} escuro animar={revelar} atraso={150} />
+          <Animated.View style={{ marginTop: 8 }} entering={revelar ? ZoomIn.delay(1450).duration(350) : undefined}>
             <Badge nivel={resultado.nivel} escuro />
-          </View>
+          </Animated.View>
         </View>
 
-        <View style={s.escuroDivisor} />
-        <Texto style={{ fontFamily: fonte.extra, fontSize: 19, lineHeight: 24, letterSpacing: -0.4, color: '#fff' }}>{personalizar(chamada.titulo, vars)}</Texto>
-        <Texto style={{ fontSize: 13.5, lineHeight: 20, color: 'rgba(255,255,255,0.72)', marginTop: 6 }}>{personalizar(chamada.texto, vars)}</Texto>
+        <Animated.View entering={revelar ? FadeInUp.delay(1650).duration(450) : undefined}>
+          <View style={s.escuroDivisor} />
+          <Texto style={{ fontFamily: fonte.extra, fontSize: 19, lineHeight: 24, letterSpacing: -0.4, color: '#fff' }}>{personalizar(chamada.titulo, vars)}</Texto>
+          <Texto style={{ fontSize: 13.5, lineHeight: 20, color: 'rgba(255,255,255,0.72)', marginTop: 6 }}>{personalizar(chamada.texto, vars)}</Texto>
+        </Animated.View>
       </View>
 
       {/* 2. Pontos fortes */}
       {fortes.length ? (
         <View style={{ gap: 12 }}>
-          <Texto style={s.secao}>Pontos fortes</Texto>
+          <Animated.View entering={revelar ? FadeInUp.delay(1900).duration(400) : undefined}>
+            <Texto style={s.secao}>Pontos fortes</Texto>
+          </Animated.View>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-            {fortes.map((a) => (
-              <View key={a.area} style={s.selo}>
+            {fortes.map((a, i) => (
+              <Animated.View key={a.area} style={s.selo} entering={revelar ? ZoomIn.delay(2000 + i * 100).springify().damping(12) : undefined}>
                 <View style={s.seloCheck}>
                   <Check cor="#fff" tamanho={10} />
                 </View>
                 <Texto style={{ fontFamily: fonte.semi, fontSize: 13, color: cores.marca }}>{a.rotulo}</Texto>
-              </View>
+              </Animated.View>
             ))}
           </View>
         </View>
@@ -263,12 +288,14 @@ export default function ResultadoTela() {
       {/* 3. Onde focar agora */}
       {foco.length ? (
         <View style={{ gap: 12 }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
+          <Animated.View entering={revelar ? FadeInUp.delay(2300).duration(400) : undefined} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
             <Texto style={s.secao}>Onde focar agora</Texto>
             <Texto variante="legenda">{foco.length === 1 ? '1 habilidade' : `${foco.length} habilidades`}</Texto>
-          </View>
-          {foco.map((a) => (
-            <CardFoco key={a.area} a={a} />
+          </Animated.View>
+          {foco.map((a, i) => (
+            <Animated.View key={a.area} entering={revelar ? FadeInUp.delay(2450 + i * 150).duration(450) : undefined}>
+              <CardFoco a={a} animar={revelar} atraso={2700 + i * 150} />
+            </Animated.View>
           ))}
         </View>
       ) : null}
@@ -278,7 +305,7 @@ export default function ResultadoTela() {
       ) : null}
 
       {/* 4. Ponte para a clínica: quem responde e o que acontece ao tocar no botão */}
-      <View style={s.ponte}>
+      <Animated.View style={s.ponte} entering={revelar ? FadeInUp.delay(2800).duration(450) : undefined}>
         <Texto style={s.ponteRotulo}>{PONTE_CLINICA.rotulo.toUpperCase()}</Texto>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
           <View>
@@ -342,7 +369,7 @@ export default function ResultadoTela() {
             {incluirResumo ? PONTE_CLINICA.privacidadeComResumo : PONTE_CLINICA.privacidade}
           </Texto>
         </View>
-      </View>
+      </Animated.View>
 
       <Texto style={{ textAlign: 'center', fontSize: 11.5, lineHeight: 17, color: cores.texto2 }}>
         {AVISO_RESULTADO}
