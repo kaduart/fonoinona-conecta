@@ -6,8 +6,8 @@ const todas = (r: Resposta) => Object.fromEntries(faixa.perguntas.map((p) => [p.
 const semAlerta = { a1: false, a2: false };
 
 describe('banco de perguntas', () => {
-  it('cobre 0 a 72 meses sem buracos nem sobreposição', () => {
-    for (let m = 0; m < 72; m++) {
+  it('cobre 0 a 84 meses sem buracos nem sobreposição', () => {
+    for (let m = 0; m < 84; m++) {
       expect(FAIXAS.filter((f) => m >= f.minMeses && m < f.maxMeses)).toHaveLength(1);
     }
   });
@@ -23,8 +23,9 @@ describe('faixaPara', () => {
     expect(faixaPara(19)?.id).toBe('f18-23m');
     expect(faixaPara(0)?.id).toBe('f0-5m');
     expect(faixaPara(71)?.id).toBe('f5a');
+    expect(faixaPara(83)?.id).toBe('f5a');
   });
-  it('fora de 0–6 anos retorna null', () => expect(faixaPara(72)).toBeNull());
+  it('fora de 0–6 anos (84 meses pra cima) retorna null', () => expect(faixaPara(84)).toBeNull());
 });
 
 describe('avaliar', () => {

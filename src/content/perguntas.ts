@@ -166,9 +166,9 @@ export const FAIXAS: Faixa[] = [
   },
   {
     id: 'f5a',
-    rotulo: '5 anos',
+    rotulo: '5 a 6 anos',
     minMeses: 60,
-    maxMeses: 72,
+    maxMeses: 84,
     perguntas: [
       { id: 'f60-1', texto: '{nome} conta uma história, ouvida ou inventada, com pelo menos 2 acontecimentos?', area: 'narrativa', base: 'cdc' },
       { id: 'f60-2', texto: 'Depois de ouvir uma história, {nome} responde perguntas simples sobre ela?', area: 'compreensao', base: 'cdc' },
