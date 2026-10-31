@@ -11,10 +11,10 @@ describe('banco de perguntas', () => {
       expect(FAIXAS.filter((f) => m >= f.minMeses && m < f.maxMeses)).toHaveLength(1);
     }
   });
-  it('tem 6 perguntas com ids únicos por faixa', () => {
+  it('tem 8 perguntas com ids únicos por faixa', () => {
     const ids = FAIXAS.flatMap((f) => f.perguntas.map((p) => p.id));
     expect(new Set(ids).size).toBe(ids.length);
-    FAIXAS.forEach((f) => expect(f.perguntas).toHaveLength(6));
+    FAIXAS.forEach((f) => expect(f.perguntas).toHaveLength(8));
   });
 });
 
