@@ -57,7 +57,7 @@ export const CHAMADA_RESULTADO: Record<NivelResultado, { titulo: string; texto: 
 
 export const CTA_RESULTADO = {
   titulo: 'Agendar avaliação para {nome}',
-  apoio: 'Fale com a fono pelo WhatsApp, sem compromisso',
+  apoio: 'Fale com a fono pelo WhatsApp',
 };
 
 /** Horário em que a equipe responde no WhatsApp (seg–sex 8h–18h). Ajustar com a clínica. */

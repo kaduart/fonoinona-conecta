@@ -71,6 +71,12 @@ export function avaliar(faixa: Faixa, respostas: Record<string, Resposta>, alert
   return { nivel, areas, areaFoco, alertaMarcado };
 }
 
+/** Quantas habilidades (perguntas da faixa) estão no esperado. As perguntas de alerta não entram: são sim/não sobre sinais, não habilidades. */
+export function contarHabilidades(respostas: Record<string, Resposta>): { noEsperado: number; total: number } {
+  const valores = Object.values(respostas);
+  return { noEsperado: valores.filter((v) => v === 'sim').length, total: valores.length };
+}
+
 /** Troca {nome} pelo apelido da criança. */
 export function personalizar(texto: string, vars: Record<string, string>): string {
   return texto.replace(/\{(\w+)\}/g, (_, k: string) => vars[k] ?? `{${k}}`);

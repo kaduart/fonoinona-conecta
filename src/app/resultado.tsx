@@ -25,7 +25,7 @@ import {
 import { formatarDataCurta } from '@/domain/acompanhamento';
 import { codigoContato, linkWhatsApp } from '@/domain/contato';
 import { formatarIdade } from '@/domain/idade';
-import { personalizar, type NivelResultado, type ResultadoArea } from '@/domain/triagem';
+import { contarHabilidades, personalizar, type NivelResultado, type ResultadoArea } from '@/domain/triagem';
 import { useApp } from '@/state/app';
 import { repositorio, type TriagemSalva } from '@/storage/repositorio';
 import { cores, fonte, raio } from '@/theme/tokens';
@@ -171,6 +171,7 @@ export default function ResultadoTela() {
   const nome = criancaAtual.apelido;
   const foco = resultado.areas.filter((a) => a.nivel !== 'esperado');
   const fortes = resultado.areas.filter((a) => a.nivel === 'esperado');
+  const habilidades = contarHabilidades(triagem.respostas);
   const vars = { nome, faixa: faixa?.rotulo ?? '', areas: juntar(foco.map((a) => a.rotulo.toLowerCase())) };
   const chamada = CHAMADA_RESULTADO[resultado.nivel];
   const idade = formatarIdade(triagem.idadeMeses);
@@ -225,7 +226,7 @@ export default function ResultadoTela() {
         </View>
 
         <View style={{ marginTop: 22, alignItems: 'center' }}>
-          <Medidor nivel={resultado.nivel} noEsperado={fortes.length} total={resultado.areas.length} escuro />
+          <Medidor nivel={resultado.nivel} noEsperado={habilidades.noEsperado} total={habilidades.total} escuro />
           <View style={{ marginTop: 8 }}>
             <Badge nivel={resultado.nivel} escuro />
           </View>

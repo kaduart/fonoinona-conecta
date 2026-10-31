@@ -1,5 +1,5 @@
 import { FAIXAS } from '@/content/perguntas';
-import { avaliar, faixaPara, personalizar, type Resposta } from '@/domain/triagem';
+import { avaliar, contarHabilidades, faixaPara, personalizar, type Resposta } from '@/domain/triagem';
 
 const faixa = FAIXAS.find((f) => f.id === 'f18-23m')!;
 const todas = (r: Resposta) => Object.fromEntries(faixa.perguntas.map((p) => [p.id, r]));
@@ -61,4 +61,8 @@ it('personalizar troca variáveis conhecidas e mantém as outras', () => {
   expect(personalizar('{nome} tem {faixa} e {x}', { nome: 'Pedrinho', faixa: '18 a 23 meses' })).toBe(
     'Pedrinho tem 18 a 23 meses e {x}',
   );
+});
+
+it('contarHabilidades conta só as respostas "sim" das perguntas da faixa', () => {
+  expect(contarHabilidades({ a: 'sim', b: 'as_vezes', c: 'sim', d: 'ainda_nao', e: 'sim', f: 'sim' })).toEqual({ noEsperado: 4, total: 6 });
 });
