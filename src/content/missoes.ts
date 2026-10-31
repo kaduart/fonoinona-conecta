@@ -79,16 +79,16 @@ export const MISSOES: Missao[] = [
     areas: ['brincar'],
     idadeMinMeses: 12,
     duracao: '10 min',
-    material: 'Papelão ou jornal, algodão, plástico-bolha e uma toalha felpuda.',
+    material: 'No quintal ou na praça: grama, terra, areia. Dentro de casa: papelão, algodão, plástico-bolha e uma toalha felpuda.',
     passos: [
-      'Em cima de um tapete, prenda com fita o plástico-bolha, o algodão e a toalha, em sequência.',
-      'Tire os sapatos da criança.',
-      'Caminhem devagar por cada textura, de mãos dadas.',
+      'Se puder, use o que já existe lá fora: grama, terra, areia. Em casa, prenda com fita o plástico-bolha, o algodão e a toalha em cima de um tapete.',
+      'Tire os sapatos da criança e deixe ela pisar descalça.',
+      'Deixe ela explorar no próprio ritmo, de mãos dadas no começo.',
       'Pare em cada uma e pergunte como é a sensação nos pés.',
     ],
     dica: 'Pergunte: "Está espetando, está macio ou está fazendo barulho?"',
     observar: 'Observe a reação em cada textura: alguma ela recusa ou tira o pé rápido? Respeite e passe para a próxima.',
-    seguranca: 'Prenda bem os materiais para não escorregar e segure a mão da criança o tempo todo. Só para quem já anda.',
+    seguranca: 'Antes, confira o chão: sem pedras, cacos, formigueiros ou fezes de animais. Em casa, prenda bem os materiais para não escorregar. Só para quem já anda.',
     quandoParar: PARAR_PADRAO,
   },
   {
@@ -109,7 +109,6 @@ export const MISSOES: Missao[] = [
     observar: 'Observe se ela consegue fazer a pinça (polegar e indicador). Se pegar com a mão toda, mostre o movimento devagar.',
     seguranca: 'Bolinhas de papel podem ir à boca: supervisão constante.',
     quandoParar: PARAR_PADRAO,
-    versaoMenores: { ateMeses: 36, texto: 'Até 3 anos, só rasgar e amassar bolas grandes de papel. A garrafa fica para depois dos 3.' },
   },
   {
     id: 'm05-espelho-caretas',
@@ -185,7 +184,7 @@ export const MISSOES: Missao[] = [
     ],
     dica: 'Fale frases um pouco maiores que as da criança. Se ela diz "bola", você diz "bola grande!".',
     observar: 'Observe se ela mantém o olhar na caixa e tenta falar, apontar ou gesticular quando você pergunta "O que será?".',
-    seguranca: 'Só objetos maiores que um rolo de papel higiênico, sem peças soltas.',
+    seguranca: 'Só objetos grandes, sem peças soltas.',
     quandoParar: PARAR_PADRAO,
   },
   {
