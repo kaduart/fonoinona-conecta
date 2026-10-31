@@ -10,6 +10,7 @@ import { MISSOES, ROTULO_COMO_FOI } from '@/content/missoes';
 import { FAIXAS, ROTULO_AREA } from '@/content/perguntas';
 import { TEXTOS_RESULTADO } from '@/content/resultados';
 import { formatarDataCurta, proximaTriagem } from '@/domain/acompanhamento';
+import { diasSeguidos } from '@/domain/missoes';
 import type { NivelResultado } from '@/domain/triagem';
 import { useApp } from '@/state/app';
 import { useDadosCrianca } from '@/state/dados';
@@ -17,8 +18,13 @@ import type { TriagemSalva } from '@/storage/repositorio';
 import { cores, fonte, raio } from '@/theme/tokens';
 
 const ALTURA: Record<NivelResultado, number> = { avaliar: 0, observar: 1, esperado: 2 };
-const COR: Record<NivelResultado, string> = { avaliar: cores.avaliar, observar: '#FFB547', esperado: cores.esperado };
+const COR: Record<NivelResultado, string> = { avaliar: cores.terra, observar: cores.sol, esperado: cores.esperado };
 const ROTULO_EIXO: Record<NivelResultado, string> = { esperado: 'Esperado', observar: 'Observar', avaliar: 'Avaliar' };
+const TOM_AREA: Record<NivelResultado, { rotulo: string; cor: string; texto: string }> = {
+  esperado: { rotulo: 'Esperado', cor: cores.esperado, texto: cores.marca },
+  observar: { rotulo: 'Estimular', cor: cores.sol, texto: cores.observarTexto },
+  avaliar: { rotulo: 'Atenção', cor: cores.terra, texto: cores.avaliarTexto },
+};
 const MESES = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
 
 function Grafico({ triagens }: { triagens: TriagemSalva[] }) {
@@ -39,7 +45,8 @@ function Grafico({ triagens }: { triagens: TriagemSalva[] }) {
           </SvgText>
         </G>
       ))}
-      <Path d={d} stroke={cores.marca} strokeWidth={2.5} fill="none" strokeLinejoin="round" />
+      {pontos.length > 1 ? <Path d={`${d} L${x(pontos.length - 1)} 112 L${x(0)} 112 Z`} fill={cores.marca} fillOpacity={0.08} /> : null}
+      <Path d={d} stroke={cores.marca} strokeWidth={3} fill="none" strokeLinejoin="round" strokeLinecap="round" />
       {pontos.map((p, i) => {
         const data = new Date(p.criadaEm);
         return (
@@ -55,6 +62,15 @@ function Grafico({ triagens }: { triagens: TriagemSalva[] }) {
   );
 }
 
+function Numero({ valor, rotulo, cor }: { valor: number; rotulo: string; cor: string }) {
+  return (
+    <Card style={{ flex: 1, padding: 14, gap: 2, borderRadius: raio.lg }}>
+      <Texto style={{ fontFamily: fonte.extra, fontSize: 24, color: cor }}>{valor}</Texto>
+      <Texto variante="legenda">{rotulo}</Texto>
+    </Card>
+  );
+}
+
 export default function Historico() {
   const router = useRouter();
   const { criancaAtual } = useApp();
@@ -67,19 +83,24 @@ export default function Historico() {
   const proxima = proximaTriagem(criancaAtual, triagens[0] ?? null);
   const melhorou = triagens.length >= 2 && ALTURA[triagens[0].resultado.nivel] > ALTURA[triagens[1].resultado.nivel];
 
+  const ultima = triagens[0];
+  const seguidos = diasSeguidos(conclusoes, new Date());
+  const missoesDiferentes = new Set(conclusoes.map((c) => c.missaoId)).size;
+  const areas = ultima ? [...ultima.resultado.areas].sort((a, b) => b.pontuacao - a.pontuacao) : [];
+
   return (
     <Tela rodape={<BarraInferior />}>
-      <View style={{ gap: 4, marginTop: 4 }}>
-        <Texto variante="titulo">Evolução</Texto>
-        <Texto>Triagens e missões de {nome}.</Texto>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
+        <Texto variante="titulo" style={{ color: cores.marcaEscura }}>
+          Evolução
+        </Texto>
+        {melhorou ? <Chip texto="↑ Melhorou" /> : null}
       </View>
 
-      {triagens.length ? (
-        <Card style={{ padding: 18, gap: 8 }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Texto variante="rotulo">Triagens</Texto>
-            {melhorou ? <Chip texto="Melhorou" /> : null}
-          </View>
+      {ultima ? (
+        <Card style={{ padding: 16, paddingBottom: 10, gap: 6 }}>
+          <Texto variante="legenda">Última triagem · {formatarDataCurta(new Date(ultima.criadaEm))}</Texto>
+          <Texto style={{ fontFamily: fonte.extra, fontSize: 19, lineHeight: 24, color: cores.texto }}>{TEXTOS_RESULTADO[ultima.resultado.nivel].rotulo}</Texto>
           <Grafico triagens={triagens} />
         </Card>
       ) : (
@@ -89,6 +110,36 @@ export default function Historico() {
         </Card>
       )}
 
+      {areas.length ? (
+        <Card style={{ padding: 16, gap: 12 }}>
+          <Texto variante="rotulo" style={{ fontSize: 14 }}>
+            Por habilidade
+          </Texto>
+          {areas.map((a) => (
+            <View key={a.area} style={{ gap: 6 }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <Texto style={{ fontFamily: fonte.semi, fontSize: 13, color: cores.texto }}>{a.rotulo}</Texto>
+                <Texto style={{ fontFamily: fonte.semi, fontSize: 13, color: TOM_AREA[a.nivel].texto }}>{TOM_AREA[a.nivel].rotulo}</Texto>
+              </View>
+              <View style={s.barra}>
+                <View style={[s.barraCheia, { width: `${Math.max(8, a.pontuacao)}%`, backgroundColor: TOM_AREA[a.nivel].cor }]} />
+              </View>
+            </View>
+          ))}
+        </Card>
+      ) : null}
+
+      <View style={{ flexDirection: 'row', gap: 10 }}>
+        <Numero valor={conclusoes.length} rotulo={conclusoes.length === 1 ? 'missão feita' : 'missões feitas'} cor={cores.marca} />
+        <Numero valor={seguidos} rotulo={seguidos === 1 ? 'dia seguido' : 'dias seguidos'} cor={cores.terra} />
+        <Numero valor={missoesDiferentes} rotulo={missoesDiferentes === 1 ? 'missão diferente' : 'missões diferentes'} cor="#C98A12" />
+      </View>
+
+      {triagens.length ? (
+        <Texto variante="rotulo" style={{ fontSize: 16, marginTop: 6 }}>
+          Triagens
+        </Texto>
+      ) : null}
       <View style={{ gap: 10 }}>
         {triagens.map((t, i) => {
           const faixa = FAIXAS.find((f) => f.id === t.faixaId);
@@ -151,8 +202,10 @@ export default function Historico() {
 }
 
 const s = StyleSheet.create({
-  marco: { width: 16, height: 16, borderRadius: 8, borderWidth: 2, borderColor: '#CBD2DC', backgroundColor: '#fff', marginTop: 16 },
-  trilho: { flex: 1, width: 2, backgroundColor: '#E4E8EE', marginTop: 4, marginBottom: -14 },
+  marco: { width: 16, height: 16, borderRadius: 8, borderWidth: 2, borderColor: '#DCD5C6', backgroundColor: '#fff', marginTop: 16 },
+  trilho: { flex: 1, width: 2, backgroundColor: cores.fundo2, marginTop: 4, marginBottom: -14 },
   proxima: { padding: 14, flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: raio.lg, backgroundColor: cores.marcaSuave, boxShadow: 'none' },
+  barra: { height: 9, borderRadius: 5, backgroundColor: cores.fundo2, overflow: 'hidden' },
+  barraCheia: { height: '100%', borderRadius: 5 },
   conclusao: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 6 },
 });

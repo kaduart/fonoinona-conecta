@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { Linking, StyleSheet, View } from 'react-native';
+import { Image, Linking, StyleSheet, View } from 'react-native';
 
 import { registrarEvento } from '@/api/cliente';
 import { Icone } from '@/components/navegacao';
@@ -38,7 +38,7 @@ export default function Sobre() {
     <Tela
       topo={
         <>
-          <BotaoVoltar onPress={() => (router.canGoBack() ? router.back() : router.replace('/perfil'))} />
+          <BotaoVoltar onPress={() => (router.canGoBack() ? router.back() : router.replace('/equipe'))} />
           <Texto variante="rotulo" style={{ fontSize: 17 }}>
             Sobre o app
           </Texto>
@@ -56,9 +56,7 @@ export default function Sobre() {
       }
     >
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
-        <View style={s.logo}>
-          <Icone nome="estrela" cor="#fff" tamanho={26} />
-        </View>
+        <Image source={require('../../assets/images/marca.png')} style={{ width: 56, height: 56 }} resizeMode="contain" />
         <View>
           <Texto variante="subtitulo">FonoInova Conecta</Texto>
           <Texto variante="legenda">Clínica Fono Inova · Anápolis, GO · v1.0</Texto>
@@ -94,6 +92,5 @@ export default function Sobre() {
 }
 
 const s = StyleSheet.create({
-  logo: { width: 56, height: 56, borderRadius: raio.md, backgroundColor: cores.marca, alignItems: 'center', justifyContent: 'center' },
   iniciais: { width: 48, height: 48, borderRadius: 14, backgroundColor: cores.marcaSuave, alignItems: 'center', justifyContent: 'center' },
 });

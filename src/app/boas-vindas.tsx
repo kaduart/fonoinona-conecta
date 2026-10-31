@@ -1,36 +1,17 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { View } from 'react-native';
-import Svg, { Circle, Path, Rect, Text as SvgText } from 'react-native-svg';
+import { Image, View } from 'react-native';
 
-import { irPara } from '@/components/navegacao';
+import { irPara, Marca } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
 import { Botao, BotaoVoltar, Campo, Interruptor, SetaDireita } from '@/components/ui';
+import { ILUSTRACOES } from '@/content/ilustracoes';
 import { idadeParaTriagem, lerData, mascararData } from '@/domain/idade';
 import { faixaPara } from '@/domain/triagem';
 import { useApp } from '@/state/app';
 import { novoId, repositorio } from '@/storage/repositorio';
 import { cores, fonte } from '@/theme/tokens';
-
-function Ilustracao() {
-  return (
-    <Svg width={240} height={200} viewBox="0 0 240 230" accessibilityLabel="Ilustração de um adulto e uma criança conversando">
-      <Circle cx={120} cy={110} r={108} fill="#FFFFFF" opacity={0.6} />
-      <Circle cx={82} cy={92} r={22} fill="#fff" stroke={cores.marca} strokeWidth={2.4} />
-      <Path d="M44 200 C44 150 58 124 82 124 C106 124 120 150 120 200" fill="#fff" stroke={cores.marca} strokeWidth={2.4} strokeLinecap="round" />
-      <Circle cx={166} cy={134} r={16} fill="#fff" stroke={cores.marcaMedia} strokeWidth={2.4} />
-      <Path d="M138 200 C138 176 150 160 166 160 C182 160 194 176 194 200" fill="#fff" stroke={cores.marcaMedia} strokeWidth={2.4} strokeLinecap="round" />
-      <Path d="M114 160 C126 170 136 172 146 170" stroke={cores.marca} strokeWidth={2.4} strokeLinecap="round" fill="none" />
-      <Path d="M30 200 H210" stroke={cores.marca} strokeWidth={2} opacity={0.4} />
-      <Rect x={104} y={38} width={76} height={34} rx={17} fill={cores.marca} />
-      <Path d="M128 70 l-6 10 12 -8z" fill={cores.marca} />
-      <SvgText x={142} y={60} textAnchor="middle" fontSize={14} fontWeight="700" fill="#fff">
-        ma-mã!
-      </SvgText>
-    </Svg>
-  );
-}
 
 export default function BoasVindas() {
   const router = useRouter();
@@ -78,8 +59,9 @@ export default function BoasVindas() {
       topo={adicionando ? <BotaoVoltar onPress={() => (router.canGoBack() ? router.back() : router.replace('/perfil'))} /> : undefined}
       rodape={<Botao titulo={adicionando ? 'Adicionar e fazer a triagem' : 'Começar gratuitamente'} onPress={continuar} carregando={salvando} icone={<SetaDireita />} />}
     >
-      <View style={{ alignItems: 'center', marginTop: 8 }}>
-        <Ilustracao />
+      {adicionando ? null : <Marca />}
+      <View style={{ borderRadius: 28, overflow: 'hidden', backgroundColor: cores.ilustracao }}>
+        <Image source={ILUSTRACOES.ler} style={{ width: '100%', aspectRatio: 320 / 234 }} resizeMode="cover" accessibilityLabel="Mãe lendo um livro com o filho" />
       </View>
       <View style={{ gap: 10 }}>
         {adicionando ? (

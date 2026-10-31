@@ -2,10 +2,10 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { Avatar, BarraInferior, Icone, ItemLista, irPara } from '@/components/navegacao';
+import { Avatar, Icone, ItemLista, irPara } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
-import { Botao, Card, Chip } from '@/components/ui';
+import { Botao, BotaoVoltar, Card, Chip } from '@/components/ui';
 import { TEXTOS_RESULTADO } from '@/content/resultados';
 import { formatarIdade, idadeDe } from '@/domain/idade';
 import { useApp } from '@/state/app';
@@ -56,11 +56,19 @@ export default function Perfil() {
   }
 
   return (
-    <Tela rodape={<BarraInferior />}>
-      <View style={{ gap: 4, marginTop: 4 }}>
-        <Texto variante="titulo">Perfil</Texto>
-        <Texto>Família de {familia}</Texto>
-      </View>
+    <Tela
+      topo={
+        <>
+          <BotaoVoltar onPress={() => (router.canGoBack() ? router.back() : irPara(router, '/inicio'))} />
+          <View>
+            <Texto variante="rotulo" style={{ fontSize: 17 }}>
+              Crianças e privacidade
+            </Texto>
+            <Texto variante="legenda">Família de {familia}</Texto>
+          </View>
+        </>
+      }
+    >
 
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
         <Texto variante="rotulo">Crianças</Texto>

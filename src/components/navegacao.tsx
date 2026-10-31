@@ -1,12 +1,12 @@
 import { usePathname, useRouter, type Href } from 'expo-router';
 import type { ReactNode } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Image, Pressable, StyleSheet, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 
 import { Texto } from '@/components/texto';
 import { cores, fonte, raio, sombra } from '@/theme/tokens';
 
-type NomeIcone = 'casa' | 'grafico' | 'pessoa' | 'seta' | 'cadeado' | 'check' | 'mais' | 'escudo' | 'info' | 'relogio' | 'chat' | 'lixo' | 'livro' | 'estrela' | 'fogo';
+type NomeIcone = 'casa' | 'grafico' | 'pessoa' | 'seta' | 'cadeado' | 'check' | 'mais' | 'escudo' | 'info' | 'relogio' | 'chat' | 'lixo' | 'livro' | 'estrela' | 'fogo' | 'equipe' | 'play' | 'cronometro' | 'baixo';
 
 const TRACOS: Record<NomeIcone, ReactNode> = {
   casa: <Path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z" />,
@@ -44,11 +44,25 @@ const TRACOS: Record<NomeIcone, ReactNode> = {
   livro: <Path d="M5 4h10a4 4 0 0 1 4 4v12H9a4 4 0 0 1-4-4zM9 20a4 4 0 0 1 0-8h10" />,
   estrela: <Path d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8z" />,
   fogo: <Path d="M12 3c1 3 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5 0 2 1 3 2 3 0-3-1-5 1-8.5z" />,
+  equipe: (
+    <>
+      <Circle cx={9} cy={8} r={3.5} />
+      <Path d="M3 20c1-3.5 3.2-5 6-5s5 1.5 6 5M16 4.5a3.5 3.5 0 0 1 0 7M18 15c1.6.6 2.6 2.2 3 5" />
+    </>
+  ),
+  play: <Path d="M8 5.5v13l11-6.5z" />,
+  cronometro: (
+    <>
+      <Circle cx={12} cy={13} r={8} />
+      <Path d="M12 9v4l2.5 2M9 2h6" />
+    </>
+  ),
+  baixo: <Path d="M6 9l6 6 6-6" />,
 };
 
-export function Icone({ nome, cor = cores.texto, tamanho = 20, espessura = 2 }: { nome: NomeIcone; cor?: string; tamanho?: number; espessura?: number }) {
+export function Icone({ nome, cor = cores.texto, tamanho = 20, espessura = 2, cheio }: { nome: NomeIcone; cor?: string; tamanho?: number; espessura?: number; cheio?: boolean }) {
   return (
-    <Svg width={tamanho} height={tamanho} viewBox="0 0 24 24" fill="none" stroke={cor} strokeWidth={espessura} strokeLinecap="round" strokeLinejoin="round">
+    <Svg width={tamanho} height={tamanho} viewBox="0 0 24 24" fill={cheio ? cor : 'none'} stroke={cor} strokeWidth={espessura} strokeLinecap="round" strokeLinejoin="round">
       {TRACOS[nome]}
     </Svg>
   );
@@ -60,7 +74,7 @@ export function irPara(router: ReturnType<typeof useRouter>, href: Href) {
   router.replace(href);
 }
 
-const CORES_AVATAR = [cores.marca, '#F08A4B', '#5B7FD6', '#B5679E', '#2E9C87'];
+const CORES_AVATAR = [cores.marca, cores.terra, '#5B7FD6', '#B5679E', '#2E9C87'];
 
 export function Avatar({ nome, indice = 0, tamanho = 44 }: { nome: string; indice?: number; tamanho?: number }) {
   return (
@@ -90,9 +104,37 @@ export function ItemLista({ icone, titulo, descricao, onPress, cor = cores.marca
 
 const ABAS: { href: Href; rota: string; titulo: string; icone: NomeIcone }[] = [
   { href: '/inicio', rota: '/inicio', titulo: 'Início', icone: 'casa' },
+  { href: '/trilha', rota: '/trilha', titulo: 'Trilha', icone: 'estrela' },
   { href: '/historico', rota: '/historico', titulo: 'Evolução', icone: 'grafico' },
-  { href: '/perfil', rota: '/perfil', titulo: 'Perfil', icone: 'pessoa' },
+  { href: '/equipe', rota: '/equipe', titulo: 'Equipe', icone: 'equipe' },
 ];
+
+/** Marca da clínica + nome do app, no topo das telas principais. */
+export function Marca() {
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }} accessibilityLabel="Fono Inova Conecta">
+      <Image source={require('../../assets/images/marca.png')} style={{ width: 40, height: 40 }} resizeMode="contain" />
+      <View>
+        <Texto style={{ fontFamily: fonte.extra, fontSize: 14, lineHeight: 16, color: cores.marcaEscura }}>Fono Inova</Texto>
+        <Texto style={{ fontFamily: fonte.semi, fontSize: 11, lineHeight: 13, color: cores.texto3, letterSpacing: 0.6 }}>CONECTA</Texto>
+      </View>
+    </View>
+  );
+}
+
+/** Pílula com a criança atual; leva ao perfil para trocar ou adicionar. */
+export function SeletorCrianca({ nome, idade, indice = 0 }: { nome: string; idade: string; indice?: number }) {
+  const router = useRouter();
+  return (
+    <Pressable accessibilityRole="button" accessibilityLabel={`${nome}, ${idade}. Trocar criança`} onPress={() => router.push('/perfil')} style={({ pressed }) => [s.seletor, pressed && { opacity: 0.8 }]}>
+      <Avatar nome={nome} indice={indice} tamanho={30} />
+      <Texto style={{ fontFamily: fonte.semi, fontSize: 13, color: cores.texto }} numberOfLines={1}>
+        {nome} · {idade}
+      </Texto>
+      <Icone nome="baixo" cor={cores.texto2} tamanho={14} espessura={2.4} />
+    </Pressable>
+  );
+}
 
 /** Barra inferior flutuante das telas principais (vai no `rodape` da Tela). */
 export function BarraInferior() {
@@ -127,7 +169,8 @@ const s = StyleSheet.create({
   item: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingVertical: 14, paddingHorizontal: 16 },
   itemIcone: { width: 38, height: 38, borderRadius: raio.sm, alignItems: 'center', justifyContent: 'center' },
   barraFora: { marginHorizontal: -4 },
-  barra: { flexDirection: 'row', backgroundColor: cores.superficie, borderRadius: raio.xl, paddingVertical: 8, boxShadow: sombra.elevada },
+  barra: { flexDirection: 'row', backgroundColor: cores.superficie, borderRadius: 26, paddingVertical: 10, boxShadow: sombra.elevada },
+  seletor: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 5, paddingLeft: 5, paddingRight: 12, borderRadius: raio.pill, backgroundColor: cores.superficie, boxShadow: sombra.card, maxWidth: 210 },
   aba: { flex: 1, alignItems: 'center', gap: 3 },
-  abaIcone: { width: 44, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center' },
+  abaIcone: { width: 46, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center' },
 });

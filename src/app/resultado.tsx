@@ -60,7 +60,7 @@ export default function ResultadoTela() {
               </Svg>
             }
           />
-          <Botao variante="texto" titulo="Ver minhas missões" onPress={() => irPara(router, '/inicio')} />
+          <Botao variante="texto" titulo="Ver minhas missões" onPress={() => irPara(router, '/trilha')} />
         </View>
       }
     >

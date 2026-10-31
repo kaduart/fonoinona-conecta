@@ -105,7 +105,7 @@ export function Interruptor({ valor, onChange, titulo, descricao }: { valor: boo
         <Texto variante="rotulo">{titulo}</Texto>
         {descricao ? <Texto variante="legenda" style={{ color: cores.texto2, marginTop: 3 }}>{descricao}</Texto> : null}
       </View>
-      <Switch value={valor} onValueChange={onChange} trackColor={{ true: cores.marca, false: '#DDE2E9' }} thumbColor="#fff" />
+      <Switch value={valor} onValueChange={onChange} trackColor={{ true: cores.marca, false: '#DCD5C6' }} thumbColor="#fff" />
     </Pressable>
   );
 }
@@ -114,7 +114,7 @@ export function Segmentos({ total, atual }: { total: number; atual: number }) {
   return (
     <View style={{ flex: 1, flexDirection: 'row', gap: 4 }} accessibilityLabel={`Pergunta ${atual} de ${total}`}>
       {Array.from({ length: total }, (_, i) => (
-        <View key={i} style={{ flex: 1, height: 6, borderRadius: 3, backgroundColor: i < atual ? cores.marca : '#E4E8EE' }} />
+        <View key={i} style={{ flex: 1, height: 6, borderRadius: 3, backgroundColor: i < atual ? cores.marca : cores.fundo2 }} />
       ))}
     </View>
   );

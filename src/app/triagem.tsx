@@ -222,6 +222,6 @@ const s = StyleSheet.create({
   },
   opcaoMarcada: { borderColor: cores.marca, boxShadow: '0px 14px 30px rgba(31, 122, 107, 0.16)' },
   opcaoIcone: { width: 42, height: 42, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
-  radio: { width: 26, height: 26, borderRadius: 13, borderWidth: 2, borderColor: '#DDE2E9', alignItems: 'center', justifyContent: 'center' },
+  radio: { width: 26, height: 26, borderRadius: 13, borderWidth: 2, borderColor: '#DCD5C6', alignItems: 'center', justifyContent: 'center' },
   radioMarcado: { backgroundColor: cores.marca, borderColor: cores.marca },
 });
