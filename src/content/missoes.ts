@@ -398,6 +398,7 @@ export const MISSOES: Missao[] = [
       'Desafio: ela escolhe uma palavra e você adivinha quantas palmas tem.',
     ],
     dica: 'Comece com palavras de 2 pedacinhos e só depois passe para as maiores. Contar os pedacinhos prepara para ler e escrever.',
+    observar: 'Observe se ela bate as palmas no ritmo dos pedacinhos ou bate sem parar. Se errar, faça junto, segurando as mãos dela.',
     quandoParar: PARAR_PADRAO,
   },
   {
@@ -416,6 +417,7 @@ export const MISSOES: Missao[] = [
       'Peça o final: "E como terminou?". Depois recontem a história inteira juntos.',
     ],
     dica: 'Ajude com palavras de ligação: "e aí", "depois", "então", "no final". Elas organizam a fala e o pensamento.',
+    observar: 'Observe se a história tem começo, meio e fim e se ela usa "e aí" ou "depois" para ligar as partes.',
     quandoParar: PARAR_PADRAO,
   },
   {
@@ -434,6 +436,7 @@ export const MISSOES: Missao[] = [
       'No final, imitem o som de um motor vibrando os lábios: "brrrrr".',
     ],
     dica: 'Peça sopro fraquinho para a bolinha andar devagar e sopro forte para ela correr. Controlar o ar ajuda nos sons mais difíceis da fala.',
+    observar: 'Observe se ela consegue soprar só pela boca, com os lábios em bico, e controlar o sopro fraco e o forte.',
     seguranca: 'Só soprar, nunca puxar o ar pelo canudo. Bolinhas grandes, que não cabem na boca. Pare se a criança ficar tonta.',
     quandoParar: PARAR_PADRAO,
   },
@@ -453,6 +456,7 @@ export const MISSOES: Missao[] = [
       'Pergunte: "O que deixa você feliz?" e conversem sobre a resposta.',
     ],
     dica: 'Dê nome ao que ela sente no dia a dia: "Você ficou bravo porque acabou o desenho". Isso ajuda a falar em vez de chorar ou bater.',
+    observar: 'Observe se ela reconhece as emoções no seu rosto e consegue dizer o nome delas, não só imitar.',
     quandoParar: PARAR_PADRAO,
   },
   {
@@ -471,6 +475,7 @@ export const MISSOES: Missao[] = [
       'No final, cumprimentem-se, ganhando ou perdendo.',
     ],
     dica: 'Esperar a vez e seguir uma regra combinada é treino de conversa: cada um fala e escuta na sua hora.',
+    observar: 'Observe se ela espera a vez e aceita a regra combinada. Frustração ao perder é normal; veja se ela se acalma com a sua ajuda.',
     seguranca: 'Dado e tampinhas são pequenos: guarde depois e não deixe com irmãos menores de 3 anos.',
     quandoParar: 'Se a criança se frustrar muito ao perder, pare, acolha e jogue outro dia em dupla com você contra o papai ou a mamãe.',
   },
@@ -490,6 +495,7 @@ export const MISSOES: Missao[] = [
       'Se ela travar, ajude: "Qual a cor? Pra que serve? Onde fica?".',
     ],
     dica: 'Dar pistas faz a criança descrever forma, cor e uso, que é como o vocabulário cresce.',
+    observar: 'Observe se ela entende as pistas e se, na vez dela, consegue dar mais de uma pista (cor, forma, para que serve).',
     quandoParar: PARAR_PADRAO,
   },
   {
@@ -508,6 +514,7 @@ export const MISSOES: Missao[] = [
       'O último fala em voz alta e todos conferem se o recado chegou igual.',
     ],
     dica: 'Se o recado mudar, não corrija com bronca: repita devagar e brinque de "o recado se perdeu no caminho".',
+    observar: 'Observe se ela repete o recado inteiro e se os outros entendem o que ela falou sem precisar repetir.',
     quandoParar: PARAR_PADRAO,
   },
   {
@@ -526,6 +533,7 @@ export const MISSOES: Missao[] = [
       'Troquem o som: "/m/, de mamãe".',
     ],
     dica: 'Fale o som, não o nome da letra: "/b/", e não "bê". É assim que a criança liga o som à escrita.',
+    observar: 'Observe se ela acha objetos que começam com o som certo. Se trouxer pelo nome da letra ("bê"), repita o som "/b/" com ela.',
     quandoParar: PARAR_PADRAO,
   },
 ];
