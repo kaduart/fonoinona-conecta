@@ -33,3 +33,18 @@ export const NovoLead = z.object({
   faixaId: FaixaId.optional(),
 });
 export type NovoLead = z.infer<typeof NovoLead>;
+
+// --- Pré-cadastro (lista de espera do site). ÚNICO contrato que recebe dado de contato,
+// com consentimento explícito. Fica separado da telemetria do app, que segue sem PII. ---
+export const FaixaPreCadastro = z.enum(['gravidez', '0-12m', '1a', '2a', '3a', '4a', '5-6a']);
+
+export const PreCadastro = z.object({
+  nome: z.string().trim().min(2, 'nome muito curto').max(80),
+  // só dígitos; aceita DDD (10-11) com DDI opcional (até 13)
+  whatsapp: z.string().transform((v) => v.replace(/\D/g, '')).pipe(z.string().regex(/^\d{10,13}$/, 'whatsapp inválido')),
+  faixa: FaixaPreCadastro,
+  // o consentimento LGPD tem de ser marcado
+  consentimento: z.literal(true, { message: 'consentimento obrigatório' }),
+  origem: z.string().trim().max(40).optional(),
+});
+export type PreCadastro = z.infer<typeof PreCadastro>;

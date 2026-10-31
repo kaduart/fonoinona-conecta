@@ -1,8 +1,8 @@
 import mongoose, { Schema } from 'mongoose';
 
-import type { Evento, NovoLead } from './esquemas.js';
+import type { Evento, NovoLead, PreCadastro } from './esquemas.js';
 import { log } from './log.js';
-import type { Conteudo, Lead, Repos } from './repos.js';
+import type { Conteudo, Lead, PreCadastroSalvo, Repos } from './repos.js';
 
 const ConteudoModelo = mongoose.model(
   'Conteudo',
@@ -43,6 +43,22 @@ const LeadModelo = mongoose.model(
   ),
 );
 
+// Pré-cadastros do site (lista de espera). Guarda dado de contato com consentimento.
+const PreCadastroModelo = mongoose.model(
+  'PreCadastro',
+  new Schema(
+    {
+      nome: { type: String, required: true },
+      whatsapp: { type: String, required: true, unique: true },
+      faixa: { type: String, required: true },
+      origem: String,
+      consentimentoEm: { type: Date, required: true },
+      criadoEm: { type: Date, default: Date.now },
+    },
+    { collection: 'pre_cadastros', versionKey: false },
+  ),
+);
+
 function paraLead(d: { codigo: string; origem: string; faixaId?: string | null; vezes: number; criadoEm: Date }): Lead {
   return { codigo: d.codigo, origem: d.origem as Lead['origem'], faixaId: (d.faixaId ?? undefined) as Lead['faixaId'], vezes: d.vezes, criadoEm: d.criadoEm.toISOString() };
 }
@@ -51,7 +67,7 @@ export async function conectar(uri: string): Promise<void> {
   mongoose.connection.on('disconnected', () => log.warn('mongo desconectado'));
   mongoose.connection.on('reconnected', () => log.info('mongo reconectado'));
   await mongoose.connect(uri, { serverSelectionTimeoutMS: 10_000 });
-  await Promise.all([ConteudoModelo.syncIndexes(), EventoModelo.syncIndexes(), LeadModelo.syncIndexes()]);
+  await Promise.all([ConteudoModelo.syncIndexes(), EventoModelo.syncIndexes(), LeadModelo.syncIndexes(), PreCadastroModelo.syncIndexes()]);
   log.info('mongo conectado', { banco: mongoose.connection.name });
 }
 
@@ -95,6 +111,21 @@ export function reposMongo(): Repos {
       async buscar(codigo: string) {
         const d = await LeadModelo.findOne({ codigo }).lean();
         return d ? paraLead(d) : null;
+      },
+    },
+    preCadastros: {
+      async registrar(p: PreCadastro) {
+        const agora = new Date();
+        const r = await PreCadastroModelo.findOneAndUpdate(
+          { whatsapp: p.whatsapp },
+          { $setOnInsert: { nome: p.nome, faixa: p.faixa, origem: p.origem, consentimentoEm: agora, criadoEm: agora } },
+          { upsert: true, includeResultMetadata: true },
+        );
+        return { criado: !r.lastErrorObject?.updatedExisting };
+      },
+      async listar(limite: number): Promise<PreCadastroSalvo[]> {
+        const ds = await PreCadastroModelo.find().sort({ criadoEm: -1 }).limit(limite).lean();
+        return ds.map((d) => ({ nome: d.nome, whatsapp: d.whatsapp, faixa: d.faixa as PreCadastroSalvo['faixa'], origem: d.origem ?? undefined, criadoEm: d.criadoEm.toISOString() }));
       },
     },
     async saudavel() {
