@@ -15,3 +15,11 @@ it('linkWhatsApp não leva dado de saúde e inclui o código', () => {
   expect(texto).toContain('agendar uma avaliação');
   expect(texto).not.toMatch(/fala|imitação|ainda não/i);
 });
+
+test('sem número no build, usa o WhatsApp da clínica', () => {
+  const antes = process.env.EXPO_PUBLIC_WHATSAPP_CLINICA;
+  delete process.env.EXPO_PUBLIC_WHATSAPP_CLINICA;
+  const { linkWhatsApp, WHATSAPP_CLINICA_PADRAO } = jest.requireActual('../contato');
+  expect(linkWhatsApp('avaliar', '3 anos', 'CONECTA-AAAA').startsWith(`https://wa.me/${WHATSAPP_CLINICA_PADRAO}?text=`)).toBe(true);
+  process.env.EXPO_PUBLIC_WHATSAPP_CLINICA = antes;
+});
