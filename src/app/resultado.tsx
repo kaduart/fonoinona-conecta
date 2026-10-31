@@ -33,7 +33,6 @@ import { useApp } from '@/state/app';
 import { repositorio, type TriagemSalva } from '@/storage/repositorio';
 import { cores, fonte, raio } from '@/theme/tokens';
 
-const ESCURO = '#12232A';
 const MARCA = require('../../assets/images/marca.png');
 
 const BADGE: Record<NivelResultado, { fundo: string; borda: string; texto: string; ponto: string }> = {
@@ -223,12 +222,12 @@ export default function ResultadoTela() {
         </View>
       }
     >
-      {/* 1. Cabeçalho clínico escuro */}
+      {/* 1. Cabeçalho do resultado, claro */}
       <View style={s.escuro}>
         <Svg style={StyleSheet.absoluteFill} preserveAspectRatio="none" viewBox="0 0 100 100">
           <Defs>
             <RadialGradient id="luz1" cx="0.9" cy="0" r="0.75">
-              <Stop offset="0" stopColor="#2BB59A" stopOpacity={0.28} />
+              <Stop offset="0" stopColor="#2BB59A" stopOpacity={0.10} />
               <Stop offset="1" stopColor="#2BB59A" stopOpacity={0} />
             </RadialGradient>
           </Defs>
@@ -242,10 +241,10 @@ export default function ResultadoTela() {
             </View>
           </View>
           <View style={{ flex: 1 }}>
-            <Texto style={{ fontFamily: fonte.extra, fontSize: 17, letterSpacing: -0.3, color: '#fff' }}>
+            <Texto style={{ fontFamily: fonte.extra, fontSize: 17, letterSpacing: -0.3, color: cores.texto }}>
               {nome} • {idadeCurta}
             </Texto>
-            <Texto style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.6)' }}>Triagem de {formatarDataCurta(new Date(triagem.criadaEm))}</Texto>
+            <Texto style={{ fontSize: 12.5, color: cores.texto2 }}>Triagem de {formatarDataCurta(new Date(triagem.criadaEm))}</Texto>
           </View>
           <View style={s.logo}>
             <Image source={MARCA} style={{ width: 26, height: 26 }} contentFit="contain" />
@@ -253,16 +252,16 @@ export default function ResultadoTela() {
         </View>
 
         <View style={{ marginTop: 22, alignItems: 'center' }}>
-          <Medidor nivel={resultado.nivel} noEsperado={habilidades.noEsperado} total={habilidades.total} escuro animar={revelar} atraso={150} />
+          <Medidor nivel={resultado.nivel} noEsperado={habilidades.noEsperado} total={habilidades.total} animar={revelar} atraso={150} />
           <Animated.View style={{ marginTop: 8 }} entering={revelar ? ZoomIn.delay(1450).duration(350) : undefined}>
-            <Badge nivel={resultado.nivel} escuro />
+            <Badge nivel={resultado.nivel} />
           </Animated.View>
         </View>
 
         <Animated.View entering={revelar ? FadeInUp.delay(1650).duration(450) : undefined}>
           <View style={s.escuroDivisor} />
-          <Texto style={{ fontFamily: fonte.extra, fontSize: 19, lineHeight: 24, letterSpacing: -0.4, color: '#fff' }}>{personalizar(chamada.titulo, vars)}</Texto>
-          <Texto style={{ fontSize: 13.5, lineHeight: 20, color: 'rgba(255,255,255,0.72)', marginTop: 6 }}>{personalizar(chamada.texto, vars)}</Texto>
+          <Texto style={{ fontFamily: fonte.extra, fontSize: 19, lineHeight: 24, letterSpacing: -0.4, color: cores.texto }}>{personalizar(chamada.titulo, vars)}</Texto>
+          <Texto style={{ fontSize: 13.5, lineHeight: 20, color: cores.texto2, marginTop: 6 }}>{personalizar(chamada.texto, vars)}</Texto>
         </Animated.View>
       </View>
 
@@ -379,11 +378,11 @@ export default function ResultadoTela() {
 }
 
 const s = StyleSheet.create({
-  escuro: { backgroundColor: ESCURO, borderRadius: 28, padding: 22, overflow: 'hidden', boxShadow: '0px 20px 40px rgba(18, 35, 42, 0.28)' },
+  escuro: { backgroundColor: '#fff', borderRadius: 28, padding: 22, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(31,122,107,0.10)', boxShadow: '0px 14px 34px rgba(44, 62, 63, 0.07)' },
   avatarAnel: { width: 54, height: 54, borderRadius: 27, padding: 2, backgroundColor: 'rgba(95,195,168,0.55)' },
-  avatar: { flex: 1, borderRadius: 25, backgroundColor: '#1F7A6B', alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: ESCURO },
-  logo: { width: 40, height: 40, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.08)', alignItems: 'center', justifyContent: 'center' },
-  escuroDivisor: { height: 1, backgroundColor: 'rgba(255,255,255,0.08)', marginTop: 20, marginBottom: 16 },
+  avatar: { flex: 1, borderRadius: 25, backgroundColor: '#1F7A6B', alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#fff' },
+  logo: { width: 40, height: 40, borderRadius: 14, backgroundColor: cores.marcaSuave, alignItems: 'center', justifyContent: 'center' },
+  escuroDivisor: { height: 1, backgroundColor: cores.linha, marginTop: 20, marginBottom: 16 },
   badge: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 28, paddingHorizontal: 12, borderRadius: raio.pill, borderWidth: 1 },
   secao: { fontFamily: fonte.extra, fontSize: 17, letterSpacing: -0.3, color: cores.texto },
   selo: { flexDirection: 'row', alignItems: 'center', gap: 7, height: 34, paddingLeft: 7, paddingRight: 13, borderRadius: raio.pill, backgroundColor: '#fff', borderWidth: 1, borderColor: 'rgba(31,122,107,0.16)', boxShadow: '0px 6px 14px rgba(31, 122, 107, 0.08)' },
