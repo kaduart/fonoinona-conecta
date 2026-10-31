@@ -1,5 +1,6 @@
-// Teste de integração com MongoDB real (em memória). Roda no CI com TESTE_MONGO=1;
-// localmente precisa baixar o binário do Mongo na primeira vez.
+// Teste de integração com MongoDB real. Roda com TESTE_MONGO=1: no CI usa o serviço mongo (MONGO_URI_TESTE);
+// localmente, sem MONGO_URI_TESTE, sobe um Mongo em memória (baixa o binário na primeira vez).
+import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
@@ -7,12 +8,17 @@ import { montarConteudo } from '../scripts/conteudo.js';
 import { conectar, desconectar, reposMongo } from '../src/mongo.js';
 
 describe.skipIf(!process.env.TESTE_MONGO)('repositórios Mongo', () => {
-  let mongo: MongoMemoryServer;
+  let mongo: MongoMemoryServer | undefined;
   const repos = reposMongo();
 
   beforeAll(async () => {
-    mongo = await MongoMemoryServer.create();
-    await conectar(mongo.getUri('conecta'));
+    let uri = process.env.MONGO_URI_TESTE;
+    if (!uri) {
+      mongo = await MongoMemoryServer.create();
+      uri = mongo.getUri('conecta');
+    }
+    await conectar(uri);
+    await mongoose.connection.db?.dropDatabase();
   }, 120_000);
 
   afterAll(async () => {
