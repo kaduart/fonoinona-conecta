@@ -1,5 +1,5 @@
 import type { Area } from '@/content/perguntas';
-import { LIMITE_DIFICIL, MISSOES, type ComoFoi, type Missao } from '@/content/missoes';
+import { FRASE_AREA, LIMITE_DIFICIL, MISSOES, type ComoFoi, type Missao } from '@/content/missoes';
 
 export type Conclusao = {
   id: string;
@@ -75,4 +75,26 @@ export function areasComDificuldade(conclusoes: Conclusao[], catalogo: Missao[] 
     for (const a of porId.get(c.missaoId)?.areas ?? []) conta.set(a, (conta.get(a) ?? 0) + 1);
   }
   return [...conta].filter(([, n]) => n >= limite).map(([a]) => a);
+}
+
+/**
+ * Ponte de propósito: o feedback da missão concluída e o próximo passo da trilha.
+ * `conclusoes` já deve incluir a missão que acabou de ser feita.
+ */
+export function ponteProposito(
+  feita: Missao,
+  nome: string,
+  missoes: Missao[],
+  conclusoes: Conclusao[],
+): { feedback: string; proxima: Missao | null; motivo: string | null } {
+  const feedback = `Muito bem! Hoje ${nome} exercitou ${FRASE_AREA[feita.areas[0]]}.`;
+  const trilha = montarTrilha(missoes, conclusoes);
+  const pendente = trilha.find((t) => t.liberada && t.feitas === 0 && t.missao.id !== feita.id);
+  if (!pendente) return { feedback, proxima: null, motivo: null };
+  const proxima = pendente.missao;
+  const motivo =
+    proxima.areas[0] === feita.areas[0]
+      ? `Próximo passo: ${proxima.titulo}, para continuar com ${FRASE_AREA[proxima.areas[0]]}.`
+      : `Próximo passo: ${proxima.titulo}, para levar essa evolução para ${FRASE_AREA[proxima.areas[0]]}.`;
+  return { feedback, proxima, motivo };
 }

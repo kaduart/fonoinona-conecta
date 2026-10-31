@@ -4,12 +4,13 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { registrarEvento } from '@/api/cliente';
 import { CelebracaoConquista } from '@/components/animacao';
-import { irPara } from '@/components/navegacao';
+import { Icone, irPara } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
 import { Botao, Card } from '@/components/ui';
 import { MISSOES, ROTULO_COMO_FOI, type ComoFoi } from '@/content/missoes';
-import { diasSeguidos, semana, type Conclusao } from '@/domain/missoes';
+import { diasSeguidos, missoesParaIdade, ponteProposito, semana, type Conclusao } from '@/domain/missoes';
+import { idadeDe } from '@/domain/idade';
 import { useApp } from '@/state/app';
 import { useDadosCrianca } from '@/state/dados';
 import { novoId, repositorio } from '@/storage/repositorio';
@@ -35,6 +36,8 @@ export default function MissaoConcluida() {
   const todas = [nova, ...(dados?.conclusoes ?? []).filter((c) => c.id !== conclusaoId)];
   const naSemana = semana(todas, agora).filter((d) => d.feito).length;
   const seguidos = diasSeguidos(todas, agora);
+  const ultima = dados?.triagens[0] ?? null;
+  const ponte = ponteProposito(missao, criancaAtual.apelido, missoesParaIdade(idadeDe(criancaAtual), ultima?.resultado.areaFoco), todas);
 
   async function salvar() {
     if (!como) return;
@@ -60,6 +63,18 @@ export default function MissaoConcluida() {
         <Texto style={{ textAlign: 'center' }}>
           Você e {criancaAtual.apelido} completaram {missao.titulo}.
         </Texto>
+      </View>
+
+      <View style={s.ponte}>
+        <Texto style={{ fontFamily: fonte.extra, fontSize: 15, lineHeight: 21, color: cores.texto }}>🎉 {ponte.feedback}</Texto>
+        {ponte.motivo ? (
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <View style={s.ponteSeta}>
+              <Icone nome="seta" cor="#fff" tamanho={14} espessura={2.6} />
+            </View>
+            <Texto style={{ flex: 1, fontSize: 13.5, lineHeight: 19, color: cores.texto2 }}>{ponte.motivo}</Texto>
+          </View>
+        ) : null}
       </View>
 
       <View style={{ flexDirection: 'row', gap: 10 }}>
@@ -95,6 +110,8 @@ export default function MissaoConcluida() {
 }
 
 const s = StyleSheet.create({
+  ponte: { gap: 10, padding: 16, borderRadius: raio.lg, backgroundColor: cores.marcaSuave, borderWidth: 1, borderColor: 'rgba(31,122,107,0.15)' },
+  ponteSeta: { width: 26, height: 26, borderRadius: 13, backgroundColor: cores.marca, alignItems: 'center', justifyContent: 'center' },
   estatistica: { flex: 1, alignItems: 'center', paddingVertical: 14, borderRadius: raio.lg },
   opcoes: { flexDirection: 'row', gap: 10 },
   opcao: { flex: 1, height: 52, borderRadius: raio.pill, backgroundColor: cores.superficie, borderWidth: 1.5, borderColor: cores.linha, alignItems: 'center', justifyContent: 'center', boxShadow: sombra.card },
