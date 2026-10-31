@@ -1,40 +1,89 @@
+import { useEffect } from 'react';
 import { View } from 'react-native';
-import Svg, { Circle, Defs, LinearGradient, Path, RadialGradient, Stop } from 'react-native-svg';
+import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
+import Svg, { Circle, Defs, LinearGradient, Path, Stop } from 'react-native-svg';
 
+import { Texto } from '@/components/texto';
 import type { NivelResultado } from '@/domain/triagem';
-import { cores } from '@/theme/tokens';
+import { cores, fonte } from '@/theme/tokens';
 
-const POSICAO: Record<NivelResultado, number> = { avaliar: 0.15, observar: 0.5, esperado: 0.85 };
+const POSICAO: Record<NivelResultado, number> = { avaliar: 0.18, observar: 0.42, esperado: 0.86 };
 const COR: Record<NivelResultado, string> = { avaliar: cores.avaliar, observar: cores.observar, esperado: cores.esperado };
 
-/** Arco fino com gradiente contínuo (avaliar → observar → esperado) e marcador com brilho. */
-export function Medidor({ nivel }: { nivel: NivelResultado }) {
-  const r = 120;
-  const cx = 150;
-  const cy = 150;
+const L = 290;
+const A = 160;
+const R = 125;
+const CX = L / 2;
+const CY = 145;
+const ARCO = `M${CX - R} ${CY} A${R} ${R} 0 0 1 ${CX + R} ${CY}`;
+
+/**
+ * Arco ultrafino com gradiente contínuo e marcador que pulsa no ponto do resultado.
+ * O centro mostra quantas habilidades estão no esperado ("4 de 6").
+ */
+export function Medidor({ nivel, noEsperado, total }: { nivel: NivelResultado; noEsperado: number; total: number }) {
   const ang = Math.PI * (1 - POSICAO[nivel]);
-  const x = cx + r * Math.cos(ang);
-  const y = cy - r * Math.sin(ang);
+  const x = CX + R * Math.cos(ang);
+  const y = CY - R * Math.sin(ang);
+  const reduzir = useReducedMotion();
+  const pulso = useSharedValue(0);
+
+  useEffect(() => {
+    if (reduzir) return;
+    pulso.value = withRepeat(withTiming(1, { duration: 1600, easing: Easing.out(Easing.quad) }), -1, false);
+  }, [pulso, reduzir]);
+
+  const halo = useAnimatedStyle(() => ({
+    opacity: 0.45 * (1 - pulso.value),
+    transform: [{ scale: 0.6 + pulso.value * 1.1 }],
+  }));
+
   return (
-    <View accessible accessibilityLabel={`Indicador na faixa ${nivel}`} style={{ alignItems: 'center' }}>
-      <Svg width={300} height={170} viewBox="0 0 300 170">
+    <View
+      accessible
+      accessibilityLabel={`${noEsperado} de ${total} habilidades dentro do esperado`}
+      style={{ width: L, height: A, alignSelf: 'center' }}
+    >
+      <Svg width={L} height={A} viewBox={`0 -8 ${L} ${A}`} style={{ position: 'absolute' }}>
         <Defs>
-          <LinearGradient id="arco" x1="30" y1="0" x2="270" y2="0" gradientUnits="userSpaceOnUse">
-            <Stop offset="0" stopColor={cores.avaliar} />
-            <Stop offset="0.45" stopColor={cores.observar} />
-            <Stop offset="1" stopColor={cores.esperado} />
+          <LinearGradient id="arco" x1={CX - R} y1="0" x2={CX + R} y2="0" gradientUnits="userSpaceOnUse">
+            <Stop offset="0" stopColor="#FF8A7A" />
+            <Stop offset="0.45" stopColor="#F2B84B" />
+            <Stop offset="0.75" stopColor="#7FD3B0" />
+            <Stop offset="1" stopColor="#18B88F" />
           </LinearGradient>
-          <RadialGradient id="brilho">
-            <Stop offset="0" stopColor={COR[nivel]} stopOpacity={0.45} />
-            <Stop offset="1" stopColor={COR[nivel]} stopOpacity={0} />
-          </RadialGradient>
         </Defs>
-        <Path d="M30 150 A120 120 0 0 1 270 150" stroke={cores.linha} strokeWidth={10} strokeLinecap="round" fill="none" />
-        <Path d="M30 150 A120 120 0 0 1 270 150" stroke="url(#arco)" strokeWidth={6} strokeLinecap="round" fill="none" />
-        <Circle cx={x} cy={y} r={26} fill="url(#brilho)" />
-        <Circle cx={x} cy={y} r={11} fill="#fff" stroke={COR[nivel]} strokeWidth={4} />
-        <Circle cx={x} cy={y} r={3.5} fill={COR[nivel]} />
+        <Path d={ARCO} stroke="#EDF3F2" strokeWidth={5} strokeLinecap="round" fill="none" />
+        <Path d={ARCO} stroke="url(#arco)" strokeWidth={14} strokeLinecap="round" fill="none" opacity={0.1} />
+        <Path d={ARCO} stroke="url(#arco)" strokeWidth={5} strokeLinecap="round" fill="none" />
+        <Circle cx={x} cy={y} r={17} fill={COR[nivel]} opacity={0.2} />
       </Svg>
+      <Animated.View
+        pointerEvents="none"
+        style={[{ position: 'absolute', left: x - 24, top: y + 8 - 24, width: 48, height: 48, borderRadius: 24, backgroundColor: COR[nivel] }, halo]}
+      />
+      <View
+        style={{
+          position: 'absolute',
+          left: x - 10,
+          top: y + 8 - 10,
+          width: 20,
+          height: 20,
+          borderRadius: 10,
+          backgroundColor: '#fff',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0px 3px 6px rgba(154, 106, 11, 0.35)',
+        }}
+      >
+        <View style={{ width: 11, height: 11, borderRadius: 6, backgroundColor: COR[nivel] }} />
+      </View>
+      <View style={{ position: 'absolute', left: 0, right: 0, top: 78, alignItems: 'center' }}>
+        <Texto style={{ fontFamily: fonte.extra, fontSize: 34, lineHeight: 40, letterSpacing: -0.8, color: cores.texto }}>
+          {noEsperado} de {total}
+        </Texto>
+        <Texto variante="legenda">habilidades no esperado</Texto>
+      </View>
     </View>
   );
 }
