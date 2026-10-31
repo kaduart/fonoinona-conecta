@@ -17,7 +17,7 @@
     "android": {
       "package": "br.com.fonoinova.conecta",
       "adaptiveIcon": {
-        "backgroundColor": "#1F7A6B",
+        "backgroundColor": "#166854",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
