@@ -9,6 +9,10 @@ import { Botao, BotaoVoltar, Card, Chip } from '@/components/ui';
 import { IlustracaoViva } from '@/components/animacao';
 import { chaveDaArea, ilustracaoDaArea, PROPORCAO, videoDaArea } from '@/content/ilustracoes';
 import { MISSOES } from '@/content/missoes';
+import { RESPONSAVEL_TECNICA } from '@/content/resultados';
+
+/** Liga o selo "Revisado por Lorrany" quando a RT aprovar as dicas (doc de validação de 31/10). */
+const DICAS_REVISADAS = false;
 import { formatarIdade, idadeDe } from '@/domain/idade';
 import { useApp } from '@/state/app';
 import { cores, fonte, raio, sombra } from '@/theme/tokens';
@@ -61,6 +65,7 @@ export default function MissaoTela() {
   const { criancaAtual } = useApp();
   const missao = MISSOES.find((m) => m.id === id);
   const [feitos, setFeitos] = useState<Set<number>>(new Set());
+  const [dicaAberta, setDicaAberta] = useState(true);
 
   if (!missao || !criancaAtual) return <Redirect href="/inicio" />;
 
@@ -77,16 +82,11 @@ export default function MissaoTela() {
   return (
     <Tela
       rodape={
-        <View style={{ gap: 8 }}>
-          <Botao
-            titulo="Concluir missão"
-            icone={<Icone nome="check" cor="#fff" tamanho={18} espessura={2.6} />}
-            onPress={() => router.push({ pathname: '/missao-concluida', params: { id: missao.id } })}
-          />
-          <Texto variante="legenda" style={{ textAlign: 'center' }}>
-            Sempre com um adulto do lado. {missao.quandoParar}
-          </Texto>
-        </View>
+        <Botao
+          titulo="Missão cumprida"
+          icone={<Icone nome="check" cor="#fff" tamanho={18} espessura={2.6} />}
+          onPress={() => router.push({ pathname: '/missao-concluida', params: { id: missao.id } })}
+        />
       }
     >
       <View style={s.capa}>
@@ -148,12 +148,37 @@ export default function MissaoTela() {
         })}
       </Card>
 
-      <View style={[s.aviso, { backgroundColor: cores.solFundo, flexDirection: 'row', gap: 10 }]}>
-        <Texto style={{ fontSize: 18 }}>💡</Texto>
-        <Texto style={{ flex: 1, color: cores.texto, fontSize: 13.5, lineHeight: 20 }}>
-          <Texto style={{ fontFamily: fonte.negrito, color: cores.solTexto, fontSize: 13.5 }}>Dica Inova: </Texto>
-          {missao.dica}
-        </Texto>
+      <View style={s.dica}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityState={{ expanded: dicaAberta }}
+          onPress={() => setDicaAberta((v) => !v)}
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}
+        >
+          <View style={s.dicaIcone}>
+            <Texto style={{ fontSize: 16 }}>💡</Texto>
+          </View>
+          <View style={{ flex: 1 }}>
+            <Texto style={{ fontFamily: fonte.extra, fontSize: 15, color: cores.solTexto }}>Dica da Fono</Texto>
+            {DICAS_REVISADAS ? (
+              <Texto style={{ fontSize: 11.5, color: cores.texto2 }}>Revisado por {RESPONSAVEL_TECNICA.nome.split(' ')[0]} • {RESPONSAVEL_TECNICA.registro}</Texto>
+            ) : null}
+          </View>
+          <View style={{ transform: [{ rotate: dicaAberta ? '180deg' : '0deg' }] }}>
+            <Icone nome="baixo" cor={cores.solTexto} tamanho={18} espessura={2.4} />
+          </View>
+        </Pressable>
+        {dicaAberta ? (
+          <View style={{ gap: 12, marginTop: 12 }}>
+            <Texto style={{ color: cores.texto, fontSize: 13.5, lineHeight: 20 }}>{missao.dica}</Texto>
+            {missao.observar ? (
+              <View style={s.observar}>
+                <Texto style={{ fontFamily: fonte.negrito, fontSize: 12, letterSpacing: 0.4, color: cores.solTexto }}>O QUE OBSERVAR</Texto>
+                <Texto style={{ color: cores.texto, fontSize: 13.5, lineHeight: 20 }}>{missao.observar}</Texto>
+              </View>
+            ) : null}
+          </View>
+        ) : null}
       </View>
 
       {missao.seguranca ? (
@@ -164,6 +189,10 @@ export default function MissaoTela() {
           </Texto>
         </View>
       ) : null}
+
+      <Texto variante="legenda" style={{ textAlign: 'center', paddingHorizontal: 12 }}>
+        Sempre com um adulto do lado. {missao.quandoParar}
+      </Texto>
     </Tela>
   );
 }
@@ -178,4 +207,7 @@ const s = StyleSheet.create({
   passoLinha: { borderBottomWidth: 1, borderBottomColor: cores.linha },
   caixa: { width: 26, height: 26, borderRadius: 9, borderWidth: 2, borderColor: '#D3DEDD', alignItems: 'center', justifyContent: 'center', marginTop: -1 },
   aviso: { padding: 18, borderRadius: raio.lg },
+  dica: { padding: 16, borderRadius: raio.lg, backgroundColor: cores.solFundo, borderWidth: 1, borderColor: 'rgba(242,184,75,0.25)' },
+  dicaIcone: { width: 36, height: 36, borderRadius: 12, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' },
+  observar: { gap: 4, padding: 12, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.7)' },
 });

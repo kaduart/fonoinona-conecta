@@ -1,6 +1,6 @@
 import { MISSOES } from '@/content/missoes';
 import { FAIXAS } from '@/content/perguntas';
-import { areasComDificuldade, diasSeguidos, missaoDoDia, missoesParaIdade, montarTrilha, semana, type Conclusao } from '@/domain/missoes';
+import { areasComDificuldade, ponteProposito, diasSeguidos, missaoDoDia, missoesParaIdade, montarTrilha, semana, type Conclusao } from '@/domain/missoes';
 
 let seq = 0;
 function feita(missaoId: string, em: string, como: Conclusao['como'] = 'facil'): Conclusao {
@@ -9,10 +9,19 @@ function feita(missaoId: string, em: string, como: Conclusao['como'] = 'facil'):
 }
 
 describe('catálogo de missões', () => {
-  it('tem 18 missões com ids e ordens únicos', () => {
-    expect(MISSOES).toHaveLength(18);
-    expect(new Set(MISSOES.map((m) => m.id)).size).toBe(18);
-    expect(new Set(MISSOES.map((m) => m.ordem)).size).toBe(18);
+  it('tem 26 missões com ids e ordens únicos', () => {
+    expect(MISSOES).toHaveLength(26);
+    expect(new Set(MISSOES.map((m) => m.id)).size).toBe(26);
+    expect(new Set(MISSOES.map((m) => m.ordem)).size).toBe(26);
+  });
+
+  it('de 3 a 6 anos a trilha começa pelas missões da fase e esconde as de bebê', () => {
+    for (const meses of [36, 48, 60, 71]) {
+      const lista = missoesParaIdade(meses);
+      expect(lista.some((m) => m.id === 'm06-conversa-bebe')).toBe(false);
+      expect(lista[0].idadeMinMeses).toBeGreaterThanOrEqual(24);
+      expect(lista.filter((m) => m.idadeMinMeses >= 36).length).toBeGreaterThanOrEqual(meses >= 48 ? 10 : 5);
+    }
   });
 
   it('toda faixa de idade tem pelo menos uma missão', () => {
@@ -117,4 +126,26 @@ describe('areasComDificuldade', () => {
     const c = ['facil', 'com_ajuda', 'com_ajuda'].map((como, i) => feita('m02-bau-sons', `2026-10-0${i + 1}T10:00:00`, como as Conclusao['como']));
     expect(areasComDificuldade(c)).toEqual([]);
   });
+});
+
+describe('ponteProposito', () => {
+  it('elogia a área da missão feita e aponta a próxima liberada da trilha', () => {
+    const missoes = missoesParaIdade(30);
+    const primeira = missoes[0];
+    const r = ponteProposito(primeira, 'Pedro', missoes, [feita(primeira.id, '2026-10-31T10:00:00Z')]);
+    expect(r.feedback).toMatch(/^Muito bem! Hoje Pedro exercitou /);
+    expect(r.proxima?.id).toBe(missoes[1].id);
+    expect(r.motivo).toContain(missoes[1].titulo);
+  });
+
+  it('sem próxima pendente, não inventa próximo passo', () => {
+    const missoes = missoesParaIdade(3);
+    const r = ponteProposito(missoes[0], 'Ana', missoes, [feita(missoes[0].id, '2026-10-31T10:00:00Z')]);
+    expect(r.proxima).toBeNull();
+    expect(r.motivo).toBeNull();
+  });
+});
+
+it('toda missão tem o que observar', () => {
+  for (const m of MISSOES) expect(m.observar).toBeTruthy();
 });

@@ -1,5 +1,5 @@
 import type { Area } from '@/content/perguntas';
-import { LIMITE_DIFICIL, MISSOES, type ComoFoi, type Missao } from '@/content/missoes';
+import { FRASE_AREA, LIMITE_DIFICIL, MISSOES, type ComoFoi, type Missao } from '@/content/missoes';
 
 export type Conclusao = {
   id: string;
@@ -12,11 +12,15 @@ export type Conclusao = {
 
 export type ItemTrilha = { missao: Missao; liberada: boolean; feitas: number };
 
-/** Missões da idade, com a área de foco da triagem primeiro e depois a ordem base. */
+/**
+ * Missões da idade, com a área de foco da triagem primeiro.
+ * A partir de 3 anos, as missões feitas para a idade (de 2 anos para cima) vêm antes das de bebê.
+ */
 export function missoesParaIdade(meses: number, areaFoco?: Area | null, catalogo: Missao[] = MISSOES): Missao[] {
-  const daIdade = catalogo.filter((m) => m.idadeMinMeses <= meses);
+  const daIdade = catalogo.filter((m) => m.idadeMinMeses <= meses && (m.idadeMaxMeses === undefined || meses <= m.idadeMaxMeses));
   const peso = (m: Missao) => (areaFoco && m.areas.includes(areaFoco) ? 0 : 1);
-  return [...daIdade].sort((a, b) => peso(a) - peso(b) || a.ordem - b.ordem);
+  const daFase = (m: Missao) => (meses >= 36 && m.idadeMinMeses < 24 ? 1 : 0);
+  return [...daIdade].sort((a, b) => peso(a) - peso(b) || daFase(a) - daFase(b) || a.ordem - b.ordem);
 }
 
 /** Trilha sequencial: cada missão abre quando a anterior foi concluída pelo menos uma vez. */
@@ -75,4 +79,26 @@ export function areasComDificuldade(conclusoes: Conclusao[], catalogo: Missao[] 
     for (const a of porId.get(c.missaoId)?.areas ?? []) conta.set(a, (conta.get(a) ?? 0) + 1);
   }
   return [...conta].filter(([, n]) => n >= limite).map(([a]) => a);
+}
+
+/**
+ * Ponte de propósito: o feedback da missão concluída e o próximo passo da trilha.
+ * `conclusoes` já deve incluir a missão que acabou de ser feita.
+ */
+export function ponteProposito(
+  feita: Missao,
+  nome: string,
+  missoes: Missao[],
+  conclusoes: Conclusao[],
+): { feedback: string; proxima: Missao | null; motivo: string | null } {
+  const feedback = `Muito bem! Hoje ${nome} exercitou ${FRASE_AREA[feita.areas[0]]}.`;
+  const trilha = montarTrilha(missoes, conclusoes);
+  const pendente = trilha.find((t) => t.liberada && t.feitas === 0 && t.missao.id !== feita.id);
+  if (!pendente) return { feedback, proxima: null, motivo: null };
+  const proxima = pendente.missao;
+  const motivo =
+    proxima.areas[0] === feita.areas[0]
+      ? `Próximo passo: ${proxima.titulo}, para continuar com ${FRASE_AREA[proxima.areas[0]]}.`
+      : `Próximo passo: ${proxima.titulo}, para levar essa evolução para ${FRASE_AREA[proxima.areas[0]]}.`;
+  return { feedback, proxima, motivo };
 }

@@ -3,7 +3,7 @@
 
 import type { Area } from '@/content/perguntas';
 
-export const VERSAO_MISSOES = '2026.10-r1';
+export const VERSAO_MISSOES = '2026.10-r2';
 
 export type Missao = {
   id: string;
@@ -15,10 +15,14 @@ export type Missao = {
   /** áreas da triagem que a missão estimula, usadas para priorizar */
   areas: Area[];
   idadeMinMeses: number;
+  /** some da trilha depois desta idade (missões de bebê); a RT confirma os cortes */
+  idadeMaxMeses?: number;
   duracao: string;
   material: string;
   passos: string[];
   dica: string;
+  /** o que os pais devem observar durante a brincadeira (rascunho para a RT) */
+  observar?: string;
   seguranca?: string;
   quandoParar: string;
   /** versão mais simples para crianças abaixo de `ateMeses` */
@@ -44,6 +48,7 @@ export const MISSOES: Missao[] = [
       'A cada achado, pergunte o que é e de que cor é.',
     ],
     dica: 'Quando ela achar, pergunte: "O que você encontrou? É um carro ou uma bola? De que cor ele é?"',
+    observar: 'Observe se ela procura com as duas mãos e se usa a ponta dos dedos para pegar. Se só olhar, coloque a mão dela no grão junto com a sua.',
     seguranca: 'Fique do lado o tempo todo: grãos não vão à boca, ao nariz nem ao ouvido.',
     quandoParar: PARAR_PADRAO,
     versaoMenores: { ateMeses: 36, texto: 'Até 3 anos, esconda só brinquedos grandes (maiores que a mão do adulto) e use macarrão parafuso no lugar de grãos pequenos.' },
@@ -64,6 +69,7 @@ export const MISSOES: Missao[] = [
       'Pergunte qual faz o som mais forte, o mais fraco e qual não faz som.',
     ],
     dica: 'Trabalhe os opostos: "Esse som é alto ou baixo? É barulhento ou silencioso?"',
+    observar: 'Observe se ela vira a cabeça para o lado do som. Se não reagir a nenhum pote, anote e comente com a equipe.',
     seguranca: 'Tampas sempre lacradas com fita. Para menores de 3 anos, use garrafas PET grandes com a tampa colada.',
     quandoParar: PARAR_PADRAO,
   },
@@ -75,15 +81,16 @@ export const MISSOES: Missao[] = [
     areas: ['brincar'],
     idadeMinMeses: 12,
     duracao: '10 min',
-    material: 'Papelão ou jornal, algodão, plástico-bolha e uma toalha felpuda.',
+    material: 'No quintal ou na praça: grama, terra, areia. Dentro de casa: papelão, algodão, plástico-bolha e uma toalha felpuda.',
     passos: [
-      'Em cima de um tapete, prenda com fita o plástico-bolha, o algodão e a toalha, em sequência.',
-      'Tire os sapatos da criança.',
-      'Caminhem devagar por cada textura, de mãos dadas.',
+      'Se puder, use o que já existe lá fora: grama, terra, areia. Em casa, prenda com fita o plástico-bolha, o algodão e a toalha em cima de um tapete.',
+      'Tire os sapatos da criança e deixe ela pisar descalça.',
+      'Deixe ela explorar no próprio ritmo, de mãos dadas no começo.',
       'Pare em cada uma e pergunte como é a sensação nos pés.',
     ],
     dica: 'Pergunte: "Está espetando, está macio ou está fazendo barulho?"',
-    seguranca: 'Prenda bem os materiais para não escorregar e segure a mão da criança o tempo todo. Só para quem já anda.',
+    observar: 'Observe a reação em cada textura: alguma ela recusa ou tira o pé rápido? Respeite e passe para a próxima.',
+    seguranca: 'Antes, confira o chão: sem pedras, cacos, formigueiros ou fezes de animais. Em casa, prenda bem os materiais para não escorregar. Só para quem já anda.',
     quandoParar: PARAR_PADRAO,
   },
   {
@@ -101,9 +108,9 @@ export const MISSOES: Missao[] = [
       'Desafio: colocar as bolinhas na garrafa usando o polegar e o indicador.',
     ],
     dica: 'Narre as ações: "Rasga, amassa, aperta, põe dentro!"',
+    observar: 'Observe se ela consegue fazer a pinça (polegar e indicador). Se pegar com a mão toda, mostre o movimento devagar.',
     seguranca: 'Bolinhas de papel podem ir à boca: supervisão constante.',
     quandoParar: PARAR_PADRAO,
-    versaoMenores: { ateMeses: 36, texto: 'Até 3 anos, só rasgar e amassar bolas grandes de papel. A garrafa fica para depois dos 3.' },
   },
   {
     id: 'm05-espelho-caretas',
@@ -121,6 +128,7 @@ export const MISSOES: Missao[] = [
       'Espere a imitação e comemore cada tentativa.',
     ],
     dica: 'Junte som e movimento: "O balão estourou! Pof! Faz igual!"',
+    observar: 'Observe se ela olha para o seu rosto no espelho e tenta copiar algum movimento, mesmo que diferente.',
     quandoParar: PARAR_PADRAO,
   },
   {
@@ -130,6 +138,7 @@ export const MISSOES: Missao[] = [
     rotuloArea: 'Fala',
     areas: ['fala', 'interacao'],
     idadeMinMeses: 0,
+    idadeMaxMeses: 24,
     duracao: '5 min',
     material: 'Nenhum.',
     passos: [
@@ -139,6 +148,7 @@ export const MISSOES: Missao[] = [
       'Faça uma pausa e espere a "resposta" dele.',
     ],
     dica: 'A pausa é o segredo. É nela que o bebê aprende que conversa tem a vez de cada um.',
+    observar: 'Observe se o bebê olha para o seu rosto e responde com som ou sorriso na pausa.',
     quandoParar: 'Se ele virar o rosto ou chorar, é sinal de cansaço.',
   },
   {
@@ -148,6 +158,7 @@ export const MISSOES: Missao[] = [
     rotuloArea: 'Interação',
     areas: ['interacao'],
     idadeMinMeses: 6,
+    idadeMaxMeses: 30,
     duracao: '5 min',
     material: 'Um pano leve ou uma fralda de pano.',
     passos: [
@@ -156,6 +167,7 @@ export const MISSOES: Missao[] = [
       'Depois, esconda um brinquedo debaixo do pano e deixe a criança procurar.',
     ],
     dica: 'Use sempre as mesmas palavras. A repetição ajuda a criança a antecipar e, depois, a falar junto.',
+    observar: 'Observe se ela antecipa o "Achou!", rindo ou se mexendo antes de você descobrir o rosto.',
     seguranca: 'Nunca cubra o rosto do bebê.',
     quandoParar: PARAR_PADRAO,
   },
@@ -175,7 +187,8 @@ export const MISSOES: Missao[] = [
       'Na segunda rodada, pergunte "O que será?" e espere.',
     ],
     dica: 'Fale frases um pouco maiores que as da criança. Se ela diz "bola", você diz "bola grande!".',
-    seguranca: 'Só objetos maiores que um rolo de papel higiênico, sem peças soltas.',
+    observar: 'Observe se ela mantém o olhar na caixa e tenta falar, apontar ou gesticular quando você pergunta "O que será?".',
+    seguranca: 'Só objetos grandes, sem peças soltas.',
     quandoParar: PARAR_PADRAO,
   },
   {
@@ -194,6 +207,7 @@ export const MISSOES: Missao[] = [
       'Comemore qualquer tentativa.',
     ],
     dica: 'Sons de bichos são mais fáceis que palavras e costumam ser as primeiras "falas" da criança.',
+    observar: 'Observe se ela tenta imitar algum som de bicho, mesmo que só a vogal ("uuu").',
     quandoParar: PARAR_PADRAO,
   },
   {
@@ -211,6 +225,7 @@ export const MISSOES: Missao[] = [
       'Troquem de papel: a criança manda e você lava.',
     ],
     dica: 'Narrar a rotina é a forma mais simples de dar um banho de palavras.',
+    observar: 'Observe se ela aponta a parte do corpo certa sem você mostrar antes.',
     seguranca: 'Nunca deixe a criança sozinha na água, nem por um segundo.',
     quandoParar: PARAR_PADRAO,
   },
@@ -229,6 +244,7 @@ export const MISSOES: Missao[] = [
       'Pare antes da última palavra de cada frase e espere a criança completar.',
     ],
     dica: 'A pausa no fim da frase convida a criança a falar.',
+    observar: 'Observe se ela completa a palavra ou o gesto quando você faz a pausa.',
     quandoParar: PARAR_PADRAO,
   },
   {
@@ -246,6 +262,7 @@ export const MISSOES: Missao[] = [
       'Façam uma corrida de um lado ao outro da bacia.',
     ],
     dica: 'Brinque com "sopro fraquinho" e "sopro de vento forte" para trabalhar o controle.',
+    observar: 'Observe se ela faz bico e sopra pela boca. Se soprar pelo nariz, brinque de apagar uma vela de mentira.',
     seguranca: 'Água rasa e um adulto do lado o tempo todo. Pare se a criança ficar tonta.',
     quandoParar: PARAR_PADRAO,
     versaoMenores: { ateMeses: 30, texto: 'Para os menores: você sopra bolhas de sabão e a criança tenta estourar.' },
@@ -266,6 +283,7 @@ export const MISSOES: Missao[] = [
       'Aumente para 3 itens quando ficar fácil.',
     ],
     dica: 'Se ela trouxer só um item, repita o pedido mostrando dois dedos.',
+    observar: 'Observe se ela traz os dois itens pedidos ou só um. Isso mostra quanto ela guarda de um pedido.',
     quandoParar: PARAR_PADRAO,
   },
   {
@@ -284,6 +302,7 @@ export const MISSOES: Missao[] = [
       'Depois é a vez dela fazer o som para você adivinhar.',
     ],
     dica: 'Se ela não reage a sons de outro cômodo, anote e comente com a equipe.',
+    observar: 'Observe se ela reconhece os sons de olhos fechados. Se errar sempre, anote e comente com a equipe.',
     quandoParar: PARAR_PADRAO,
   },
   {
@@ -301,6 +320,7 @@ export const MISSOES: Missao[] = [
       'Use palavras de tamanho e forma: grande, pequeno, comprido, redondo.',
     ],
     dica: 'Peça escolhas: "Você quer a bolinha grande ou a pequena?" Assim ela precisa responder com palavras.',
+    observar: 'Observe se ela usa palavras de tamanho e forma sozinha ("grande", "redonda") ou só repete as suas.',
     seguranca: 'A massinha tem sal e não é para comer. Lavem as mãos no final.',
     quandoParar: PARAR_PADRAO,
   },
@@ -320,6 +340,7 @@ export const MISSOES: Missao[] = [
       'Brinquem de recado: "Diga para o papai que é hora do lanche".',
     ],
     dica: 'Combine: quem fala, fala; quem escuta, espera. É assim que se treina a vez de cada um.',
+    observar: 'Observe se ela espera a vez de falar e se o recado chega parecido com o que você disse.',
     seguranca: 'O barbante nunca fica perto do pescoço. Guarde após a brincadeira.',
     quandoParar: PARAR_PADRAO,
   },
@@ -338,6 +359,7 @@ export const MISSOES: Missao[] = [
       'Peça que conte: "Primeiro… depois… no final…".',
     ],
     dica: 'Palavras de tempo como "primeiro", "depois" e "no final" organizam a fala e o pensamento.',
+    observar: 'Observe se ela usa "primeiro", "depois" e "no final" ou se só nomeia as cenas.',
     quandoParar: PARAR_PADRAO,
   },
   {
@@ -356,9 +378,181 @@ export const MISSOES: Missao[] = [
       'Desafio: ela inventa uma rima para "pão".',
     ],
     dica: 'Brincar com os sons das palavras é a base da alfabetização.',
+    observar: 'Observe se ela percebe a rima pelo final da palavra. Se errar, repita o par mais devagar, caprichando no final.',
+    quandoParar: PARAR_PADRAO,
+  },
+  // ---- Fase 3 a 6 anos (rascunho de 31/10 para revisão da RT) ----
+  {
+    id: 'm19-palmas-silabas',
+    ordem: 19,
+    titulo: 'Palmas das Sílabas',
+    rotuloArea: 'Consciência fonológica',
+    areas: ['consciencia_fonologica'],
+    idadeMinMeses: 48,
+    duracao: '5 min',
+    material: 'Nenhum. Só as mãos (ou pulinhos no chão).',
+    passos: [
+      'Diga o nome da criança batendo uma palma em cada pedacinho: "Pe-dro".',
+      'Peça que ela repita batendo junto.',
+      'Façam com outras palavras da casa: "me-sa", "ja-ne-la", "te-le-vi-são".',
+      'Desafio: ela escolhe uma palavra e você adivinha quantas palmas tem.',
+    ],
+    dica: 'Comece com palavras de 2 pedacinhos e só depois passe para as maiores. Contar os pedacinhos prepara para ler e escrever.',
+    observar: 'Observe se ela bate as palmas no ritmo dos pedacinhos ou bate sem parar. Se errar, faça junto, segurando as mãos dela.',
+    quandoParar: PARAR_PADRAO,
+  },
+  {
+    id: 'm20-diretor-cinema',
+    ordem: 20,
+    titulo: 'Diretor de Cinema',
+    rotuloArea: 'Narrativa',
+    areas: ['narrativa', 'fala'],
+    idadeMinMeses: 42,
+    duracao: '10 min',
+    material: '3 objetos de casa escolhidos pela criança (um bicho de pelúcia, uma colher, uma caixa).',
+    passos: [
+      'Você começa a história usando os objetos: "Era uma vez um urso que estava com muita fome…".',
+      'Pare e pergunte: "E aí, o que aconteceu?".',
+      'A criança conta o meio da história mexendo nos objetos.',
+      'Peça o final: "E como terminou?". Depois recontem a história inteira juntos.',
+    ],
+    dica: 'Ajude com palavras de ligação: "e aí", "depois", "então", "no final". Elas organizam a fala e o pensamento.',
+    observar: 'Observe se a história tem começo, meio e fim e se ela usa "e aí" ou "depois" para ligar as partes.',
+    quandoParar: PARAR_PADRAO,
+  },
+  {
+    id: 'm21-laboratorio-sopros',
+    ordem: 21,
+    titulo: 'Laboratório dos Sopros',
+    rotuloArea: 'Motricidade oral',
+    areas: ['motricidade_oral'],
+    idadeMinMeses: 36,
+    duracao: '10 min',
+    material: 'Um canudo, 3 bolinhas de papel amassado e fita adesiva para marcar a chegada na mesa.',
+    passos: [
+      'Marque uma linha de chegada na ponta da mesa com fita.',
+      'Mostre como soprar pelo canudo para empurrar a bolinha.',
+      'Façam uma corrida: quem leva a bolinha até a linha?',
+      'No final, imitem o som de um motor vibrando os lábios: "brrrrr".',
+    ],
+    dica: 'Peça sopro fraquinho para a bolinha andar devagar e sopro forte para ela correr. Controlar o ar ajuda nos sons mais difíceis da fala.',
+    observar: 'Observe se ela consegue soprar só pela boca, com os lábios em bico, e controlar o sopro fraco e o forte.',
+    seguranca: 'Só soprar, nunca puxar o ar pelo canudo. Bolinhas grandes, que não cabem na boca. Pare se a criança ficar tonta.',
+    quandoParar: PARAR_PADRAO,
+  },
+  {
+    id: 'm22-mimica-emocoes',
+    ordem: 22,
+    titulo: 'Mímica das Emoções',
+    rotuloArea: 'Interação',
+    areas: ['interacao', 'imitacao'],
+    idadeMinMeses: 36,
+    duracao: '10 min',
+    material: 'Um espelho (opcional).',
+    passos: [
+      'Faça uma cara de feliz e pergunte: "Como eu estou?".',
+      'Repita com triste, bravo, assustado e surpreso.',
+      'Troquem: a criança faz a cara e você adivinha.',
+      'Pergunte: "O que deixa você feliz?" e conversem sobre a resposta.',
+    ],
+    dica: 'Dê nome ao que ela sente no dia a dia: "Você ficou bravo porque acabou o desenho". Isso ajuda a falar em vez de chorar ou bater.',
+    observar: 'Observe se ela reconhece as emoções no seu rosto e consegue dizer o nome delas, não só imitar.',
+    quandoParar: PARAR_PADRAO,
+  },
+  {
+    id: 'm23-jogo-da-vez',
+    ordem: 23,
+    titulo: 'Jogo da Vez',
+    rotuloArea: 'Interação e regras',
+    areas: ['interacao', 'compreensao'],
+    idadeMinMeses: 48,
+    duracao: '15 min',
+    material: 'Uma folha com um caminho de 15 quadradinhos desenhado, um dado (ou papeizinhos de 1 a 3) e 2 tampinhas como peões.',
+    passos: [
+      'Combine as regras antes: cada um joga uma vez, e quem chegar primeiro vence.',
+      'Joguem falando de quem é a vez: "Agora é a minha vez… agora é a sua".',
+      'Conte as casas em voz alta junto com a criança.',
+      'No final, cumprimentem-se, ganhando ou perdendo.',
+    ],
+    dica: 'Esperar a vez e seguir uma regra combinada é treino de conversa: cada um fala e escuta na sua hora.',
+    observar: 'Observe se ela espera a vez e aceita a regra combinada. Frustração ao perder é normal; veja se ela se acalma com a sua ajuda.',
+    seguranca: 'Dado e tampinhas são pequenos: guarde depois e não deixe com irmãos menores de 3 anos.',
+    quandoParar: 'Se a criança se frustrar muito ao perder, pare, acolha e jogue outro dia em dupla com você contra o papai ou a mamãe.',
+  },
+  {
+    id: 'm24-o-que-e',
+    ordem: 24,
+    titulo: 'O que é, o que é?',
+    rotuloArea: 'Compreensão e vocabulário',
+    areas: ['compreensao', 'fala'],
+    idadeMinMeses: 48,
+    duracao: '10 min',
+    material: 'Nenhum (ou objetos da casa para olhar).',
+    passos: [
+      'Dê 3 pistas de um objeto da casa: "É redondo, a gente chuta e rola no chão".',
+      'A criança adivinha.',
+      'Troquem: ela dá as pistas e você adivinha.',
+      'Se ela travar, ajude: "Qual a cor? Pra que serve? Onde fica?".',
+    ],
+    dica: 'Dar pistas faz a criança descrever forma, cor e uso, que é como o vocabulário cresce.',
+    observar: 'Observe se ela entende as pistas e se, na vez dela, consegue dar mais de uma pista (cor, forma, para que serve).',
+    quandoParar: PARAR_PADRAO,
+  },
+  {
+    id: 'm25-recado-secreto',
+    ordem: 25,
+    titulo: 'Recado Secreto',
+    rotuloArea: 'Escuta e fala clara',
+    areas: ['audicao', 'inteligibilidade'],
+    idadeMinMeses: 48,
+    duracao: '10 min',
+    material: 'Pelo menos 3 pessoas da família.',
+    passos: [
+      'Sentem em roda.',
+      'Você fala um recado curto no ouvido da criança: "O gato comeu o bolo".',
+      'Ela passa o recado para o próximo, falando devagar e claro.',
+      'O último fala em voz alta e todos conferem se o recado chegou igual.',
+    ],
+    dica: 'Se o recado mudar, não corrija com bronca: repita devagar e brinque de "o recado se perdeu no caminho".',
+    observar: 'Observe se ela repete o recado inteiro e se os outros entendem o que ela falou sem precisar repetir.',
+    quandoParar: PARAR_PADRAO,
+  },
+  {
+    id: 'm26-primeiro-som',
+    ordem: 26,
+    titulo: 'Caça ao Primeiro Som',
+    rotuloArea: 'Consciência fonológica',
+    areas: ['consciencia_fonologica', 'fala'],
+    idadeMinMeses: 60,
+    duracao: '10 min',
+    material: 'Objetos da casa e uma cesta.',
+    passos: [
+      'Escolha um som: "/b/, de bola".',
+      'Saiam pela casa procurando coisas que começam com esse som (banana, boneca, balde).',
+      'Coloquem tudo na cesta e falem o nome de cada um, caprichando no primeiro som.',
+      'Troquem o som: "/m/, de mamãe".',
+    ],
+    dica: 'Fale o som, não o nome da letra: "/b/", e não "bê". É assim que a criança liga o som à escrita.',
+    observar: 'Observe se ela acha objetos que começam com o som certo. Se trouxer pelo nome da letra ("bê"), repita o som "/b/" com ela.',
     quandoParar: PARAR_PADRAO,
   },
 ];
+
+/** Como cada área aparece na frase de feedback da missão concluída ("Hoje Pedro exercitou a escuta"). */
+export const FRASE_AREA: Record<Area, string> = {
+  fala: 'a fala',
+  compreensao: 'a compreensão',
+  interacao: 'a troca com as pessoas',
+  audicao: 'a escuta',
+  motricidade_oral: 'os músculos da boca',
+  alimentacao: 'a mastigação',
+  imitacao: 'a imitação',
+  gestos: 'os gestos',
+  brincar: 'o tato e o brincar',
+  narrativa: 'o jeito de contar histórias',
+  inteligibilidade: 'a fala clara',
+  consciencia_fonologica: 'os sons das palavras',
+};
 
 export type ComoFoi = 'facil' | 'com_ajuda' | 'dificil';
 

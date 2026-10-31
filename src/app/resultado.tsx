@@ -2,10 +2,13 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Image } from 'expo-image';
 import { useEffect, useState } from 'react';
 import { Linking, Pressable, StyleSheet, View } from 'react-native';
+import Animated, { FadeInUp, useAnimatedStyle, useSharedValue, withTiming, ZoomIn, Easing } from 'react-native-reanimated';
 import Svg, { Defs, LinearGradient, Path, RadialGradient, Rect, Stop } from 'react-native-svg';
 
 import { registrarEvento, registrarLead } from '@/api/cliente';
+import { CelebracaoConquista } from '@/components/animacao';
 import { Medidor } from '@/components/medidor';
+import { useProgresso } from '@/components/progresso';
 import { irPara } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
@@ -18,12 +21,12 @@ import {
   CTA_RESULTADO,
   DESCRICAO_AREA,
   DICA_AREA,
-  equipeOnline,
+  PONTE_CLINICA,
   RESPONSAVEL_TECNICA,
   TEXTOS_RESULTADO,
 } from '@/content/resultados';
 import { formatarDataCurta } from '@/domain/acompanhamento';
-import { codigoContato, linkWhatsApp } from '@/domain/contato';
+import { codigoContato, linkWhatsApp, resumoTriagem } from '@/domain/contato';
 import { formatarIdade } from '@/domain/idade';
 import { contarHabilidades, personalizar, type NivelResultado, type ResultadoArea } from '@/domain/triagem';
 import { useApp } from '@/state/app';
@@ -73,8 +76,9 @@ function Check({ cor = cores.marca, tamanho = 12 }: { cor?: string; tamanho?: nu
   );
 }
 
-function CardFoco({ a }: { a: ResultadoArea }) {
+function CardFoco({ a, animar = false, atraso = 0 }: { a: ResultadoArea; animar?: boolean; atraso?: number }) {
   const falta = Math.max(0, 100 - a.pontuacao);
+  const barra = useProgresso(animar, 900, atraso);
   return (
     <View style={s.foco}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
@@ -89,7 +93,7 @@ function CardFoco({ a }: { a: ResultadoArea }) {
       </View>
       <View style={{ gap: 8 }}>
         <View style={s.trilho} accessibilityLabel={`${a.rotulo}: ${a.pontuacao}% desenvolvido, faltam ${falta}%`}>
-          <Svg width={`${Math.max(6, a.pontuacao)}%`} height={8}>
+          <Svg width={`${Math.max(6, a.pontuacao) * barra}%`} height={8}>
             <Defs>
               <LinearGradient id={`b-${a.area}`} x1="0" y1="0" x2="1" y2="0">
                 <Stop offset="0" stopColor="#FFB27A" />
@@ -117,30 +121,15 @@ function CardFoco({ a }: { a: ResultadoArea }) {
   );
 }
 
-/** CTA: degradê vivo verde → azul, ícone do WhatsApp e micro-texto dentro do botão. */
-function BotaoWhatsApp({ titulo, onPress }: { titulo: string; onPress: () => void }) {
+/** CTA verde sólido da marca (#1F7A6B), ícone do WhatsApp e micro-texto dentro do botão. */
+function BotaoWhatsApp({ titulo, apoio, onPress }: { titulo: string; apoio: string; onPress: () => void }) {
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${titulo}. ${CTA_RESULTADO.apoio}`}
+      accessibilityLabel={`${titulo}. ${apoio}`}
       onPress={onPress}
       style={({ pressed }) => [s.cta, pressed && { transform: [{ scale: 0.985 }], opacity: 0.96 }]}
     >
-      <Svg style={StyleSheet.absoluteFill} preserveAspectRatio="none" viewBox="0 0 100 100">
-        <Defs>
-          <LinearGradient id="cta" x1="0" y1="0" x2="1" y2="0.4">
-            <Stop offset="0" stopColor="#14C08F" />
-            <Stop offset="0.5" stopColor="#12A7B8" />
-            <Stop offset="1" stopColor="#2F74F5" />
-          </LinearGradient>
-          <LinearGradient id="ctaLuz" x1="0" y1="0" x2="0" y2="1">
-            <Stop offset="0" stopColor="#fff" stopOpacity={0.1} />
-            <Stop offset="0.5" stopColor="#fff" stopOpacity={0} />
-          </LinearGradient>
-        </Defs>
-        <Rect x={0} y={0} width={100} height={100} fill="url(#cta)" />
-        <Rect x={0} y={0} width={100} height={100} fill="url(#ctaLuz)" />
-      </Svg>
       <View style={s.wa}>
         <Svg width={24} height={24} viewBox="0 0 24 24" fill="#fff">
           <Path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.3.8 3.2.7.5-.1 1.5-.6 1.8-1.2.2-.6.2-1.1.1-1.2l-.5-.3z" />
@@ -148,7 +137,7 @@ function BotaoWhatsApp({ titulo, onPress }: { titulo: string; onPress: () => voi
       </View>
       <View style={{ flex: 1 }}>
         <Texto style={{ fontFamily: fonte.extra, fontSize: 16, lineHeight: 20, letterSpacing: -0.2, color: '#fff' }}>{titulo}</Texto>
-        <Texto style={{ fontFamily: fonte.media, fontSize: 12, lineHeight: 16, color: 'rgba(255,255,255,0.9)', marginTop: 2 }}>{CTA_RESULTADO.apoio}</Texto>
+        <Texto style={{ fontFamily: fonte.media, fontSize: 12, lineHeight: 16, color: 'rgba(255,255,255,0.9)', marginTop: 2 }}>{apoio}</Texto>
       </View>
     </Pressable>
   );
@@ -156,15 +145,53 @@ function BotaoWhatsApp({ titulo, onPress }: { titulo: string; onPress: () => voi
 
 export default function ResultadoTela() {
   const router = useRouter();
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, novo } = useLocalSearchParams<{ id: string; novo?: string }>();
   const { criancaAtual } = useApp();
   const [triagem, setTriagem] = useState<TriagemSalva | null>(null);
+  const [incluirResumo, setIncluirResumo] = useState(false);
+  // Comemoração de ter feito a triagem (não do resultado): só ao chegar direto da triagem.
+  const revelar = novo === '1';
+  const [intro, setIntro] = useState(revelar);
+  // A estrela "voa" para o arco do medidor e some; aí o resultado se revela.
+  const voo = useSharedValue(0);
+  const estiloVoo = useAnimatedStyle(() => ({
+    opacity: 1 - voo.value,
+    transform: [{ translateY: -330 * voo.value }, { scale: 1 - 0.85 * voo.value }],
+  }));
+  const estiloTextoVoo = useAnimatedStyle(() => ({ opacity: 1 - Math.min(1, voo.value * 2) }));
+  useEffect(() => {
+    if (!intro) return;
+    const t1 = setTimeout(() => {
+      voo.value = withTiming(1, { duration: 520, easing: Easing.in(Easing.cubic) });
+    }, 2100);
+    const t2 = setTimeout(() => setIntro(false), 2620);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, [intro, voo]);
 
   useEffect(() => {
     if (id) repositorio.lerTriagem(id).then(setTriagem);
   }, [id]);
 
   if (!triagem || !criancaAtual) return <Tela>{null}</Tela>;
+
+  if (intro) {
+    return (
+      <Pressable style={s.intro} onPress={() => setIntro(false)} accessibilityRole="button" accessibilityLabel="Ver resultado">
+        <Animated.View style={estiloVoo}>
+          <CelebracaoConquista tamanho={280} />
+        </Animated.View>
+        <Animated.View style={[{ alignItems: 'center', gap: 10 }, estiloTextoVoo]}>
+          <Texto style={{ fontFamily: fonte.extra, fontSize: 26, letterSpacing: -0.6, color: cores.texto, textAlign: 'center' }}>Triagem concluída!</Texto>
+          <Texto style={{ fontSize: 15, lineHeight: 22, color: cores.texto2, textAlign: 'center', maxWidth: 300 }}>
+            Obrigado por dedicar esse tempo a {criancaAtual.apelido}. Preparando o resultado…
+          </Texto>
+        </Animated.View>
+      </Pressable>
+    );
+  }
 
   const { resultado } = triagem;
   const faixa = FAIXAS.find((f) => f.id === triagem.faixaId);
@@ -176,12 +203,12 @@ export default function ResultadoTela() {
   const chamada = CHAMADA_RESULTADO[resultado.nivel];
   const idade = formatarIdade(triagem.idadeMeses);
   const idadeCurta = triagem.idadeMeses < 24 ? idade : `${Math.floor(triagem.idadeMeses / 12)} anos`;
-  const online = equipeOnline();
   const tituloCta = personalizar(CTA_RESULTADO.titulo, vars);
+  const codigo = codigoContato(triagem.id);
+  const resumo = resumoTriagem(foco.map((a) => a.rotulo), habilidades.noEsperado, habilidades.total);
 
   function abrirWhatsApp() {
-    const codigo = codigoContato(triagem!.id);
-    const url = linkWhatsApp(resultado.nivel, idade, codigo);
+    const url = linkWhatsApp(resultado.nivel, idade, codigo, undefined, incluirResumo ? resumo : undefined);
     registrarEvento({ tipo: 'whatsapp_aberto', origem: 'resultado' });
     registrarLead(codigo, 'resultado', triagem!.faixaId);
     Linking.openURL(url).catch((e) => console.error('[resultado] não abriu o WhatsApp', e));
@@ -191,7 +218,7 @@ export default function ResultadoTela() {
     <Tela
       rodape={
         <View style={{ gap: 6, alignItems: 'center' }}>
-          <BotaoWhatsApp titulo={tituloCta} onPress={abrirWhatsApp} />
+          <BotaoWhatsApp titulo={tituloCta} apoio={personalizar(CTA_RESULTADO.apoio, vars)} onPress={abrirWhatsApp} />
           <Botao variante="texto" titulo="Ver minhas missões" onPress={() => irPara(router, '/trilha')} />
         </View>
       }
@@ -226,29 +253,33 @@ export default function ResultadoTela() {
         </View>
 
         <View style={{ marginTop: 22, alignItems: 'center' }}>
-          <Medidor nivel={resultado.nivel} noEsperado={habilidades.noEsperado} total={habilidades.total} escuro />
-          <View style={{ marginTop: 8 }}>
+          <Medidor nivel={resultado.nivel} noEsperado={habilidades.noEsperado} total={habilidades.total} escuro animar={revelar} atraso={150} />
+          <Animated.View style={{ marginTop: 8 }} entering={revelar ? ZoomIn.delay(1450).duration(350) : undefined}>
             <Badge nivel={resultado.nivel} escuro />
-          </View>
+          </Animated.View>
         </View>
 
-        <View style={s.escuroDivisor} />
-        <Texto style={{ fontFamily: fonte.extra, fontSize: 19, lineHeight: 24, letterSpacing: -0.4, color: '#fff' }}>{personalizar(chamada.titulo, vars)}</Texto>
-        <Texto style={{ fontSize: 13.5, lineHeight: 20, color: 'rgba(255,255,255,0.72)', marginTop: 6 }}>{personalizar(chamada.texto, vars)}</Texto>
+        <Animated.View entering={revelar ? FadeInUp.delay(1650).duration(450) : undefined}>
+          <View style={s.escuroDivisor} />
+          <Texto style={{ fontFamily: fonte.extra, fontSize: 19, lineHeight: 24, letterSpacing: -0.4, color: '#fff' }}>{personalizar(chamada.titulo, vars)}</Texto>
+          <Texto style={{ fontSize: 13.5, lineHeight: 20, color: 'rgba(255,255,255,0.72)', marginTop: 6 }}>{personalizar(chamada.texto, vars)}</Texto>
+        </Animated.View>
       </View>
 
       {/* 2. Pontos fortes */}
       {fortes.length ? (
         <View style={{ gap: 12 }}>
-          <Texto style={s.secao}>Pontos fortes</Texto>
+          <Animated.View entering={revelar ? FadeInUp.delay(1900).duration(400) : undefined}>
+            <Texto style={s.secao}>Pontos fortes</Texto>
+          </Animated.View>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-            {fortes.map((a) => (
-              <View key={a.area} style={s.selo}>
+            {fortes.map((a, i) => (
+              <Animated.View key={a.area} style={s.selo} entering={revelar ? ZoomIn.delay(2000 + i * 100).springify().damping(12) : undefined}>
                 <View style={s.seloCheck}>
                   <Check cor="#fff" tamanho={10} />
                 </View>
                 <Texto style={{ fontFamily: fonte.semi, fontSize: 13, color: cores.marca }}>{a.rotulo}</Texto>
-              </View>
+              </Animated.View>
             ))}
           </View>
         </View>
@@ -257,12 +288,14 @@ export default function ResultadoTela() {
       {/* 3. Onde focar agora */}
       {foco.length ? (
         <View style={{ gap: 12 }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
+          <Animated.View entering={revelar ? FadeInUp.delay(2300).duration(400) : undefined} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
             <Texto style={s.secao}>Onde focar agora</Texto>
             <Texto variante="legenda">{foco.length === 1 ? '1 habilidade' : `${foco.length} habilidades`}</Texto>
-          </View>
-          {foco.map((a) => (
-            <CardFoco key={a.area} a={a} />
+          </Animated.View>
+          {foco.map((a, i) => (
+            <Animated.View key={a.area} entering={revelar ? FadeInUp.delay(2450 + i * 150).duration(450) : undefined}>
+              <CardFoco a={a} animar={revelar} atraso={2700 + i * 150} />
+            </Animated.View>
           ))}
         </View>
       ) : null}
@@ -271,24 +304,74 @@ export default function ResultadoTela() {
         <Texto style={{ fontFamily: fonte.semi, color: cores.avaliarTexto, textAlign: 'center' }}>{personalizar(AVISO_PEDIATRA, vars)}</Texto>
       ) : null}
 
-      {/* 4. Assinatura de autoridade */}
-      <View style={s.rt}>
-        <View style={s.rtAvatar}>
-          <Texto style={{ fontFamily: fonte.extra, color: cores.marca, fontSize: 16 }}>LS</Texto>
-        </View>
-        <View style={{ flex: 1, gap: 2 }}>
-          <Texto style={{ fontFamily: fonte.extra, fontSize: 14.5, color: cores.texto }}>{RESPONSAVEL_TECNICA.nome}</Texto>
-          <Texto variante="legenda">Fonoaudióloga • {RESPONSAVEL_TECNICA.registro}</Texto>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 }}>
-            <View style={[s.luz, { backgroundColor: online ? '#22C55E' : '#C3CDCC' }, online && { boxShadow: '0px 0px 8px rgba(34,197,94,0.8)' }]} />
-            <Texto style={{ fontFamily: fonte.semi, fontSize: 12, color: online ? '#15803D' : cores.texto3 }}>
-              {online ? 'Disponível online' : 'Responde em horário comercial'}
-            </Texto>
+      {/* 4. Ponte para a clínica: quem responde e o que acontece ao tocar no botão */}
+      <Animated.View style={s.ponte} entering={revelar ? FadeInUp.delay(2800).duration(450) : undefined}>
+        <Texto style={s.ponteRotulo}>{PONTE_CLINICA.rotulo.toUpperCase()}</Texto>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+          <View>
+            <View style={s.rtAvatar}>
+              <Texto style={{ fontFamily: fonte.extra, color: cores.marca, fontSize: 17 }}>LS</Texto>
+            </View>
+          </View>
+          <View style={{ flex: 1, gap: 2 }}>
+            <Texto style={{ fontFamily: fonte.extra, fontSize: 15, letterSpacing: -0.2, color: cores.texto }}>{RESPONSAVEL_TECNICA.nome}</Texto>
+            <Texto variante="legenda">Fonoaudióloga • {RESPONSAVEL_TECNICA.registro}</Texto>
+            <Texto style={{ fontFamily: fonte.semi, fontSize: 12, color: cores.texto2 }}>{PONTE_CLINICA.horario}</Texto>
           </View>
         </View>
-      </View>
 
-      <Texto variante="legenda" style={{ textAlign: 'center', fontSize: 11 }}>
+        <View style={s.ponteDivisor} />
+        <Texto style={{ fontFamily: fonte.extra, fontSize: 16, letterSpacing: -0.3, color: cores.texto }}>{PONTE_CLINICA.titulo}</Texto>
+        <View style={{ gap: 0 }}>
+          {PONTE_CLINICA.passos.map((p, i) => (
+            <View key={p} style={{ flexDirection: 'row', gap: 12 }}>
+              <View style={{ alignItems: 'center' }}>
+                <View style={s.passoNum}>
+                  <Texto style={{ fontFamily: fonte.extra, fontSize: 12, color: '#fff' }}>{i + 1}</Texto>
+                </View>
+                {i < PONTE_CLINICA.passos.length - 1 ? <View style={s.passoLinha} /> : null}
+              </View>
+              <View style={{ flex: 1, paddingTop: 2, paddingBottom: i < PONTE_CLINICA.passos.length - 1 ? 14 : 0, gap: 6 }}>
+                <Texto style={{ fontSize: 13.5, lineHeight: 19, color: cores.texto }}>{personalizar(p, vars)}</Texto>
+                {i === 0 ? (
+                  <View style={s.codigo}>
+                    <Texto style={{ fontFamily: fonte.extra, fontSize: 12.5, letterSpacing: 0.6, color: cores.marca }}>{codigo}</Texto>
+                  </View>
+                ) : null}
+              </View>
+            </View>
+          ))}
+        </View>
+        <Pressable
+          accessibilityRole="checkbox"
+          accessibilityState={{ checked: incluirResumo }}
+          onPress={() => setIncluirResumo((v) => !v)}
+          style={[s.opcao, incluirResumo && s.opcaoAtiva]}
+        >
+          <View style={[s.caixa, incluirResumo && s.caixaAtiva]}>{incluirResumo ? <Check cor="#fff" tamanho={13} /> : null}</View>
+          <View style={{ flex: 1, gap: 2 }}>
+            <Texto style={{ fontFamily: fonte.negrito, fontSize: 13.5, color: cores.texto }}>{PONTE_CLINICA.opcao}</Texto>
+            {PONTE_CLINICA.opcaoApoio ? <Texto style={{ fontSize: 12, lineHeight: 17, color: cores.texto2 }}>{PONTE_CLINICA.opcaoApoio}</Texto> : null}
+          </View>
+        </Pressable>
+        {incluirResumo ? (
+          <View style={s.previa}>
+            <Texto style={{ fontFamily: fonte.semi, fontSize: 12, color: cores.texto2 }}>{PONTE_CLINICA.previa}</Texto>
+            <Texto style={{ fontSize: 13, lineHeight: 19, color: cores.texto }}>{resumo}</Texto>
+          </View>
+        ) : null}
+        <View style={s.privacidade}>
+          <Svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke={cores.marca} strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round">
+            <Rect x={5} y={11} width={14} height={10} rx={2.5} />
+            <Path d="M8 11V8a4 4 0 0 1 8 0v3" />
+          </Svg>
+          <Texto style={{ flex: 1, fontSize: 11.5, lineHeight: 16, color: cores.texto2 }}>
+            {incluirResumo ? PONTE_CLINICA.privacidadeComResumo : PONTE_CLINICA.privacidade}
+          </Texto>
+        </View>
+      </Animated.View>
+
+      <Texto style={{ textAlign: 'center', fontSize: 11.5, lineHeight: 17, color: cores.texto2 }}>
         {AVISO_RESULTADO}
       </Texto>
     </Tela>
@@ -309,9 +392,23 @@ const s = StyleSheet.create({
   focoIcone: { width: 44, height: 44, borderRadius: 15, backgroundColor: '#FDF3DC', alignItems: 'center', justifyContent: 'center' },
   trilho: { height: 8, borderRadius: 4, backgroundColor: '#EDF3F2', overflow: 'hidden' },
   dica: { backgroundColor: '#FFF9EC', borderRadius: 14, paddingVertical: 12, paddingHorizontal: 14, borderWidth: 1, borderColor: 'rgba(242,184,75,0.22)' },
+  ponte: { backgroundColor: '#fff', borderRadius: 24, padding: 20, gap: 14, borderWidth: 1, borderColor: 'rgba(31,122,107,0.12)', boxShadow: '0px 14px 34px rgba(44, 62, 63, 0.07)' },
+  ponteRotulo: { fontFamily: fonte.extra, fontSize: 11, letterSpacing: 1.2, color: cores.marca },
+  ponteDivisor: { height: 1, backgroundColor: '#EDF3F2' },
+  luzAvatar: { position: 'absolute', right: -2, bottom: -2, width: 14, height: 14, borderRadius: 7, borderWidth: 2.5, borderColor: '#fff' },
+  passoNum: { width: 24, height: 24, borderRadius: 12, backgroundColor: cores.marca, alignItems: 'center', justifyContent: 'center' },
+  passoLinha: { flex: 1, width: 2, backgroundColor: 'rgba(31,122,107,0.18)', marginVertical: 3 },
+  codigo: { alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, backgroundColor: cores.marcaSuave, borderWidth: 1, borderStyle: 'dashed', borderColor: 'rgba(31,122,107,0.35)' },
+  opcao: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 16, borderWidth: 1.5, borderColor: '#E3ECEA', backgroundColor: '#fff' },
+  opcaoAtiva: { borderColor: cores.marca, backgroundColor: '#F2FAF7' },
+  caixa: { width: 22, height: 22, borderRadius: 7, borderWidth: 2, borderColor: '#B9C8C6', alignItems: 'center', justifyContent: 'center' },
+  caixaAtiva: { backgroundColor: cores.marca, borderColor: cores.marca },
+  previa: { gap: 4, padding: 14, borderRadius: 14, backgroundColor: '#F2FAF7', borderLeftWidth: 3, borderLeftColor: cores.marca },
+  privacidade: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#F4F8F7', borderRadius: 12, paddingVertical: 10, paddingHorizontal: 12 },
+  intro: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10, padding: 24, backgroundColor: cores.fundo },
   rt: { flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: '#fff', borderRadius: 20, padding: 16, boxShadow: '0px 12px 30px rgba(44, 62, 63, 0.05)' },
   rtAvatar: { width: 50, height: 50, borderRadius: 17, backgroundColor: cores.marcaSuave, alignItems: 'center', justifyContent: 'center' },
   luz: { width: 8, height: 8, borderRadius: 4 },
-  cta: { width: '100%', minHeight: 72, borderRadius: 24, overflow: 'hidden', paddingVertical: 14, paddingLeft: 14, paddingRight: 18, flexDirection: 'row', alignItems: 'center', gap: 14, boxShadow: '0px 18px 36px rgba(32, 140, 200, 0.35)' },
+  cta: { width: '100%', minHeight: 72, borderRadius: 24, overflow: 'hidden', backgroundColor: cores.marca, paddingVertical: 14, paddingLeft: 14, paddingRight: 18, flexDirection: 'row', alignItems: 'center', gap: 14, boxShadow: '0px 16px 32px rgba(31, 122, 107, 0.30)' },
   wa: { width: 44, height: 44, borderRadius: 15, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' },
 });

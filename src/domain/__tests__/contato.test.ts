@@ -1,4 +1,4 @@
-import { codigoContato, linkWhatsApp } from '@/domain/contato';
+import { codigoContato, linkWhatsApp, resumoTriagem } from '@/domain/contato';
 
 it('codigoContato é estável e no formato CONECTA-XXXX', () => {
   const c = codigoContato('abc-123');
@@ -22,4 +22,17 @@ test('sem número no build, usa o WhatsApp da clínica', () => {
   const { linkWhatsApp, WHATSAPP_CLINICA_PADRAO } = jest.requireActual('../contato');
   expect(linkWhatsApp('avaliar', '3 anos', 'CONECTA-AAAA').startsWith(`https://wa.me/${WHATSAPP_CLINICA_PADRAO}?text=`)).toBe(true);
   process.env.EXPO_PUBLIC_WHATSAPP_CLINICA = antes;
+});
+
+test('resumo da triagem é neutro e só entra na mensagem quando os pais escolhem', () => {
+  const resumo = resumoTriagem(['Fala', 'Compreensão'], 6, 8);
+  expect(resumo).toBe('Resumo da triagem: 6 de 8 habilidades no esperado. Ainda em desenvolvimento: fala e compreensão.');
+  expect(resumo).not.toMatch(/atraso|laudo|diagn/i);
+  expect(resumoTriagem([], 8, 8)).toBe('Resumo da triagem: 8 de 8 habilidades no esperado.');
+
+  const sem = decodeURIComponent(linkWhatsApp('observar', '3 anos', 'CONECTA-AAAA'));
+  expect(sem).not.toContain('Resumo da triagem');
+  const com = decodeURIComponent(linkWhatsApp('observar', '3 anos', 'CONECTA-AAAA', undefined, resumo));
+  expect(com).toContain('CONECTA-AAAA');
+  expect(com).toContain('Ainda em desenvolvimento: fala e compreensão.');
 });

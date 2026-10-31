@@ -56,8 +56,28 @@ export const CHAMADA_RESULTADO: Record<NivelResultado, { titulo: string; texto: 
 };
 
 export const CTA_RESULTADO = {
-  titulo: 'Agendar avaliação para {nome}',
-  apoio: 'Fale com a fono pelo WhatsApp',
+  titulo: 'Conversar com a equipe',
+  apoio: 'Sobre a avaliação de {nome}, pelo WhatsApp',
+};
+
+/**
+ * Ponte para a clínica (card antes do botão do WhatsApp). Aprovada pelo Kadu em 31/10.
+ * Regra: nunca chamar de "laudo"; só o código da triagem sai do celular.
+ */
+export const PONTE_CLINICA = {
+  rotulo: 'Próximo passo',
+  titulo: 'Como funciona a conversa',
+  passos: [
+    'O código da triagem de {nome} já vai pronto na mensagem',
+    'Nossa equipe tira suas dúvidas',
+    'Vocês combinam o melhor horário para a avaliação',
+  ],
+  opcao: 'Incluir o resumo dessas habilidades na mensagem para adiantar o meu atendimento',
+  opcaoApoio: '',
+  previa: 'Vai junto na mensagem:',
+  privacidade: 'As respostas da triagem ficam no seu celular. O código só identifica a conversa: a clínica não consegue ver a triagem por ele.',
+  privacidadeComResumo: 'A clínica recebe só o que está na mensagem. Você revisa tudo no WhatsApp antes de enviar.',
+  horario: 'Atende de seg. a sex., 8h às 18h',
 };
 
 /** Horário em que a equipe responde no WhatsApp (seg–sex 8h–18h). Ajustar com a clínica. */

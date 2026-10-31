@@ -139,7 +139,7 @@ export default function Triagem() {
         criadaEm: new Date().toISOString(),
       });
       registrarEvento({ tipo: 'triagem_concluida', faixaId: faixa.id });
-      router.replace({ pathname: '/resultado', params: { id } });
+      router.replace({ pathname: '/resultado', params: { id, novo: '1' } });
     } catch (e) {
       console.error('[triagem] falha ao concluir', e);
       setSalvando(false);
