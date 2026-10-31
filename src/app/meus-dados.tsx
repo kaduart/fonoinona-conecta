@@ -1,3 +1,6 @@
+import * as DocumentPicker from 'expo-document-picker';
+import { File, Paths } from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
@@ -29,7 +32,6 @@ export default function MeusDados() {
     setOcupado('exportar');
     setMsg(null);
     try {
-      const [{ File, Paths }, Sharing] = await Promise.all([import('expo-file-system'), import('expo-sharing')]);
       const agora = new Date();
       const arquivo = new File(Paths.cache, nomeArquivoBackup(agora));
       arquivo.create({ overwrite: true });
@@ -49,7 +51,6 @@ export default function MeusDados() {
     setOcupado('importar');
     setMsg(null);
     try {
-      const [DocumentPicker, { File }] = await Promise.all([import('expo-document-picker'), import('expo-file-system')]);
       const r = await DocumentPicker.getDocumentAsync({ type: ['application/json', 'text/plain', '*/*'], copyToCacheDirectory: true });
       if (r.canceled || !r.assets?.[0]) return;
       const lido = lerBackup(await new File(r.assets[0].uri).text());
