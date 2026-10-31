@@ -6,7 +6,7 @@ import { rateLimit } from 'express-rate-limit';
 import helmet from 'helmet';
 import { z } from 'zod';
 
-import { LoteEventos, NovoLead } from './esquemas.js';
+import { LoteEventos, NovoLead, PreCadastro } from './esquemas.js';
 import { log } from './log.js';
 import type { Repos } from './repos.js';
 
@@ -64,6 +64,22 @@ export function criarApp(repos: Repos, opcoes: OpcoesApp) {
     const { criado, lead } = await repos.leads.registrar(r.data);
     if (criado) log.info('lead novo', { codigo: lead.codigo, origem: lead.origem });
     res.status(criado ? 201 : 200).json(lead);
+  });
+
+  /** Pré-cadastro da lista de espera (landing page). Consentimento LGPD obrigatório. Idempotente pelo WhatsApp. */
+  app.post('/v1/pre-cadastro', limite, async (req, res) => {
+    const r = PreCadastro.safeParse(req.body);
+    if (!r.success) return invalido(res, r.error);
+    const { criado } = await repos.preCadastros.registrar(r.data);
+    if (criado) log.info('pre-cadastro novo', { faixa: r.data.faixa, origem: r.data.origem ?? 'landing' });
+    res.status(criado ? 201 : 200).json({ ok: true, novo: criado });
+  });
+
+  /** Lista da equipe: contatos interessados no app. Protegida por chave. */
+  app.get('/v1/pre-cadastros', limite, async (req, res) => {
+    if (!chaveConfere(req.header('x-api-key'), opcoes.adminApiKey)) return res.status(401).json({ erro: 'nao_autorizado' });
+    const limiteN = Math.min(500, Math.max(1, Number(req.query.limite) || 200));
+    res.json({ total: await repos.preCadastros.listar(limiteN) });
   });
 
   /** Consulta da equipe: "esse código veio do app?". Protegida por chave. */

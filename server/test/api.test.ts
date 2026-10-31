@@ -101,6 +101,48 @@ describe('leads', () => {
   });
 });
 
+describe('pré-cadastro (lista de espera)', () => {
+  const valido = { nome: 'Ana Souza', whatsapp: '(62) 99201-3573', faixa: '2a', consentimento: true };
+
+  it('registra e é idempotente pelo WhatsApp', async () => {
+    const r1 = await request(app).post('/v1/pre-cadastro').send(valido).expect(201);
+    expect(r1.body).toMatchObject({ ok: true, novo: true });
+    const r2 = await request(app).post('/v1/pre-cadastro').send({ ...valido, nome: 'Ana S.' }).expect(200);
+    expect(r2.body.novo).toBe(false);
+  });
+
+  it('exige consentimento, nome e WhatsApp válido', async () => {
+    await request(app).post('/v1/pre-cadastro').send({ ...valido, consentimento: false }).expect(400);
+    await request(app).post('/v1/pre-cadastro').send({ ...valido, nome: 'A' }).expect(400);
+    await request(app).post('/v1/pre-cadastro').send({ ...valido, whatsapp: '123' }).expect(400);
+    await request(app).post('/v1/pre-cadastro').send({ ...valido, faixa: '9a' }).expect(400);
+  });
+
+  it('não guarda nome da criança nem outros campos fora do contrato', async () => {
+    await request(app).post('/v1/pre-cadastro').send({ nome: 'João', whatsapp: '62990000000', faixa: '3a', consentimento: true, nomeCrianca: 'Bebê', respostas: {} }).expect(201);
+    const r = await request(app).get('/v1/pre-cadastros').set('x-api-key', CHAVE).expect(200);
+    const reg = r.body.total.find((x: { whatsapp: string }) => x.whatsapp === '62990000000');
+    expect(reg).toBeTruthy();
+    expect(reg.nomeCrianca).toBeUndefined();
+    expect(reg.respostas).toBeUndefined();
+  });
+
+  it('aceita interesse opcional (lista curta) e recusa valor fora da lista', async () => {
+    await request(app).post('/v1/pre-cadastro').send({ nome: 'Rui', whatsapp: '62990001111', faixa: '4a', interesse: 'fala', consentimento: true }).expect(201);
+    await request(app).post('/v1/pre-cadastro').send({ nome: 'Rui', whatsapp: '62990002222', faixa: '4a', interesse: 'queixa-livre', consentimento: true }).expect(400);
+    const r = await request(app).get('/v1/pre-cadastros').set('x-api-key', CHAVE).expect(200);
+    expect(r.body.total.find((x: { whatsapp: string }) => x.whatsapp === '62990001111').interesse).toBe('fala');
+  });
+
+  it('lista protegida por chave da equipe', async () => {
+    await request(app).post('/v1/pre-cadastro').send(valido);
+    await request(app).get('/v1/pre-cadastros').expect(401);
+    await request(app).get('/v1/pre-cadastros').set('x-api-key', 'errada').expect(401);
+    const r = await request(app).get('/v1/pre-cadastros').set('x-api-key', CHAVE).expect(200);
+    expect(Array.isArray(r.body.total)).toBe(true);
+  });
+});
+
 describe('limite de requisições', () => {
   it('responde 429 depois do limite', async () => {
     const limitado = criarApp(reposEmMemoria(), { adminApiKey: CHAVE, limitePorMinuto: 2 });
