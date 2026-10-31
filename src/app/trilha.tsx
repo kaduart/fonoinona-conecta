@@ -8,6 +8,7 @@ import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
 import { Medalha } from '@/components/medalha';
 import { Chip } from '@/components/ui';
+import { temaDaFase } from '@/content/fases';
 import { ROTULO_AREA } from '@/content/perguntas';
 import { idadeDe } from '@/domain/idade';
 import { fasesDaTrilha, MISSOES_POR_FASE, missoesParaIdade, montarTrilha, type ItemTrilha } from '@/domain/missoes';
@@ -59,9 +60,15 @@ export default function Trilha() {
       <View style={{ gap: 22 }}>
         {fases.map((fase, f) => {
           const aberta = fase.itens.some((t) => t.liberada);
+          const tema = temaDaFase(fase.numero);
           return (
             <View key={fase.numero} style={{ gap: 10 }}>
-              <View style={[s.fase, !aberta && { opacity: 0.6 }]}>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`Fase ${fase.numero}, ${tema.titulo}. Ver o objetivo e os recursos`}
+                onPress={() => router.push({ pathname: '/fase/[numero]', params: { numero: String(fase.numero) } })}
+                style={({ pressed }) => [s.fase, !aberta && { opacity: 0.6 }, pressed && { opacity: 0.75 }]}
+              >
                 <Medalha tom={fase.medalha.tom} trancada={!fase.completa} tamanho={38} />
                 <View style={{ flex: 1 }}>
                   <Texto variante="legenda" style={{ fontFamily: fonte.negrito, letterSpacing: 0.5, color: fase.completa ? cores.marca : cores.texto2 }}>
@@ -69,13 +76,18 @@ export default function Trilha() {
                     {fase.completa ? ' · CONQUISTADA' : ''}
                   </Texto>
                   <Texto variante="rotulo" style={{ fontSize: 14.5 }}>
-                    Medalha {fase.medalha.nome}
+                    {tema.titulo}
                   </Texto>
+                  {aberta ? (
+                    <Texto variante="legenda" style={{ color: cores.marca, fontFamily: fonte.semi }}>
+                      Objetivo e recursos da fase ›
+                    </Texto>
+                  ) : null}
                 </View>
                 <Texto style={{ fontFamily: fonte.extra, fontSize: 14, color: fase.completa ? cores.marca : cores.texto3 }}>
                   {fase.feitas}/{fase.itens.length}
                 </Texto>
-              </View>
+              </Pressable>
               {fase.itens.map((item, i) => (
                 <CartaoMissao
                   key={item.missao.id}
@@ -111,7 +123,7 @@ function BrilhoDesbloqueio({ ativo, children }: { ativo: boolean; children: Reac
   }, [ativo, reduzir, pulso, escala]);
   const estilo = useAnimatedStyle(() => ({
     transform: [{ scale: escala.value }],
-    boxShadow: ativo ? `0px 0px ${10 + pulso.value * 22}px rgba(242,184,75,${0.35 + pulso.value * 0.5})` : undefined,
+    boxShadow: ativo ? `0px 0px ${10 + pulso.value * 22}px rgba(242,184,75,${0.35 + pulso.value * 0.5})` : '0px 0px 0px rgba(0,0,0,0)',
     borderColor: ativo ? `rgba(242,184,75,${0.5 + pulso.value * 0.5})` : 'transparent',
   }));
   return <Animated.View style={[{ borderRadius: raio.lg + 3, borderWidth: 2.5, padding: 0 }, estilo]}>{children}</Animated.View>;

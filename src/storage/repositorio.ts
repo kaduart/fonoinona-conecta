@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { FILA_VAZIA, type Fila } from '@/api/fila';
+import type { RegistroDiario } from '@/domain/diario';
 import type { Conclusao } from '@/domain/missoes';
 import { chaveDoAparelho, descartarChave, novoNonce } from '@/storage/chave';
 import { cifrar, decifrar, estaCifrado } from '@/storage/cifra';
@@ -42,6 +43,8 @@ const CHAVES = {
   instalacao: 'conecta:instalacao:v1',
   fila: 'conecta:fila-eventos:v1',
   conteudo: 'conecta:conteudo-remoto:v1',
+  diario: 'conecta:diario:v1',
+  kitInteresse: 'conecta:kit-interesse:v1',
 } as const;
 
 export type ConteudoRemoto = { versao: string; publicadoEm: string; dados: unknown };
@@ -111,6 +114,30 @@ export const repositorio = {
     await gravar(CHAVES.conclusoes, [...todas.filter((x) => x.id !== c.id), c]);
   },
 
+  listarDiario: async (criancaId: string) => {
+    const todos = await ler<RegistroDiario[]>(CHAVES.diario, []);
+    return todos.filter((r) => r.criancaId === criancaId).sort((a, b) => b.data.localeCompare(a.data) || b.criadoEm.localeCompare(a.criadoEm));
+  },
+
+  /** Cria ou edita (idempotente pelo id). Validar antes com normalizarRegistro. */
+  async salvarRegistroDiario(r: RegistroDiario) {
+    const todos = await ler<RegistroDiario[]>(CHAVES.diario, []);
+    await gravar(CHAVES.diario, [...todos.filter((x) => x.id !== r.id), r]);
+  },
+
+  async removerRegistroDiario(id: string) {
+    const todos = await ler<RegistroDiario[]>(CHAVES.diario, []);
+    await gravar(CHAVES.diario, todos.filter((x) => x.id !== id));
+  },
+
+  /** Fases em que a família pediu aviso do kit (lista de espera local; a contagem anônima vai pela telemetria). */
+  listarKitInteresse: () => ler<number[]>(CHAVES.kitInteresse, []),
+
+  async marcarKitInteresse(fase: number) {
+    const atual = await repositorio.listarKitInteresse();
+    if (!atual.includes(fase)) await gravar(CHAVES.kitInteresse, [...atual, fase]);
+  },
+
   /** Id aleatório desta instalação, sem ligação com a família. Criado na primeira vez. */
   async instalacaoId() {
     const id = await ler<string | null>(CHAVES.instalacao, null);
@@ -126,17 +153,19 @@ export const repositorio = {
   lerConteudoRemoto: () => ler<ConteudoRemoto | null>(CHAVES.conteudo, null),
   salvarConteudoRemoto: (c: ConteudoRemoto) => gravar(CHAVES.conteudo, c),
 
-  /** Remove uma criança e tudo dela (triagens e missões). */
+  /** Remove uma criança e tudo dela (triagens, missões e Diário). */
   async removerCrianca(id: string) {
-    const [criancas, triagens, conclusoes] = await Promise.all([
+    const [criancas, triagens, conclusoes, diario] = await Promise.all([
       repositorio.listarCriancas(),
       ler<TriagemSalva[]>(CHAVES.triagens, []),
       ler<Conclusao[]>(CHAVES.conclusoes, []),
+      ler<RegistroDiario[]>(CHAVES.diario, []),
     ]);
     await Promise.all([
       gravar(CHAVES.criancas, criancas.filter((c) => c.id !== id)),
       gravar(CHAVES.triagens, triagens.filter((t) => t.criancaId !== id)),
       gravar(CHAVES.conclusoes, conclusoes.filter((c) => c.criancaId !== id)),
+      gravar(CHAVES.diario, diario.filter((r) => r.criancaId !== id)),
     ]);
   },
 

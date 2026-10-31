@@ -6,7 +6,7 @@ import Svg, { Circle, Path } from 'react-native-svg';
 import { Texto } from '@/components/texto';
 import { cores, fonte, raio, sombra } from '@/theme/tokens';
 
-type NomeIcone = 'casa' | 'grafico' | 'pessoa' | 'seta' | 'cadeado' | 'check' | 'mais' | 'escudo' | 'info' | 'relogio' | 'chat' | 'lixo' | 'livro' | 'estrela' | 'fogo' | 'equipe' | 'play' | 'cronometro' | 'baixo';
+type NomeIcone = 'casa' | 'grafico' | 'pessoa' | 'seta' | 'cadeado' | 'check' | 'mais' | 'escudo' | 'info' | 'relogio' | 'chat' | 'lixo' | 'livro' | 'estrela' | 'fogo' | 'equipe' | 'play' | 'cronometro' | 'baixo' | 'lapis' | 'compartilhar' | 'presente';
 
 const TRACOS: Record<NomeIcone, ReactNode> = {
   casa: <Path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z" />,
@@ -58,7 +58,22 @@ const TRACOS: Record<NomeIcone, ReactNode> = {
     </>
   ),
   baixo: <Path d="M6 9l6 6 6-6" />,
+  lapis: <Path d="M4 20l1-4.5L15.5 5a2.1 2.1 0 0 1 3 3L8 18.5zM13.5 7l3 3" />,
+  compartilhar: (
+    <>
+      <Path d="M12 3v12M7 8l5-5 5 5" />
+      <Path d="M5 13v6a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-6" />
+    </>
+  ),
+  presente: (
+    <>
+      <Path d="M4 10h16v10H4zM3 7h18v3H3zM12 7v13" />
+      <Path d="M12 7c-1.5-3-5-3.5-5-1.2C7 7 9 7 12 7zM12 7c1.5-3 5-3.5 5-1.2C17 7 15 7 12 7z" />
+    </>
+  ),
 };
+
+export type { NomeIcone };
 
 export function Icone({ nome, cor = cores.texto, tamanho = 20, espessura = 2, cheio }: { nome: NomeIcone; cor?: string; tamanho?: number; espessura?: number; cheio?: boolean }) {
   return (
@@ -105,6 +120,7 @@ export function ItemLista({ icone, titulo, descricao, onPress, cor = cores.marca
 const ABAS: { href: Href; rota: string; titulo: string; icone: NomeIcone }[] = [
   { href: '/inicio', rota: '/inicio', titulo: 'Início', icone: 'casa' },
   { href: '/trilha', rota: '/trilha', titulo: 'Trilha', icone: 'estrela' },
+  { href: '/diario', rota: '/diario', titulo: 'Diário', icone: 'lapis' },
   { href: '/historico', rota: '/historico', titulo: 'Evolução', icone: 'grafico' },
   { href: '/equipe', rota: '/equipe', titulo: 'Equipe', icone: 'equipe' },
 ];
@@ -172,5 +188,5 @@ const s = StyleSheet.create({
   barra: { flexDirection: 'row', backgroundColor: cores.superficie, borderRadius: 26, paddingVertical: 10, boxShadow: sombra.elevada },
   seletor: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 5, paddingLeft: 5, paddingRight: 12, borderRadius: raio.pill, backgroundColor: cores.superficie, boxShadow: sombra.card, maxWidth: 210 },
   aba: { flex: 1, alignItems: 'center', gap: 3 },
-  abaIcone: { width: 46, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center' },
+  abaIcone: { width: 42, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center' },
 });
