@@ -9,10 +9,19 @@ function feita(missaoId: string, em: string, como: Conclusao['como'] = 'facil'):
 }
 
 describe('catálogo de missões', () => {
-  it('tem 18 missões com ids e ordens únicos', () => {
-    expect(MISSOES).toHaveLength(18);
-    expect(new Set(MISSOES.map((m) => m.id)).size).toBe(18);
-    expect(new Set(MISSOES.map((m) => m.ordem)).size).toBe(18);
+  it('tem 26 missões com ids e ordens únicos', () => {
+    expect(MISSOES).toHaveLength(26);
+    expect(new Set(MISSOES.map((m) => m.id)).size).toBe(26);
+    expect(new Set(MISSOES.map((m) => m.ordem)).size).toBe(26);
+  });
+
+  it('de 3 a 6 anos a trilha começa pelas missões da fase e esconde as de bebê', () => {
+    for (const meses of [36, 48, 60, 71]) {
+      const lista = missoesParaIdade(meses);
+      expect(lista.some((m) => m.id === 'm06-conversa-bebe')).toBe(false);
+      expect(lista[0].idadeMinMeses).toBeGreaterThanOrEqual(24);
+      expect(lista.filter((m) => m.idadeMinMeses >= 36).length).toBeGreaterThanOrEqual(meses >= 48 ? 10 : 5);
+    }
   });
 
   it('toda faixa de idade tem pelo menos uma missão', () => {

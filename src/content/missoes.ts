@@ -3,7 +3,7 @@
 
 import type { Area } from '@/content/perguntas';
 
-export const VERSAO_MISSOES = '2026.10-r1';
+export const VERSAO_MISSOES = '2026.10-r2';
 
 export type Missao = {
   id: string;
@@ -15,6 +15,8 @@ export type Missao = {
   /** áreas da triagem que a missão estimula, usadas para priorizar */
   areas: Area[];
   idadeMinMeses: number;
+  /** some da trilha depois desta idade (missões de bebê); a RT confirma os cortes */
+  idadeMaxMeses?: number;
   duracao: string;
   material: string;
   passos: string[];
@@ -136,6 +138,7 @@ export const MISSOES: Missao[] = [
     rotuloArea: 'Fala',
     areas: ['fala', 'interacao'],
     idadeMinMeses: 0,
+    idadeMaxMeses: 24,
     duracao: '5 min',
     material: 'Nenhum.',
     passos: [
@@ -155,6 +158,7 @@ export const MISSOES: Missao[] = [
     rotuloArea: 'Interação',
     areas: ['interacao'],
     idadeMinMeses: 6,
+    idadeMaxMeses: 30,
     duracao: '5 min',
     material: 'Um pano leve ou uma fralda de pano.',
     passos: [
@@ -375,6 +379,153 @@ export const MISSOES: Missao[] = [
     ],
     dica: 'Brincar com os sons das palavras é a base da alfabetização.',
     observar: 'Observe se ela percebe a rima pelo final da palavra. Se errar, repita o par mais devagar, caprichando no final.',
+    quandoParar: PARAR_PADRAO,
+  },
+  // ---- Fase 3 a 6 anos (rascunho de 31/10 para revisão da RT) ----
+  {
+    id: 'm19-palmas-silabas',
+    ordem: 19,
+    titulo: 'Palmas das Sílabas',
+    rotuloArea: 'Consciência fonológica',
+    areas: ['consciencia_fonologica'],
+    idadeMinMeses: 48,
+    duracao: '5 min',
+    material: 'Nenhum. Só as mãos (ou pulinhos no chão).',
+    passos: [
+      'Diga o nome da criança batendo uma palma em cada pedacinho: "Pe-dro".',
+      'Peça que ela repita batendo junto.',
+      'Façam com outras palavras da casa: "me-sa", "ja-ne-la", "te-le-vi-são".',
+      'Desafio: ela escolhe uma palavra e você adivinha quantas palmas tem.',
+    ],
+    dica: 'Comece com palavras de 2 pedacinhos e só depois passe para as maiores. Contar os pedacinhos prepara para ler e escrever.',
+    quandoParar: PARAR_PADRAO,
+  },
+  {
+    id: 'm20-diretor-cinema',
+    ordem: 20,
+    titulo: 'Diretor de Cinema',
+    rotuloArea: 'Narrativa',
+    areas: ['narrativa', 'fala'],
+    idadeMinMeses: 42,
+    duracao: '10 min',
+    material: '3 objetos de casa escolhidos pela criança (um bicho de pelúcia, uma colher, uma caixa).',
+    passos: [
+      'Você começa a história usando os objetos: "Era uma vez um urso que estava com muita fome…".',
+      'Pare e pergunte: "E aí, o que aconteceu?".',
+      'A criança conta o meio da história mexendo nos objetos.',
+      'Peça o final: "E como terminou?". Depois recontem a história inteira juntos.',
+    ],
+    dica: 'Ajude com palavras de ligação: "e aí", "depois", "então", "no final". Elas organizam a fala e o pensamento.',
+    quandoParar: PARAR_PADRAO,
+  },
+  {
+    id: 'm21-laboratorio-sopros',
+    ordem: 21,
+    titulo: 'Laboratório dos Sopros',
+    rotuloArea: 'Motricidade oral',
+    areas: ['motricidade_oral'],
+    idadeMinMeses: 36,
+    duracao: '10 min',
+    material: 'Um canudo, 3 bolinhas de papel amassado e fita adesiva para marcar a chegada na mesa.',
+    passos: [
+      'Marque uma linha de chegada na ponta da mesa com fita.',
+      'Mostre como soprar pelo canudo para empurrar a bolinha.',
+      'Façam uma corrida: quem leva a bolinha até a linha?',
+      'No final, imitem o som de um motor vibrando os lábios: "brrrrr".',
+    ],
+    dica: 'Peça sopro fraquinho para a bolinha andar devagar e sopro forte para ela correr. Controlar o ar ajuda nos sons mais difíceis da fala.',
+    seguranca: 'Só soprar, nunca puxar o ar pelo canudo. Bolinhas grandes, que não cabem na boca. Pare se a criança ficar tonta.',
+    quandoParar: PARAR_PADRAO,
+  },
+  {
+    id: 'm22-mimica-emocoes',
+    ordem: 22,
+    titulo: 'Mímica das Emoções',
+    rotuloArea: 'Interação',
+    areas: ['interacao', 'imitacao'],
+    idadeMinMeses: 36,
+    duracao: '10 min',
+    material: 'Um espelho (opcional).',
+    passos: [
+      'Faça uma cara de feliz e pergunte: "Como eu estou?".',
+      'Repita com triste, bravo, assustado e surpreso.',
+      'Troquem: a criança faz a cara e você adivinha.',
+      'Pergunte: "O que deixa você feliz?" e conversem sobre a resposta.',
+    ],
+    dica: 'Dê nome ao que ela sente no dia a dia: "Você ficou bravo porque acabou o desenho". Isso ajuda a falar em vez de chorar ou bater.',
+    quandoParar: PARAR_PADRAO,
+  },
+  {
+    id: 'm23-jogo-da-vez',
+    ordem: 23,
+    titulo: 'Jogo da Vez',
+    rotuloArea: 'Interação e regras',
+    areas: ['interacao', 'compreensao'],
+    idadeMinMeses: 48,
+    duracao: '15 min',
+    material: 'Uma folha com um caminho de 15 quadradinhos desenhado, um dado (ou papeizinhos de 1 a 3) e 2 tampinhas como peões.',
+    passos: [
+      'Combine as regras antes: cada um joga uma vez, e quem chegar primeiro vence.',
+      'Joguem falando de quem é a vez: "Agora é a minha vez… agora é a sua".',
+      'Conte as casas em voz alta junto com a criança.',
+      'No final, cumprimentem-se, ganhando ou perdendo.',
+    ],
+    dica: 'Esperar a vez e seguir uma regra combinada é treino de conversa: cada um fala e escuta na sua hora.',
+    seguranca: 'Dado e tampinhas são pequenos: guarde depois e não deixe com irmãos menores de 3 anos.',
+    quandoParar: 'Se a criança se frustrar muito ao perder, pare, acolha e jogue outro dia em dupla com você contra o papai ou a mamãe.',
+  },
+  {
+    id: 'm24-o-que-e',
+    ordem: 24,
+    titulo: 'O que é, o que é?',
+    rotuloArea: 'Compreensão e vocabulário',
+    areas: ['compreensao', 'fala'],
+    idadeMinMeses: 48,
+    duracao: '10 min',
+    material: 'Nenhum (ou objetos da casa para olhar).',
+    passos: [
+      'Dê 3 pistas de um objeto da casa: "É redondo, a gente chuta e rola no chão".',
+      'A criança adivinha.',
+      'Troquem: ela dá as pistas e você adivinha.',
+      'Se ela travar, ajude: "Qual a cor? Pra que serve? Onde fica?".',
+    ],
+    dica: 'Dar pistas faz a criança descrever forma, cor e uso, que é como o vocabulário cresce.',
+    quandoParar: PARAR_PADRAO,
+  },
+  {
+    id: 'm25-recado-secreto',
+    ordem: 25,
+    titulo: 'Recado Secreto',
+    rotuloArea: 'Escuta e fala clara',
+    areas: ['audicao', 'inteligibilidade'],
+    idadeMinMeses: 48,
+    duracao: '10 min',
+    material: 'Pelo menos 3 pessoas da família.',
+    passos: [
+      'Sentem em roda.',
+      'Você fala um recado curto no ouvido da criança: "O gato comeu o bolo".',
+      'Ela passa o recado para o próximo, falando devagar e claro.',
+      'O último fala em voz alta e todos conferem se o recado chegou igual.',
+    ],
+    dica: 'Se o recado mudar, não corrija com bronca: repita devagar e brinque de "o recado se perdeu no caminho".',
+    quandoParar: PARAR_PADRAO,
+  },
+  {
+    id: 'm26-primeiro-som',
+    ordem: 26,
+    titulo: 'Caça ao Primeiro Som',
+    rotuloArea: 'Consciência fonológica',
+    areas: ['consciencia_fonologica', 'fala'],
+    idadeMinMeses: 60,
+    duracao: '10 min',
+    material: 'Objetos da casa e uma cesta.',
+    passos: [
+      'Escolha um som: "/b/, de bola".',
+      'Saiam pela casa procurando coisas que começam com esse som (banana, boneca, balde).',
+      'Coloquem tudo na cesta e falem o nome de cada um, caprichando no primeiro som.',
+      'Troquem o som: "/m/, de mamãe".',
+    ],
+    dica: 'Fale o som, não o nome da letra: "/b/", e não "bê". É assim que a criança liga o som à escrita.',
     quandoParar: PARAR_PADRAO,
   },
 ];
