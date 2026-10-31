@@ -21,7 +21,7 @@ const ARCO = `M${CX - R} ${CY} A${R} ${R} 0 0 1 ${CX + R} ${CY}`;
  * Arco ultrafino com gradiente contínuo e marcador que pulsa no ponto do resultado.
  * O centro mostra quantas habilidades estão no esperado ("4 de 6").
  */
-export function Medidor({ nivel, noEsperado, total }: { nivel: NivelResultado; noEsperado: number; total: number }) {
+export function Medidor({ nivel, noEsperado, total, escuro = false }: { nivel: NivelResultado; noEsperado: number; total: number; escuro?: boolean }) {
   const ang = Math.PI * (1 - POSICAO[nivel]);
   const x = CX + R * Math.cos(ang);
   const y = CY - R * Math.sin(ang);
@@ -53,9 +53,9 @@ export function Medidor({ nivel, noEsperado, total }: { nivel: NivelResultado; n
             <Stop offset="1" stopColor="#18B88F" />
           </LinearGradient>
         </Defs>
-        <Path d={ARCO} stroke="#EDF3F2" strokeWidth={5} strokeLinecap="round" fill="none" />
-        <Path d={ARCO} stroke="url(#arco)" strokeWidth={14} strokeLinecap="round" fill="none" opacity={0.1} />
-        <Path d={ARCO} stroke="url(#arco)" strokeWidth={5} strokeLinecap="round" fill="none" />
+        <Path d={ARCO} stroke={escuro ? 'rgba(255,255,255,0.10)' : '#EDF3F2'} strokeWidth={escuro ? 3 : 5} strokeLinecap="round" fill="none" />
+        <Path d={ARCO} stroke="url(#arco)" strokeWidth={escuro ? 16 : 14} strokeLinecap="round" fill="none" opacity={escuro ? 0.16 : 0.1} />
+        <Path d={ARCO} stroke="url(#arco)" strokeWidth={escuro ? 3.5 : 5} strokeLinecap="round" fill="none" />
         <Circle cx={x} cy={y} r={17} fill={COR[nivel]} opacity={0.2} />
       </Svg>
       <Animated.View
@@ -73,16 +73,16 @@ export function Medidor({ nivel, noEsperado, total }: { nivel: NivelResultado; n
           backgroundColor: '#fff',
           alignItems: 'center',
           justifyContent: 'center',
-          boxShadow: '0px 3px 6px rgba(154, 106, 11, 0.35)',
+          boxShadow: escuro ? `0px 0px 14px ${COR[nivel]}` : '0px 3px 6px rgba(154, 106, 11, 0.35)',
         }}
       >
         <View style={{ width: 11, height: 11, borderRadius: 6, backgroundColor: COR[nivel] }} />
       </View>
       <View style={{ position: 'absolute', left: 0, right: 0, top: 78, alignItems: 'center' }}>
-        <Texto style={{ fontFamily: fonte.extra, fontSize: 34, lineHeight: 40, letterSpacing: -0.8, color: cores.texto }}>
+        <Texto style={{ fontFamily: fonte.extra, fontSize: 34, lineHeight: 40, letterSpacing: -0.8, color: escuro ? '#fff' : cores.texto }}>
           {noEsperado} de {total}
         </Texto>
-        <Texto variante="legenda">habilidades no esperado</Texto>
+        <Texto variante="legenda" style={escuro ? { color: 'rgba(255,255,255,0.62)' } : undefined}>habilidades no esperado</Texto>
       </View>
     </View>
   );

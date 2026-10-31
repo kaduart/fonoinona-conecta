@@ -56,9 +56,16 @@ export const CHAMADA_RESULTADO: Record<NivelResultado, { titulo: string; texto: 
 };
 
 export const CTA_RESULTADO = {
-  titulo: 'Potencializar desenvolvimento no WhatsApp',
-  apoio: 'Fale diretamente com os especialistas da Fono Inova Anápolis',
+  titulo: 'Montar o plano de {nome} no WhatsApp',
+  apoio: 'Fale com os especialistas da Fono Inova',
 };
+
+/** Horário em que a equipe responde no WhatsApp (seg–sex 8h–18h). Ajustar com a clínica. */
+export function equipeOnline(agora: Date = new Date()) {
+  const dia = agora.getDay();
+  const h = agora.getHours();
+  return dia >= 1 && dia <= 5 && h >= 8 && h < 18;
+}
 
 /** Descrição curta de cada habilidade, para os cards do resultado. */
 export const DESCRICAO_AREA: Record<string, string> = {
@@ -74,4 +81,20 @@ export const DESCRICAO_AREA: Record<string, string> = {
   narrativa: 'Contar o que viveu',
   inteligibilidade: 'Ser entendido',
   consciencia_fonologica: 'Rimas e sílabas',
+};
+
+/** Dica prática imediata por habilidade ("Dica da Fono"). Aguarda revisão da RT. */
+export const DICA_AREA: Record<string, string> = {
+  fala: 'Narre o que vocês fazem juntos e espere a criança completar a frase.',
+  compreensao: 'Dê pedidos curtos com gesto: "pega a bola e me dá".',
+  interacao: 'Brinque de esconde-esconde com o rosto e espere o olhar dela.',
+  audicao: 'Brinque de achar de onde vem o som de um chocalho escondido.',
+  motricidade_oral: 'Soprar bolhas e encher as bochechas no espelho ajuda muito.',
+  alimentacao: 'Ofereça alimentos de texturas diferentes, sempre sentada e com calma.',
+  imitacao: 'Faça caretas e sons de bichos no espelho e convide a imitar.',
+  gestos: 'Aponte e nomeie as coisas no passeio: "olha o cachorro!".',
+  brincar: 'Brinque de faz de conta 10 min por dia, narrando o que acontece.',
+  narrativa: 'Na hora de dormir, peça para contar 3 coisas que aconteceram no dia.',
+  inteligibilidade: 'Repita a palavra do jeito certo, sem corrigir: "é, o carro!".',
+  consciencia_fonologica: 'Brinque de rimas: "gato, pato, sapato… o que mais rima?".',
 };
