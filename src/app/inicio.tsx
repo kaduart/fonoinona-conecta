@@ -5,12 +5,14 @@ import { registrarEvento } from '@/api/cliente';
 import { BarraInferior, Icone, irPara, Marca, SeletorCrianca } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
-import { Botao, Card } from '@/components/ui';
+import { Botao, Card, Chip } from '@/components/ui';
+import { TEXTOS_RESULTADO } from '@/content/resultados';
+import { contarHabilidades } from '@/domain/triagem';
 import { IlustracaoViva } from '@/components/animacao';
 import { chaveDaArea, ilustracaoDaArea, PROPORCAO, videoDaArea } from '@/content/ilustracoes';
 import { ROTULO_AREA } from '@/content/perguntas';
 import { formatarDataCurta, proximaTriagem } from '@/domain/acompanhamento';
-import { linkWhatsAppGeral } from '@/domain/contato';
+import { codigoContato, linkWhatsApp, linkWhatsAppGeral } from '@/domain/contato';
 import { formatarIdade, idadeDe } from '@/domain/idade';
 import { areasComDificuldade, diasSeguidos, missaoDoDia, missoesParaIdade, montarTrilha, semana } from '@/domain/missoes';
 import { useApp } from '@/state/app';
@@ -54,6 +56,14 @@ export default function Inicio() {
   const feitosNaSemana = dias.filter((d) => d.feito).length;
   const dificeis = areasComDificuldade(conclusoes);
   const proxima = proximaTriagem(criancaAtual, ultima, hoje);
+  const { noEsperado, total } = ultima ? contarHabilidades(ultima.respostas) : { noEsperado: 0, total: 0 };
+  const emDesenvolvimento = ultima?.resultado.areas.filter((a) => a.nivel !== 'esperado').map((a) => a.rotulo.toLowerCase()) ?? [];
+  function falarComEquipe() {
+    if (!ultima) return;
+    registrarEvento({ tipo: 'whatsapp_aberto', origem: 'resultado' });
+    const url = linkWhatsApp(ultima.resultado.nivel, formatarIdade(ultima.idadeMeses), codigoContato(ultima.id));
+    Linking.openURL(url).catch((e) => console.error('[inicio] WhatsApp', e));
+  }
   const indice = criancas.findIndex((c) => c.id === criancaAtual.id);
 
   return (
@@ -99,6 +109,53 @@ export default function Inicio() {
             </View>
           </Pressable>
         </View>
+      ) : null}
+
+      {ultima ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Ver resultado completo da última triagem"
+          onPress={() => router.push({ pathname: '/resultado', params: { id: ultima.id } })}
+          style={({ pressed }) => [s.resultado, pressed && { opacity: 0.9 }]}
+        >
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+            <Texto variante="legenda" numberOfLines={1} style={{ flexShrink: 1 }}>
+              Triagem · {formatarDataCurta(new Date(ultima.criadaEm))}
+            </Texto>
+            <Chip texto={TEXTOS_RESULTADO[ultima.resultado.nivel].rotulo} tom={ultima.resultado.nivel} />
+          </View>
+          <Texto style={{ fontFamily: fonte.extra, fontSize: 17, lineHeight: 22, color: cores.texto }}>
+            {noEsperado} de {total} habilidades no esperado
+          </Texto>
+          {emDesenvolvimento.length ? (
+            <Texto style={{ fontSize: 13.5, lineHeight: 19 }}>
+              Ainda em desenvolvimento: {emDesenvolvimento.length === 1 ? emDesenvolvimento[0] : `${emDesenvolvimento.slice(0, -1).join(', ')} e ${emDesenvolvimento[emDesenvolvimento.length - 1]}`}.
+            </Texto>
+          ) : (
+            <Texto style={{ fontSize: 13.5, lineHeight: 19 }}>Tudo no esperado para a idade. As missões ajudam {nome} a seguir assim.</Texto>
+          )}
+          {ultima.resultado.areaFoco ? (
+            <View style={s.foco}>
+              <Icone nome="estrela" cor={cores.marca} tamanho={13} cheio />
+              <Texto style={{ flex: 1, fontSize: 13, lineHeight: 18, color: cores.texto }}>
+                As missões de {nome} agora dão foco em <Texto style={{ fontFamily: fonte.negrito, fontSize: 13, color: cores.texto }}>{ROTULO_AREA[ultima.resultado.areaFoco].toLowerCase()}</Texto>.
+              </Texto>
+            </View>
+          ) : null}
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 }}>
+            <Texto style={{ fontFamily: fonte.negrito, fontSize: 14, color: cores.marca }}>Ver resultado completo</Texto>
+            <Icone nome="seta" cor={cores.marca} tamanho={14} espessura={2.6} />
+          </View>
+          {ultima.resultado.nivel === 'avaliar' ? (
+            <Botao titulo="Conversar com a equipe" onPress={falarComEquipe} />
+          ) : ultima.resultado.nivel === 'observar' ? (
+            <Pressable accessibilityRole="link" onPress={falarComEquipe} hitSlop={8}>
+              <Texto variante="legenda" style={{ marginTop: 2 }}>
+                Ficou com dúvida? <Texto variante="legenda" style={{ fontFamily: fonte.negrito, color: cores.marca, textDecorationLine: 'underline' }}>Fale com a equipe</Texto>
+              </Texto>
+            </Pressable>
+          ) : null}
+        </Pressable>
       ) : null}
 
       <Card style={{ padding: 20, gap: 12 }}>
@@ -198,6 +255,8 @@ const s = StyleSheet.create({
   play: { width: 52, height: 52, borderRadius: 18, backgroundColor: cores.marca, alignItems: 'center', justifyContent: 'center', boxShadow: sombra.botao },
   dia: { width: 36, height: 36, borderRadius: 12, backgroundColor: cores.fundo2, alignItems: 'center', justifyContent: 'center' },
   diaHoje: { backgroundColor: 'transparent', borderWidth: 2, borderStyle: 'dashed', borderColor: cores.marca },
+  resultado: { gap: 8, padding: 16, borderRadius: raio.lg, backgroundColor: cores.superficie, boxShadow: sombra.card },
+  foco: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 10, borderRadius: 12, backgroundColor: cores.marcaSuave },
   triagem: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: raio.lg, backgroundColor: cores.superficie, boxShadow: sombra.card },
   triagemIcone: { width: 40, height: 40, borderRadius: 13, backgroundColor: cores.solFundo, alignItems: 'center', justifyContent: 'center' },
 });
