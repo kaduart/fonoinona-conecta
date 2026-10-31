@@ -62,10 +62,10 @@ Identificador: `br.com.fonoinova.conecta`. Guia completo, com textos das lojas e
 - injeta o manifest, os ícones (`public/icons/`) e o registro do service worker no `index.html`;
 - gera `dist/sw.js` com todos os arquivos do app. Depois do primeiro acesso, o app abre sem internet.
 
-Hospedagem grátis no Cloudflare Pages (Workers & Pages → Create → Pages → Connect to Git):
+Hospedagem grátis no Cloudflare (Workers & Pages → Create → Connect GitHub; o `wrangler.jsonc` já aponta para `dist/`):
 - repositório `kaduart/fonoinona-conecta`, branch `develop`;
-- build command `npm run build:web`, output directory `dist`;
-- variável `EXPO_PUBLIC_WHATSAPP_CLINICA` (e `EXPO_PUBLIC_API_URL` quando a API estiver no ar).
+- build command `npm run build:web`, deploy command `npx wrangler deploy`;
+- variável de build `EXPO_PUBLIC_WHATSAPP_CLINICA` (e `EXPO_PUBLIC_API_URL` quando a API estiver no ar).
 
 Cada push na branch publica sozinho. `public/_headers` impede o cache do `sw.js`, então a atualização chega no próximo acesso.
 No iPhone: abrir no Safari → Compartilhar → Adicionar à Tela de Início. No Android, o Chrome oferece "Instalar app".
