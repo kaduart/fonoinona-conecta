@@ -2,7 +2,7 @@
 // Fonte: marcos do CDC "Learn the Signs. Act Early" (2022), adaptados; itens "fono" são sugestões da equipe.
 // Rascunho revisado pela RT Lorrany Siqueira Marques (CRFa 5-13633). Ajustes dela entram aqui, sem mexer nas telas.
 
-export const VERSAO_CONTEUDO = '2026.10-r1';
+export const VERSAO_CONTEUDO = '2026.10-r2';
 
 export type Area =
   | 'fala'
@@ -64,6 +64,8 @@ export const FAIXAS: Faixa[] = [
       { id: 'f0-4', texto: '{nome} olha para o seu rosto quando você fala com ele(a)?', area: 'interacao', base: 'cdc' },
       { id: 'f0-5', texto: '{nome} faz sons além do choro, como "aaa" e "ooo"?', area: 'fala', base: 'cdc' },
       { id: 'f0-6', texto: '{nome} mama ou toma a mamadeira sem engasgar com frequência?', area: 'alimentacao', base: 'fono' },
+      { id: 'f0-7', texto: 'Quando você conversa com {nome}, ele(a) faz sons de volta, como se respondesse?', area: 'fala', base: 'cdc' },
+      { id: 'f0-8', texto: '{nome} leva as mãos à boca e chupa os dedinhos?', area: 'motricidade_oral', base: 'cdc' },
     ],
   },
   {
@@ -78,6 +80,8 @@ export const FAIXAS: Faixa[] = [
       { id: 'f6-4', texto: '{nome} faz "brrr" ou sopra com os lábios?', area: 'motricidade_oral', base: 'cdc' },
       { id: 'f6-5', texto: '{nome} reconhece as pessoas da família e estranha quem não conhece?', area: 'interacao', base: 'cdc' },
       { id: 'f6-6', texto: '{nome} aceita papinhas e comidas amassadas na colher?', area: 'alimentacao', base: 'fono' },
+      { id: 'f6-7', texto: '{nome} balbucia juntando sílabas, como "mamama" ou "bababa"?', area: 'fala', base: 'cdc' },
+      { id: 'f6-8', texto: '{nome} levanta os braços para pedir colo?', area: 'gestos', base: 'cdc' },
     ],
   },
   {
@@ -92,6 +96,8 @@ export const FAIXAS: Faixa[] = [
       { id: 'f12-4', texto: '{nome} para, mesmo que só por um instante, quando ouve "não"?', area: 'compreensao', base: 'cdc' },
       { id: 'f12-5', texto: '{nome} brinca de "cadê? achou!" ou bate palminhas junto com você?', area: 'imitacao', base: 'cdc' },
       { id: 'f12-6', texto: '{nome} procura de onde vem um barulho inesperado, como a campainha?', area: 'audicao', base: 'fono' },
+      { id: 'f12-7', texto: '{nome} fala 1 ou 2 palavras além de "mamã" e "papá", como "bola" ou "au-au"?', area: 'fala', base: 'cdc' },
+      { id: 'f12-8', texto: '{nome} entrega um objeto quando você estende a mão e pede "me dá"?', area: 'compreensao', base: 'cdc' },
     ],
   },
   {
@@ -106,6 +112,8 @@ export const FAIXAS: Faixa[] = [
       { id: 'f18-4', texto: '{nome} olha para onde você aponta quando diz "olha!"?', area: 'interacao', base: 'cdc' },
       { id: 'f18-5', texto: '{nome} imita você em tarefas, como varrer ou falar ao telefone?', area: 'imitacao', base: 'cdc' },
       { id: 'f18-6', texto: '{nome} bebe em copo sem tampa e tenta comer de colher?', area: 'alimentacao', base: 'cdc' },
+      { id: 'f18-7', texto: '{nome} tenta repetir palavras novas que ouve você falar?', area: 'imitacao', base: 'fono' },
+      { id: 'f18-8', texto: '{nome} brinca com brinquedos do jeito certo, como empurrar um carrinho?', area: 'brincar', base: 'cdc' },
     ],
   },
   {
@@ -120,6 +128,8 @@ export const FAIXAS: Faixa[] = [
       { id: 'f24-4', texto: '{nome} percebe quando alguém está triste ou chorando?', area: 'interacao', base: 'cdc' },
       { id: 'f24-5', texto: '{nome} brinca de faz de conta, como dar comida para a boneca?', area: 'brincar', base: 'cdc' },
       { id: 'f24-6', texto: '{nome} mastiga alimentos em pedaços, como carne e frutas?', area: 'alimentacao', base: 'fono' },
+      { id: 'f24-7', texto: '{nome} fala muitas palavras diferentes (umas 50 ou mais)?', area: 'fala', base: 'fono' },
+      { id: 'f24-8', texto: '{nome} usa gestos como mandar beijo ou balançar a cabeça para dizer "sim"?', area: 'gestos', base: 'cdc' },
     ],
   },
   {
@@ -134,6 +144,8 @@ export const FAIXAS: Faixa[] = [
       { id: 'f36-4', texto: 'Pessoas de fora da família entendem a maior parte do que {nome} fala?', area: 'inteligibilidade', base: 'cdc' },
       { id: 'f36-5', texto: '{nome} se aproxima de outras crianças e entra na brincadeira?', area: 'interacao', base: 'cdc' },
       { id: 'f36-6', texto: '{nome} bebe de canudinho e fecha bem os lábios ao mastigar?', area: 'motricidade_oral', base: 'fono' },
+      { id: 'f36-7', texto: '{nome} entende "em cima", "embaixo" e "dentro" quando você pede algo?', area: 'compreensao', base: 'fono' },
+      { id: 'f36-8', texto: '{nome} brinca de faz de conta com uma sequência, como cozinhar e servir os bonecos?', area: 'brincar', base: 'cdc' },
     ],
   },
   {
@@ -148,6 +160,8 @@ export const FAIXAS: Faixa[] = [
       { id: 'f48-4', texto: '{nome} canta ou fala trechos de músicas, histórias ou rimas?', area: 'fala', base: 'cdc' },
       { id: 'f48-5', texto: '{nome} brinca de ser outra pessoa, como mãe, médico ou professora?', area: 'brincar', base: 'cdc' },
       { id: 'f48-6', texto: '{nome} consegue soprar uma vela ou fazer bolhas de sabão?', area: 'motricidade_oral', base: 'fono' },
+      { id: 'f48-7', texto: '{nome} diz o nome de algumas cores?', area: 'compreensao', base: 'cdc' },
+      { id: 'f48-8', texto: '{nome} usa palavras de tempo, como "ontem", "amanhã" ou "depois"?', area: 'fala', base: 'fono' },
     ],
   },
   {
@@ -162,6 +176,8 @@ export const FAIXAS: Faixa[] = [
       { id: 'f60-4', texto: '{nome} percebe rimas simples, como "bola" e "cola"?', area: 'consciencia_fonologica', base: 'cdc' },
       { id: 'f60-5', texto: 'Pessoas desconhecidas entendem quase tudo o que {nome} fala?', area: 'inteligibilidade', base: 'fono' },
       { id: 'f60-6', texto: '{nome} espera a vez e segue as regras em brincadeiras?', area: 'interacao', base: 'cdc' },
+      { id: 'f60-7', texto: '{nome} usa frases com "porque" ou "quando" para explicar as coisas?', area: 'fala', base: 'fono' },
+      { id: 'f60-8', texto: '{nome} reconhece algumas letras ou o próprio nome escrito?', area: 'consciencia_fonologica', base: 'cdc' },
     ],
   },
 ];

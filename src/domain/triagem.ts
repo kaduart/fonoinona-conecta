@@ -35,7 +35,7 @@ export function pior(a: NivelResultado, b: NivelResultado): NivelResultado {
 
 /**
  * Calcula o resultado da triagem.
- * @param respostas respostas das 6 perguntas da faixa, por id
+ * @param respostas respostas das 8 perguntas da faixa, por id
  * @param alertas respostas sim/não das perguntas de alerta, por id
  */
 export function avaliar(faixa: Faixa, respostas: Record<string, Resposta>, alertas: Record<string, boolean>): Resultado {
@@ -69,6 +69,12 @@ export function avaliar(faixa: Faixa, respostas: Record<string, Resposta>, alert
 
   const areaFoco = areas[0] && areas[0].nivel !== 'esperado' ? areas[0].area : null;
   return { nivel, areas, areaFoco, alertaMarcado };
+}
+
+/** Quantas habilidades (perguntas da faixa) estão no esperado. As perguntas de alerta não entram: são sim/não sobre sinais, não habilidades. */
+export function contarHabilidades(respostas: Record<string, Resposta>): { noEsperado: number; total: number } {
+  const valores = Object.values(respostas);
+  return { noEsperado: valores.filter((v) => v === 'sim').length, total: valores.length };
 }
 
 /** Troca {nome} pelo apelido da criança. */
