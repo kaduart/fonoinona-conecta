@@ -2,7 +2,7 @@ import type { Evento, NovoLead, PreCadastro } from './esquemas.js';
 
 export type Conteudo = { versao: string; publicadoEm: string; dados: unknown };
 export type Lead = NovoLead & { criadoEm: string; vezes: number };
-export type PreCadastroSalvo = { nome: string; whatsapp: string; faixa: PreCadastro['faixa']; origem?: string; criadoEm: string };
+export type PreCadastroSalvo = { nome: string; whatsapp: string; faixa: PreCadastro['faixa']; interesse?: PreCadastro['interesse']; origem?: string; criadoEm: string };
 
 /** Acesso a dados. A API depende só desta interface: Mongo em produção, memória nos testes. */
 export interface Repos {
@@ -68,7 +68,7 @@ export function reposEmMemoria(): Repos {
     preCadastros: {
       async registrar(p) {
         if (preCadastros.has(p.whatsapp)) return { criado: false };
-        preCadastros.set(p.whatsapp, { nome: p.nome, whatsapp: p.whatsapp, faixa: p.faixa, origem: p.origem, criadoEm: new Date().toISOString() });
+        preCadastros.set(p.whatsapp, { nome: p.nome, whatsapp: p.whatsapp, faixa: p.faixa, interesse: p.interesse, origem: p.origem, criadoEm: new Date().toISOString() });
         return { criado: true };
       },
       async listar(limite) {

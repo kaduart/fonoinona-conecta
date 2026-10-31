@@ -51,6 +51,7 @@ const PreCadastroModelo = mongoose.model(
       nome: { type: String, required: true },
       whatsapp: { type: String, required: true, unique: true },
       faixa: { type: String, required: true },
+      interesse: String,
       origem: String,
       consentimentoEm: { type: Date, required: true },
       criadoEm: { type: Date, default: Date.now },
@@ -118,14 +119,14 @@ export function reposMongo(): Repos {
         const agora = new Date();
         const r = await PreCadastroModelo.findOneAndUpdate(
           { whatsapp: p.whatsapp },
-          { $setOnInsert: { nome: p.nome, faixa: p.faixa, origem: p.origem, consentimentoEm: agora, criadoEm: agora } },
+          { $setOnInsert: { nome: p.nome, faixa: p.faixa, interesse: p.interesse, origem: p.origem, consentimentoEm: agora, criadoEm: agora } },
           { upsert: true, includeResultMetadata: true },
         );
         return { criado: !r.lastErrorObject?.updatedExisting };
       },
       async listar(limite: number): Promise<PreCadastroSalvo[]> {
         const ds = await PreCadastroModelo.find().sort({ criadoEm: -1 }).limit(limite).lean();
-        return ds.map((d) => ({ nome: d.nome, whatsapp: d.whatsapp, faixa: d.faixa as PreCadastroSalvo['faixa'], origem: d.origem ?? undefined, criadoEm: d.criadoEm.toISOString() }));
+        return ds.map((d) => ({ nome: d.nome, whatsapp: d.whatsapp, faixa: d.faixa as PreCadastroSalvo['faixa'], interesse: (d.interesse ?? undefined) as PreCadastroSalvo['interesse'], origem: d.origem ?? undefined, criadoEm: d.criadoEm.toISOString() }));
       },
     },
     async saudavel() {

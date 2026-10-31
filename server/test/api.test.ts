@@ -127,6 +127,13 @@ describe('pré-cadastro (lista de espera)', () => {
     expect(reg.respostas).toBeUndefined();
   });
 
+  it('aceita interesse opcional (lista curta) e recusa valor fora da lista', async () => {
+    await request(app).post('/v1/pre-cadastro').send({ nome: 'Rui', whatsapp: '62990001111', faixa: '4a', interesse: 'fala', consentimento: true }).expect(201);
+    await request(app).post('/v1/pre-cadastro').send({ nome: 'Rui', whatsapp: '62990002222', faixa: '4a', interesse: 'queixa-livre', consentimento: true }).expect(400);
+    const r = await request(app).get('/v1/pre-cadastros').set('x-api-key', CHAVE).expect(200);
+    expect(r.body.total.find((x: { whatsapp: string }) => x.whatsapp === '62990001111').interesse).toBe('fala');
+  });
+
   it('lista protegida por chave da equipe', async () => {
     await request(app).post('/v1/pre-cadastro').send(valido);
     await request(app).get('/v1/pre-cadastros').expect(401);
