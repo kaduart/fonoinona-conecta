@@ -14,7 +14,7 @@ import { ROTULO_AREA } from '@/content/perguntas';
 import { formatarDataCurta, proximaTriagem } from '@/domain/acompanhamento';
 import { codigoContato, linkWhatsApp, linkWhatsAppGeral } from '@/domain/contato';
 import { formatarIdade, idadeDe } from '@/domain/idade';
-import { areasComDificuldade, diasSeguidos, missaoDoDia, missoesParaIdade, montarTrilha, semana } from '@/domain/missoes';
+import { areasComDificuldade, diasSeguidos, META_SEMANAL, missaoDoDia, missoesParaIdade, montarTrilha, semana } from '@/domain/missoes';
 import { useApp } from '@/state/app';
 import { useDadosCrianca } from '@/state/dados';
 import { cores, fonte, raio, sombra } from '@/theme/tokens';
@@ -54,6 +54,7 @@ export default function Inicio() {
   const seguidos = diasSeguidos(conclusoes, hoje);
   const dias = semana(conclusoes, hoje);
   const feitosNaSemana = dias.filter((d) => d.feito).length;
+  const metaBatida = feitosNaSemana >= META_SEMANAL;
   const dificeis = areasComDificuldade(conclusoes);
   const proxima = proximaTriagem(criancaAtual, ultima, hoje);
   const { noEsperado, total } = ultima ? contarHabilidades(ultima.respostas) : { noEsperado: 0, total: 0 };
@@ -163,7 +164,12 @@ export default function Inicio() {
           <Texto variante="rotulo" style={{ fontSize: 14 }}>
             Sua semana
           </Texto>
-          <Texto variante="legenda">{feitosNaSemana} de 7 dias</Texto>
+          <View style={[s.chama, seguidos === 0 && { backgroundColor: cores.fundo2 }]} accessibilityLabel={`${seguidos} dias seguidos`}>
+            <Texto style={{ fontFamily: fonte.negrito, fontSize: 12, color: seguidos ? cores.terra : cores.texto3 }}>
+              {seguidos ? '🔥 ' : ''}
+              {seguidos === 1 ? '1 dia seguido' : `${seguidos} dias seguidos`}
+            </Texto>
+          </View>
         </View>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }} accessibilityLabel={`${feitosNaSemana} dias com missão nesta semana`}>
           {dias.map((d, i) => {
@@ -183,6 +189,26 @@ export default function Inicio() {
               </View>
             );
           })}
+        </View>
+        <View style={s.meta}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
+            <Texto style={{ fontFamily: fonte.semi, fontSize: 13, color: cores.texto }}>
+              {metaBatida ? 'Meta da semana batida! 🎉' : `Meta: ${META_SEMANAL} dias na semana`}
+            </Texto>
+            <Texto variante="legenda" style={{ fontFamily: fonte.negrito, color: metaBatida ? cores.marca : cores.texto2 }}>
+              {Math.min(feitosNaSemana, META_SEMANAL)}/{META_SEMANAL}
+            </Texto>
+          </View>
+          <View style={{ flexDirection: 'row', gap: 6 }}>
+            {Array.from({ length: META_SEMANAL }, (_, i) => (
+              <View key={i} style={[s.metaPasso, i < feitosNaSemana && { backgroundColor: cores.marca }]} />
+            ))}
+          </View>
+          {!metaBatida ? (
+            <Texto variante="legenda">
+              {META_SEMANAL - feitosNaSemana === 1 ? 'Falta 1 dia' : `Faltam ${META_SEMANAL - feitosNaSemana} dias`} para fechar a semana com {nome}.
+            </Texto>
+          ) : null}
         </View>
       </Card>
 
@@ -253,6 +279,9 @@ const s = StyleSheet.create({
     boxShadow: '0px 10px 24px rgba(44, 62, 63, 0.08)',
   },
   play: { width: 52, height: 52, borderRadius: 18, backgroundColor: cores.marca, alignItems: 'center', justifyContent: 'center', boxShadow: sombra.botao },
+  chama: { flexDirection: 'row', alignItems: 'center', gap: 5, height: 26, paddingHorizontal: 10, borderRadius: raio.pill, backgroundColor: '#FCE9E3' },
+  meta: { gap: 8, paddingTop: 12, borderTopWidth: 1, borderTopColor: cores.linha },
+  metaPasso: { flex: 1, height: 8, borderRadius: 4, backgroundColor: cores.fundo2 },
   dia: { width: 36, height: 36, borderRadius: 12, backgroundColor: cores.fundo2, alignItems: 'center', justifyContent: 'center' },
   diaHoje: { backgroundColor: 'transparent', borderWidth: 2, borderStyle: 'dashed', borderColor: cores.marca },
   resultado: { gap: 8, padding: 16, borderRadius: raio.lg, backgroundColor: cores.superficie, boxShadow: sombra.card },
