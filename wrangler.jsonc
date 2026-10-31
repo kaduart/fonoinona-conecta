@@ -1,0 +1,10 @@
+// Publicação da versão web (PWA) no Cloudflare Workers, só arquivos estáticos.
+// Build: npm run build:web  →  Deploy: npx wrangler deploy
+{
+  "name": "fonoinona-conecta",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application"
+  }
+}

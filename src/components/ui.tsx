@@ -1,12 +1,12 @@
 import type { ReactNode } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Switch, TextInput, View, type TextInputProps, type ViewStyle } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Switch, TextInput, View, type StyleProp, type TextInputProps, type ViewStyle } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import { Texto } from '@/components/texto';
 import type { NivelResultado } from '@/domain/triagem';
 import { cores, fonte, raio, sombra } from '@/theme/tokens';
 
-export function Card({ children, style, elevado }: { children: ReactNode; style?: ViewStyle; elevado?: boolean }) {
+export function Card({ children, style, elevado }: { children: ReactNode; style?: StyleProp<ViewStyle>; elevado?: boolean }) {
   return <View style={[s.card, elevado && { boxShadow: sombra.elevada }, style]}>{children}</View>;
 }
 
@@ -105,7 +105,7 @@ export function Interruptor({ valor, onChange, titulo, descricao }: { valor: boo
         <Texto variante="rotulo">{titulo}</Texto>
         {descricao ? <Texto variante="legenda" style={{ color: cores.texto2, marginTop: 3 }}>{descricao}</Texto> : null}
       </View>
-      <Switch value={valor} onValueChange={onChange} trackColor={{ true: cores.marca, false: '#DDE2E9' }} thumbColor="#fff" />
+      <Switch value={valor} onValueChange={onChange} trackColor={{ true: cores.marca, false: '#D3DEDD' }} thumbColor="#fff" />
     </Pressable>
   );
 }
@@ -114,14 +114,14 @@ export function Segmentos({ total, atual }: { total: number; atual: number }) {
   return (
     <View style={{ flex: 1, flexDirection: 'row', gap: 4 }} accessibilityLabel={`Pergunta ${atual} de ${total}`}>
       {Array.from({ length: total }, (_, i) => (
-        <View key={i} style={{ flex: 1, height: 6, borderRadius: 3, backgroundColor: i < atual ? cores.marca : '#E4E8EE' }} />
+        <View key={i} style={{ flex: 1, height: 6, borderRadius: 3, backgroundColor: i < atual ? cores.marca : cores.fundo2 }} />
       ))}
     </View>
   );
 }
 
 const s = StyleSheet.create({
-  card: { backgroundColor: cores.superficie, borderRadius: raio.xl, boxShadow: sombra.card },
+  card: { backgroundColor: cores.superficie, borderRadius: 24, boxShadow: sombra.card },
   botao: {
     height: 58,
     borderRadius: raio.lg,

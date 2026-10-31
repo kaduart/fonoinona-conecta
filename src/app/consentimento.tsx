@@ -70,6 +70,8 @@ export default function ConsentimentoTela() {
         selecionar(id);
       }
       await recarregar();
+      // tira o cadastro da pilha: depois do termo, "voltar" não retorna ao início do onboarding
+      if (router.canDismiss()) router.dismissAll();
       router.replace('/triagem');
     } catch (e) {
       console.error('[consentimento] falha ao salvar', e);

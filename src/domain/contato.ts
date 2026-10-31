@@ -25,3 +25,12 @@ export function linkWhatsApp(nivel: NivelResultado, idade: string, codigo: strin
   const destino = numero.replace(/\D/g, '');
   return `https://wa.me/${destino}?text=${encodeURIComponent(texto)}`;
 }
+
+const MENSAGEM_GERAL = 'Olá, equipe Fono Inova! Vim pelo app FonoInova Conecta e gostaria de tirar uma dúvida.';
+const MENSAGEM_MISSOES = 'Olá, equipe Fono Inova! Estou fazendo as missões do app FonoInova Conecta com meu filho(a) de {idade} e algumas estão difíceis. Gostaria de uma orientação.';
+
+/** Contato sem triagem: dúvida geral ou dificuldade nas missões. Também sem dados de saúde. */
+export function linkWhatsAppGeral(motivo: 'geral' | 'missoes' = 'geral', idade = '', numero = process.env.EXPO_PUBLIC_WHATSAPP_CLINICA ?? ''): string {
+  const texto = motivo === 'missoes' ? MENSAGEM_MISSOES.replace('{idade}', idade) : MENSAGEM_GERAL;
+  return `https://wa.me/${numero.replace(/\D/g, '')}?text=${encodeURIComponent(texto)}`;
+}

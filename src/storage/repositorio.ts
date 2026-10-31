@@ -1,9 +1,13 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { FILA_VAZIA, type Fila } from '@/api/fila';
+import type { Conclusao } from '@/domain/missoes';
+import { chaveDoAparelho, descartarChave, novoNonce } from '@/storage/chave';
+import { cifrar, decifrar, estaCifrado } from '@/storage/cifra';
 import type { Resposta, Resultado } from '@/domain/triagem';
 
-// Sprint 1: tudo fica no aparelho via AsyncStorage.
-// TODO(sprint 3): migrar respostas para armazenamento criptografado (expo-sqlite + expo-secure-store).
+// Tudo fica no aparelho, no AsyncStorage, cifrado com XChaCha20-Poly1305.
+// A chave fica no Keychain/Keystore (expo-secure-store). Dados antigos em texto puro são cifrados na primeira leitura.
 
 export type Crianca = {
   id: string;
@@ -33,12 +37,24 @@ const CHAVES = {
   criancas: 'conecta:criancas:v1',
   consentimento: 'conecta:consentimento:v1',
   triagens: 'conecta:triagens:v1',
+  conclusoes: 'conecta:conclusoes:v1',
+  atual: 'conecta:crianca-atual:v1',
+  instalacao: 'conecta:instalacao:v1',
+  fila: 'conecta:fila-eventos:v1',
+  conteudo: 'conecta:conteudo-remoto:v1',
 } as const;
+
+export type ConteudoRemoto = { versao: string; publicadoEm: string; dados: unknown };
 
 async function ler<T>(chave: string, padrao: T): Promise<T> {
   try {
     const bruto = await AsyncStorage.getItem(chave);
-    return bruto ? (JSON.parse(bruto) as T) : padrao;
+    if (!bruto) return padrao;
+    if (estaCifrado(bruto)) return JSON.parse(decifrar(await chaveDoAparelho(), bruto)) as T;
+    // formato antigo (Sprint 1): migra para cifrado
+    const valor = JSON.parse(bruto) as T;
+    await gravar(chave, valor);
+    return valor;
   } catch (e) {
     console.warn(`[repositorio] falha ao ler ${chave}`, e);
     return padrao;
@@ -46,7 +62,7 @@ async function ler<T>(chave: string, padrao: T): Promise<T> {
 }
 
 async function gravar<T>(chave: string, valor: T): Promise<void> {
-  await AsyncStorage.setItem(chave, JSON.stringify(valor));
+  await AsyncStorage.setItem(chave, cifrar(await chaveDoAparelho(), JSON.stringify(valor), novoNonce()));
 }
 
 export function novoId(): string {
@@ -81,8 +97,52 @@ export const repositorio = {
     return todas.find((t) => t.id === id) ?? null;
   },
 
+  lerAtual: () => ler<string | null>(CHAVES.atual, null),
+  salvarAtual: (id: string) => gravar(CHAVES.atual, id),
+
+  listarConclusoes: async (criancaId: string) => {
+    const todas = await ler<Conclusao[]>(CHAVES.conclusoes, []);
+    return todas.filter((c) => c.criancaId === criancaId).sort((a, b) => b.em.localeCompare(a.em));
+  },
+
+  async salvarConclusao(c: Conclusao) {
+    const todas = await ler<Conclusao[]>(CHAVES.conclusoes, []);
+    // idempotente pelo id
+    await gravar(CHAVES.conclusoes, [...todas.filter((x) => x.id !== c.id), c]);
+  },
+
+  /** Id aleatório desta instalação, sem ligação com a família. Criado na primeira vez. */
+  async instalacaoId() {
+    const id = await ler<string | null>(CHAVES.instalacao, null);
+    if (id) return id;
+    const novo = `inst-${novoId()}`;
+    await gravar(CHAVES.instalacao, novo);
+    return novo;
+  },
+
+  lerFila: () => ler<Fila>(CHAVES.fila, FILA_VAZIA),
+  salvarFila: (f: Fila) => gravar(CHAVES.fila, f),
+
+  lerConteudoRemoto: () => ler<ConteudoRemoto | null>(CHAVES.conteudo, null),
+  salvarConteudoRemoto: (c: ConteudoRemoto) => gravar(CHAVES.conteudo, c),
+
+  /** Remove uma criança e tudo dela (triagens e missões). */
+  async removerCrianca(id: string) {
+    const [criancas, triagens, conclusoes] = await Promise.all([
+      repositorio.listarCriancas(),
+      ler<TriagemSalva[]>(CHAVES.triagens, []),
+      ler<Conclusao[]>(CHAVES.conclusoes, []),
+    ]);
+    await Promise.all([
+      gravar(CHAVES.criancas, criancas.filter((c) => c.id !== id)),
+      gravar(CHAVES.triagens, triagens.filter((t) => t.criancaId !== id)),
+      gravar(CHAVES.conclusoes, conclusoes.filter((c) => c.criancaId !== id)),
+    ]);
+  },
+
   /** Direito de exclusão (LGPD): apaga tudo do aparelho. */
   async apagarTudo() {
     await AsyncStorage.multiRemove(Object.values(CHAVES));
+    await descartarChave();
   },
 };

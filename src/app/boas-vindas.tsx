@@ -1,43 +1,32 @@
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
-import Svg, { Circle, Path, Rect, Text as SvgText } from 'react-native-svg';
 
+import { irPara, Marca } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
-import { Botao, Campo, Interruptor, SetaDireita } from '@/components/ui';
+import { Botao, BotaoVoltar, Campo, Interruptor, SetaDireita } from '@/components/ui';
+import { IlustracaoViva } from '@/components/animacao';
+import { ILUSTRACOES, PROPORCAO } from '@/content/ilustracoes';
 import { idadeParaTriagem, lerData, mascararData } from '@/domain/idade';
 import { faixaPara } from '@/domain/triagem';
+import { useApp } from '@/state/app';
+import { novoId, repositorio } from '@/storage/repositorio';
 import { cores, fonte } from '@/theme/tokens';
-
-function Ilustracao() {
-  return (
-    <Svg width={240} height={200} viewBox="0 0 240 230" accessibilityLabel="Ilustração de um adulto e uma criança conversando">
-      <Circle cx={120} cy={110} r={108} fill="#FFFFFF" opacity={0.6} />
-      <Circle cx={82} cy={92} r={22} fill="#fff" stroke={cores.marca} strokeWidth={2.4} />
-      <Path d="M44 200 C44 150 58 124 82 124 C106 124 120 150 120 200" fill="#fff" stroke={cores.marca} strokeWidth={2.4} strokeLinecap="round" />
-      <Circle cx={166} cy={134} r={16} fill="#fff" stroke={cores.marcaMedia} strokeWidth={2.4} />
-      <Path d="M138 200 C138 176 150 160 166 160 C182 160 194 176 194 200" fill="#fff" stroke={cores.marcaMedia} strokeWidth={2.4} strokeLinecap="round" />
-      <Path d="M114 160 C126 170 136 172 146 170" stroke={cores.marca} strokeWidth={2.4} strokeLinecap="round" fill="none" />
-      <Path d="M30 200 H210" stroke={cores.marca} strokeWidth={2} opacity={0.4} />
-      <Rect x={104} y={38} width={76} height={34} rx={17} fill={cores.marca} />
-      <Path d="M128 70 l-6 10 12 -8z" fill={cores.marca} />
-      <SvgText x={142} y={60} textAnchor="middle" fontSize={14} fontWeight="700" fill="#fff">
-        ma-mã!
-      </SvgText>
-    </Svg>
-  );
-}
 
 export default function BoasVindas() {
   const router = useRouter();
+  const { nova } = useLocalSearchParams<{ nova?: string }>();
+  const { consentimento, selecionar, recarregar } = useApp();
+  const adicionando = nova === '1' && !!consentimento;
+  const [salvando, setSalvando] = useState(false);
   const [apelido, setApelido] = useState('');
   const [nascimento, setNascimento] = useState('');
   const [prematuro, setPrematuro] = useState(false);
   const [semanas, setSemanas] = useState('');
   const [erro, setErro] = useState<string | null>(null);
 
-  function continuar() {
+  async function continuar() {
     const nome = apelido.trim();
     const data = lerData(nascimento);
     const sem = prematuro ? Number(semanas) : null;
@@ -47,18 +36,42 @@ export default function BoasVindas() {
     if (!faixaPara(idadeParaTriagem(data, new Date(), sem))) return setErro('O app é para crianças de 0 a 6 anos.');
     setErro(null);
     const iso = `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, '0')}-${String(data.getDate()).padStart(2, '0')}`;
-    router.push({ pathname: '/consentimento', params: { apelido: nome, nascimento: iso, semanas: sem ? String(sem) : '' } });
+    if (!adicionando) {
+      router.push({ pathname: '/consentimento', params: { apelido: nome, nascimento: iso, semanas: sem ? String(sem) : '' } });
+      return;
+    }
+    // termo já aceito: a nova criança vai direto para a triagem
+    setSalvando(true);
+    try {
+      const id = novoId();
+      await repositorio.salvarCrianca({ id, apelido: nome, nascimento: iso, semanasGestacao: sem, criadaEm: new Date().toISOString() });
+      selecionar(id);
+      await recarregar();
+      irPara(router, '/triagem');
+    } catch (e) {
+      console.error('[boas-vindas] falha ao salvar criança', e);
+      setErro('Não conseguimos salvar. Tente de novo.');
+      setSalvando(false);
+    }
   }
 
   return (
-    <Tela rodape={<Botao titulo="Começar gratuitamente" onPress={continuar} icone={<SetaDireita />} />}>
-      <View style={{ alignItems: 'center', marginTop: 8 }}>
-        <Ilustracao />
+    <Tela
+      topo={adicionando ? <BotaoVoltar onPress={() => (router.canGoBack() ? router.back() : router.replace('/perfil'))} /> : undefined}
+      rodape={<Botao titulo={adicionando ? 'Adicionar e fazer a triagem' : 'Começar gratuitamente'} onPress={continuar} carregando={salvando} icone={<SetaDireita />} />}
+    >
+      {adicionando ? null : <Marca />}
+      <View style={{ borderRadius: 28, overflow: 'hidden', backgroundColor: cores.ilustracao }}>
+        <IlustracaoViva fonte={ILUSTRACOES.ler} proporcao={PROPORCAO.ler} rotulo="Mãe lendo um livro com o filho" />
       </View>
       <View style={{ gap: 10 }}>
-        <Texto variante="titulo">
-          Acompanhe cada <Texto variante="titulo" style={{ color: cores.marca }}>conquista</Texto> do seu filho.
-        </Texto>
+        {adicionando ? (
+          <Texto variante="titulo">Quem mais vamos acompanhar?</Texto>
+        ) : (
+          <Texto variante="titulo">
+            Acompanhe cada <Texto variante="titulo" style={{ color: cores.marca }}>conquista</Texto> do seu filho.
+          </Texto>
+        )}
         <Texto>Triagem do desenvolvimento e brincadeiras diárias criadas por fonoaudiólogas.</Texto>
       </View>
       <View style={{ gap: 10 }}>
