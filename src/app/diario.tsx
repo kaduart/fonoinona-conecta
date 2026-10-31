@@ -157,6 +157,14 @@ export default function Diario() {
         </View>
       ))}
 
+      {dados ? (
+        <Pressable accessibilityRole="button" onPress={() => router.push('/lembrete')} style={({ pressed }) => [s.lembrete, pressed && { opacity: 0.8 }]}>
+          <Icone nome="relogio" cor={cores.marca} tamanho={18} />
+          <Texto style={{ flex: 1, fontSize: 14 }}>Quer um lembrete para anotar todo dia?</Texto>
+          <Icone nome="seta" cor={cores.texto3} tamanho={16} />
+        </Pressable>
+      ) : null}
+
       {/* espaço para o botão flutuante não cobrir o último registro */}
       <View style={{ height: 56 }} />
 
@@ -232,6 +240,7 @@ function CartaoRegistro({ registro: r, destaque, onPress }: { registro: Registro
 
 const s = StyleSheet.create({
   ilustracao: { alignSelf: 'stretch', alignItems: 'center', borderRadius: raio.lg, backgroundColor: cores.ilustracao, paddingVertical: 6 },
+  lembrete: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 14, borderRadius: raio.lg, backgroundColor: cores.marcaSuave, marginTop: 6 },
   topo: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginTop: 4 },
   resumo: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 11, paddingVertical: 8, borderRadius: raio.sm, backgroundColor: cores.marcaSuave, marginTop: 6 },
   dia: { width: 34, height: 34, borderRadius: 17, backgroundColor: cores.fundo2, alignItems: 'center', justifyContent: 'center' },

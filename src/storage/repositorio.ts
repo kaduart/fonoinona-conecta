@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { FILA_VAZIA, type Fila } from '@/api/fila';
+import { mesclar, type ConteudoBackup } from '@/domain/backup';
 import type { RegistroDiario } from '@/domain/diario';
 import type { Conclusao } from '@/domain/missoes';
 import { chaveDoAparelho, descartarChave, novoNonce } from '@/storage/chave';
@@ -45,7 +46,11 @@ const CHAVES = {
   conteudo: 'conecta:conteudo-remoto:v1',
   diario: 'conecta:diario:v1',
   kitInteresse: 'conecta:kit-interesse:v1',
+  lembrete: 'conecta:lembrete:v1',
 } as const;
+
+export type Lembrete = { ativo: boolean; hora: number; minuto: number; notificacaoId: string | null };
+export const LEMBRETE_PADRAO: Lembrete = { ativo: false, hora: 20, minuto: 0, notificacaoId: null };
 
 export type ConteudoRemoto = { versao: string; publicadoEm: string; dados: unknown };
 
@@ -136,6 +141,31 @@ export const repositorio = {
   async marcarKitInteresse(fase: number) {
     const atual = await repositorio.listarKitInteresse();
     if (!atual.includes(fase)) await gravar(CHAVES.kitInteresse, [...atual, fase]);
+  },
+
+  lerLembrete: () => ler<Lembrete>(CHAVES.lembrete, LEMBRETE_PADRAO),
+  salvarLembrete: (l: Lembrete) => gravar(CHAVES.lembrete, l),
+
+  /** Tudo o que é da família, para a cópia (sem chave, fila de eventos ou id da instalação). */
+  async exportar(): Promise<ConteudoBackup> {
+    const [criancas, triagens, conclusoes, diario] = await Promise.all([
+      repositorio.listarCriancas(),
+      ler<TriagemSalva[]>(CHAVES.triagens, []),
+      ler<Conclusao[]>(CHAVES.conclusoes, []),
+      ler<RegistroDiario[]>(CHAVES.diario, []),
+    ]);
+    return { criancas, triagens, conclusoes, diario };
+  },
+
+  /** Restaura uma cópia já conferida (lerBackup), somando ao que existe. Idempotente. */
+  async importar(c: ConteudoBackup) {
+    const atual = await repositorio.exportar();
+    await Promise.all([
+      gravar(CHAVES.criancas, mesclar(atual.criancas, c.criancas)),
+      gravar(CHAVES.triagens, mesclar(atual.triagens, c.triagens)),
+      gravar(CHAVES.conclusoes, mesclar(atual.conclusoes, c.conclusoes)),
+      gravar(CHAVES.diario, mesclar(atual.diario, c.diario)),
+    ]);
   },
 
   /** Id aleatório desta instalação, sem ligação com a família. Criado na primeira vez. */
