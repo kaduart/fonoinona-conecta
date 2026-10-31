@@ -35,7 +35,7 @@ export function pior(a: NivelResultado, b: NivelResultado): NivelResultado {
 
 /**
  * Calcula o resultado da triagem.
- * @param respostas respostas das 6 perguntas da faixa, por id
+ * @param respostas respostas das 8 perguntas da faixa, por id
  * @param alertas respostas sim/não das perguntas de alerta, por id
  */
 export function avaliar(faixa: Faixa, respostas: Record<string, Resposta>, alertas: Record<string, boolean>): Resultado {
