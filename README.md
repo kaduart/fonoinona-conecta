@@ -56,6 +56,20 @@ eas submit -p ios --latest                 # TestFlight
 
 Identificador: `br.com.fonoinova.conecta`. Guia completo, com textos das lojas e formulários de privacidade: https://claude.ai/artifact/9efxdBaRsTH9CmFdhA6ccZ
 
+## Versão web instalável (PWA)
+
+`npm run build:web` exporta a versão web em `dist/` e roda `scripts/pwa.mjs`, que:
+- injeta o manifest, os ícones (`public/icons/`) e o registro do service worker no `index.html`;
+- gera `dist/sw.js` com todos os arquivos do app. Depois do primeiro acesso, o app abre sem internet.
+
+Hospedagem grátis no Cloudflare Pages (Workers & Pages → Create → Pages → Connect to Git):
+- repositório `kaduart/fonoinona-conecta`, branch `develop`;
+- build command `npm run build:web`, output directory `dist`;
+- variável `EXPO_PUBLIC_WHATSAPP_CLINICA` (e `EXPO_PUBLIC_API_URL` quando a API estiver no ar).
+
+Cada push na branch publica sozinho. `public/_headers` impede o cache do `sw.js`, então a atualização chega no próximo acesso.
+No iPhone: abrir no Safari → Compartilhar → Adicionar à Tela de Início. No Android, o Chrome oferece "Instalar app".
+
 ## Regra do resultado
 
 - **Avaliação recomendada:** alerta marcado (regressão ou audição) ou 2+ respostas "Ainda não".
