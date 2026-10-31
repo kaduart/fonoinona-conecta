@@ -319,7 +319,7 @@ export default function ResultadoTela() {
           <View style={[s.caixa, incluirResumo && s.caixaAtiva]}>{incluirResumo ? <Check cor="#fff" tamanho={13} /> : null}</View>
           <View style={{ flex: 1, gap: 2 }}>
             <Texto style={{ fontFamily: fonte.negrito, fontSize: 13.5, color: cores.texto }}>{PONTE_CLINICA.opcao}</Texto>
-            <Texto style={{ fontSize: 12, lineHeight: 17, color: cores.texto2 }}>{PONTE_CLINICA.opcaoApoio}</Texto>
+            {PONTE_CLINICA.opcaoApoio ? <Texto style={{ fontSize: 12, lineHeight: 17, color: cores.texto2 }}>{PONTE_CLINICA.opcaoApoio}</Texto> : null}
           </View>
         </Pressable>
         {incluirResumo ? (
@@ -339,7 +339,7 @@ export default function ResultadoTela() {
         </View>
       </View>
 
-      <Texto variante="legenda" style={{ textAlign: 'center', fontSize: 11 }}>
+      <Texto style={{ textAlign: 'center', fontSize: 11.5, lineHeight: 17, color: cores.texto2 }}>
         {AVISO_RESULTADO}
       </Texto>
     </Tela>
