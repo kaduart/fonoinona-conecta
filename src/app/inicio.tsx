@@ -1,12 +1,13 @@
 import { Redirect, useRouter } from 'expo-router';
-import { Image, Linking, Pressable, StyleSheet, View } from 'react-native';
+import { Linking, Pressable, StyleSheet, View } from 'react-native';
 
 import { registrarEvento } from '@/api/cliente';
 import { BarraInferior, Icone, irPara, Marca, SeletorCrianca } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
 import { Botao, Card } from '@/components/ui';
-import { ilustracaoDaArea } from '@/content/ilustracoes';
+import { IlustracaoViva } from '@/components/animacao';
+import { chaveDaArea, ilustracaoDaArea, PROPORCAO } from '@/content/ilustracoes';
 import { ROTULO_AREA } from '@/content/perguntas';
 import { formatarDataCurta, proximaTriagem } from '@/domain/acompanhamento';
 import { linkWhatsAppGeral } from '@/domain/contato';
@@ -71,7 +72,7 @@ export default function Inicio() {
 
       {doDia ? (
         <View style={s.heroi}>
-          <Image source={ilustracaoDaArea(doDia.areas[0])} style={s.heroiImagem} resizeMode="cover" accessibilityIgnoresInvertColors />
+          <IlustracaoViva fonte={ilustracaoDaArea(doDia.areas[0])} proporcao={PROPORCAO[chaveDaArea(doDia.areas[0])]} style={{ marginTop: 18 }} />
           <View style={[s.selo, { left: 14 }]}>
             <Icone nome="estrela" cor={cores.marca} tamanho={12} cheio />
             <Texto style={{ fontFamily: fonte.semi, fontSize: 11.5, color: cores.marca }}>Missão do dia</Texto>
@@ -100,7 +101,7 @@ export default function Inicio() {
         </View>
       ) : null}
 
-      <Card style={{ padding: 16, gap: 10 }}>
+      <Card style={{ padding: 20, gap: 12 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
           <Texto variante="rotulo" style={{ fontSize: 14 }}>
             Sua semana
@@ -178,9 +179,8 @@ export default function Inicio() {
 
 const s = StyleSheet.create({
   cabecalho: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginTop: 4 },
-  manchete: { fontFamily: fonte.extra, fontSize: 25, lineHeight: 30, letterSpacing: -0.6, color: cores.marcaEscura, marginTop: 2 },
+  manchete: { fontFamily: fonte.extra, fontSize: 25, lineHeight: 30, letterSpacing: -0.6, color: cores.texto, marginTop: 2 },
   heroi: { borderRadius: raio.xxl, backgroundColor: cores.ilustracao, overflow: 'hidden', boxShadow: sombra.card },
-  heroiImagem: { width: '100%', aspectRatio: 418 / 325 },
   selo: { position: 'absolute', top: 14, flexDirection: 'row', alignItems: 'center', gap: 6, height: 26, paddingHorizontal: 11, borderRadius: raio.pill, backgroundColor: cores.marcaSuave },
   heroiCartao: {
     marginTop: -34,
@@ -193,7 +193,7 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    boxShadow: '0px 10px 24px rgba(60, 45, 20, 0.08)',
+    boxShadow: '0px 10px 24px rgba(44, 62, 63, 0.08)',
   },
   play: { width: 52, height: 52, borderRadius: 18, backgroundColor: cores.marca, alignItems: 'center', justifyContent: 'center', boxShadow: sombra.botao },
   dia: { width: 36, height: 36, borderRadius: 12, backgroundColor: cores.fundo2, alignItems: 'center', justifyContent: 'center' },

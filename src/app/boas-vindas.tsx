@@ -1,12 +1,13 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Image, View } from 'react-native';
+import { View } from 'react-native';
 
 import { irPara, Marca } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
 import { Botao, BotaoVoltar, Campo, Interruptor, SetaDireita } from '@/components/ui';
-import { ILUSTRACOES } from '@/content/ilustracoes';
+import { IlustracaoViva } from '@/components/animacao';
+import { ILUSTRACOES, PROPORCAO } from '@/content/ilustracoes';
 import { idadeParaTriagem, lerData, mascararData } from '@/domain/idade';
 import { faixaPara } from '@/domain/triagem';
 import { useApp } from '@/state/app';
@@ -61,7 +62,7 @@ export default function BoasVindas() {
     >
       {adicionando ? null : <Marca />}
       <View style={{ borderRadius: 28, overflow: 'hidden', backgroundColor: cores.ilustracao }}>
-        <Image source={ILUSTRACOES.ler} style={{ width: '100%', aspectRatio: 320 / 234 }} resizeMode="cover" accessibilityLabel="Mãe lendo um livro com o filho" />
+        <IlustracaoViva fonte={ILUSTRACOES.ler} proporcao={PROPORCAO.ler} rotulo="Mãe lendo um livro com o filho" />
       </View>
       <View style={{ gap: 10 }}>
         {adicionando ? (

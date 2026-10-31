@@ -29,7 +29,7 @@ export default function Trilha() {
   return (
     <Tela rodape={<BarraInferior />}>
       <View style={{ gap: 4, marginTop: 4 }}>
-        <Texto variante="titulo" style={{ color: cores.marcaEscura }}>
+        <Texto variante="titulo" style={{ color: cores.texto }}>
           Trilha de {nome}
         </Texto>
         <Texto>Cada missão concluída abre a próxima.</Texto>

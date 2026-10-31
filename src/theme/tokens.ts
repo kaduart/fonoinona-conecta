@@ -1,13 +1,15 @@
 export const cores = {
-  fundo: '#FBF7EF',
-  fundo2: '#F5EEDF',
-  /** fundo das ilustrações (igual ao papel delas) */
-  ilustracao: '#FCF8EF',
+  fundo: '#F8FBFB',
+  /** trilhos de barras e casas vazias */
+  fundo2: '#EDF3F2',
+  /** fundo das ilustrações 3D (igual ao delas) */
+  ilustracao: '#F6F9FA',
   superficie: '#FFFFFF',
-  texto: '#1D2B27',
-  texto2: '#5E6B66',
-  texto3: '#9AA59F',
-  linha: '#EFE8DA',
+  /** grafite clínico: títulos e textos fortes */
+  texto: '#1F2C2D',
+  texto2: '#5B6B6C',
+  texto3: '#97A5A6',
+  linha: '#E9EFEE',
   marca: '#1F7A6B',
   marcaEscura: '#14564B',
   marcaMedia: '#2E9C87',
@@ -22,7 +24,7 @@ export const cores = {
   avaliar: '#FF7A6B',
   avaliarFundo: '#FFECE8',
   avaliarTexto: '#C2412D',
-  neutroFundo: '#F5EEDF',
+  neutroFundo: '#EDF3F2',
   terra: '#E07A5F',
   sol: '#F2B84B',
   solFundo: '#FDF3DC',
@@ -34,8 +36,8 @@ export const raio = { sm: 12, md: 16, lg: 20, xl: 24, xxl: 28, pill: 999 } as co
 export const espaco = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 } as const;
 
 export const sombra = {
-  card: '0px 12px 32px rgba(60, 45, 20, 0.06), 0px 2px 6px rgba(60, 45, 20, 0.04)',
-  elevada: '0px 18px 40px rgba(40, 40, 20, 0.10), 0px 4px 12px rgba(40, 40, 20, 0.04)',
+  card: '0px 12px 30px rgba(44, 62, 63, 0.04)',
+  elevada: '0px 18px 40px rgba(44, 62, 63, 0.08)',
   botao: '0px 12px 24px rgba(31, 122, 107, 0.28)',
 } as const;
 

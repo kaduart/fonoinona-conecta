@@ -1,12 +1,13 @@
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Image, Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Icone } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
 import { Botao, BotaoVoltar, Card, Chip } from '@/components/ui';
-import { ilustracaoDaArea } from '@/content/ilustracoes';
+import { IlustracaoViva } from '@/components/animacao';
+import { chaveDaArea, ilustracaoDaArea, PROPORCAO } from '@/content/ilustracoes';
 import { MISSOES } from '@/content/missoes';
 import { formatarIdade, idadeDe } from '@/domain/idade';
 import { useApp } from '@/state/app';
@@ -89,7 +90,7 @@ export default function MissaoTela() {
       }
     >
       <View style={s.capa}>
-        <Image source={ilustracaoDaArea(missao.areas[0])} style={s.capaImagem} resizeMode="cover" accessibilityIgnoresInvertColors />
+        <IlustracaoViva fonte={ilustracaoDaArea(missao.areas[0])} proporcao={PROPORCAO[chaveDaArea(missao.areas[0])]} style={{ marginTop: 40 }} />
         <View style={[s.capaTopo]}>
           <BotaoVoltar onPress={() => (router.canGoBack() ? router.back() : router.replace('/inicio'))} />
           <Cronometro total={segundosDe(missao.duracao)} />
@@ -100,7 +101,7 @@ export default function MissaoTela() {
         <Chip texto={missao.rotuloArea} />
         <Chip texto={`A partir de ${formatarIdade(missao.idadeMinMeses)}`} tom="neutro" />
       </View>
-      <Texto variante="titulo" style={{ color: cores.marcaEscura, fontSize: 26, lineHeight: 31 }}>
+      <Texto variante="titulo" style={{ color: cores.texto, fontSize: 26, lineHeight: 31 }}>
         {missao.titulo}
       </Texto>
 
@@ -122,7 +123,7 @@ export default function MissaoTela() {
         </View>
       </Card>
 
-      <Card style={{ paddingHorizontal: 14, paddingVertical: 4 }}>
+      <Card style={{ paddingHorizontal: 20, paddingVertical: 6 }}>
         {missao.passos.map((p, i) => {
           const feito = feitos.has(i);
           const proximo = !feito && [...Array(i).keys()].every((j) => feitos.has(j));
@@ -169,13 +170,12 @@ export default function MissaoTela() {
 
 const s = StyleSheet.create({
   capa: { marginHorizontal: -20, marginTop: -8, borderBottomLeftRadius: raio.xxl, borderBottomRightRadius: raio.xxl, overflow: 'hidden', backgroundColor: cores.ilustracao },
-  capaImagem: { width: '100%', aspectRatio: 396 / 270 },
   capaTopo: { position: 'absolute', top: 10, left: 18, right: 18, flexDirection: 'row', justifyContent: 'space-between' },
   flutuante: { height: 44, borderRadius: raio.md, backgroundColor: 'rgba(255,255,255,0.9)', flexDirection: 'row', alignItems: 'center', boxShadow: sombra.card },
-  material: { padding: 14, flexDirection: 'row', gap: 12, alignItems: 'center', borderRadius: raio.lg },
+  material: { padding: 20, flexDirection: 'row', gap: 12, alignItems: 'center', borderRadius: raio.lg },
   materialIcone: { width: 42, height: 42, borderRadius: 14, backgroundColor: '#FBE9E2', alignItems: 'center', justifyContent: 'center' },
-  passo: { flexDirection: 'row', gap: 12, alignItems: 'flex-start', paddingVertical: 12 },
+  passo: { flexDirection: 'row', gap: 14, alignItems: 'flex-start', paddingVertical: 15 },
   passoLinha: { borderBottomWidth: 1, borderBottomColor: cores.linha },
-  caixa: { width: 26, height: 26, borderRadius: 9, borderWidth: 2, borderColor: '#DCD5C6', alignItems: 'center', justifyContent: 'center', marginTop: -1 },
-  aviso: { padding: 14, borderRadius: raio.md },
+  caixa: { width: 26, height: 26, borderRadius: 9, borderWidth: 2, borderColor: '#D3DEDD', alignItems: 'center', justifyContent: 'center', marginTop: -1 },
+  aviso: { padding: 18, borderRadius: raio.lg },
 });

@@ -91,7 +91,7 @@ export default function Historico() {
   return (
     <Tela rodape={<BarraInferior />}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 }}>
-        <Texto variante="titulo" style={{ color: cores.marcaEscura }}>
+        <Texto variante="titulo" style={{ color: cores.texto }}>
           Evolução
         </Texto>
         {melhorou ? <Chip texto="↑ Melhorou" /> : null}
@@ -202,7 +202,7 @@ export default function Historico() {
 }
 
 const s = StyleSheet.create({
-  marco: { width: 16, height: 16, borderRadius: 8, borderWidth: 2, borderColor: '#DCD5C6', backgroundColor: '#fff', marginTop: 16 },
+  marco: { width: 16, height: 16, borderRadius: 8, borderWidth: 2, borderColor: '#D3DEDD', backgroundColor: '#fff', marginTop: 16 },
   trilho: { flex: 1, width: 2, backgroundColor: cores.fundo2, marginTop: 4, marginBottom: -14 },
   proxima: { padding: 14, flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: raio.lg, backgroundColor: cores.marcaSuave, boxShadow: 'none' },
   barra: { height: 9, borderRadius: 5, backgroundColor: cores.fundo2, overflow: 'hidden' },

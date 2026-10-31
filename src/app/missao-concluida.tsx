@@ -3,7 +3,8 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { registrarEvento } from '@/api/cliente';
-import { Icone, irPara } from '@/components/navegacao';
+import { CelebracaoConquista } from '@/components/animacao';
+import { irPara } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
 import { Botao, Card } from '@/components/ui';
@@ -12,7 +13,7 @@ import { diasSeguidos, semana, type Conclusao } from '@/domain/missoes';
 import { useApp } from '@/state/app';
 import { useDadosCrianca } from '@/state/dados';
 import { novoId, repositorio } from '@/storage/repositorio';
-import { cores, fonte, raio } from '@/theme/tokens';
+import { cores, fonte, raio, sombra } from '@/theme/tokens';
 
 const OPCOES: ComoFoi[] = ['facil', 'com_ajuda', 'dificil'];
 
@@ -50,13 +51,7 @@ export default function MissaoConcluida() {
 
   return (
     <Tela rodape={<Botao titulo="Salvar e voltar ao início" onPress={salvar} desabilitado={!como} carregando={salvando} />}>
-      <View style={s.medalhaFora}>
-        <View style={s.medalhaMeio}>
-          <View style={s.medalha}>
-            <Icone nome="estrela" cor="#fff" tamanho={48} espessura={1.8} />
-          </View>
-        </View>
-      </View>
+      <CelebracaoConquista tamanho={250} />
 
       <View style={{ alignItems: 'center', gap: 6 }}>
         <Texto variante="titulo" style={{ textAlign: 'center' }}>
@@ -84,10 +79,10 @@ export default function MissaoConcluida() {
         <Texto variante="rotulo" style={{ textAlign: 'center' }}>
           Como foi para {criancaAtual.apelido}?
         </Texto>
-        <View style={s.segmentado} accessibilityRole="radiogroup">
+        <View style={s.opcoes} accessibilityRole="radiogroup">
           {OPCOES.map((o) => (
-            <Pressable key={o} accessibilityRole="radio" accessibilityState={{ checked: como === o }} onPress={() => setComo(o)} style={[s.segmento, como === o && s.segmentoAtivo]}>
-              <Texto style={{ fontFamily: fonte.semi, fontSize: 14, color: como === o ? '#fff' : cores.texto2 }}>{ROTULO_COMO_FOI[o]}</Texto>
+            <Pressable key={o} accessibilityRole="radio" accessibilityState={{ checked: como === o }} onPress={() => setComo(o)} style={[s.opcao, como === o && s.opcaoAtiva]}>
+              <Texto style={{ fontFamily: fonte.semi, fontSize: 14, color: como === o ? '#fff' : cores.texto }}>{ROTULO_COMO_FOI[o]}</Texto>
             </Pressable>
           ))}
         </View>
@@ -100,11 +95,8 @@ export default function MissaoConcluida() {
 }
 
 const s = StyleSheet.create({
-  medalhaFora: { alignSelf: 'center', width: 200, height: 200, borderRadius: 100, backgroundColor: 'rgba(43,181,154,0.08)', alignItems: 'center', justifyContent: 'center', marginTop: 16 },
-  medalhaMeio: { width: 150, height: 150, borderRadius: 75, backgroundColor: 'rgba(43,181,154,0.14)', alignItems: 'center', justifyContent: 'center' },
-  medalha: { width: 104, height: 104, borderRadius: 52, backgroundColor: cores.marca, alignItems: 'center', justifyContent: 'center', boxShadow: '0px 16px 32px rgba(31, 122, 107, 0.3)' },
   estatistica: { flex: 1, alignItems: 'center', paddingVertical: 14, borderRadius: raio.lg },
-  segmentado: { flexDirection: 'row', backgroundColor: cores.superficie, borderRadius: raio.lg, padding: 5, gap: 4, boxShadow: '0px 12px 32px rgba(0,0,0,0.04)' },
-  segmento: { flex: 1, height: 44, borderRadius: raio.md, alignItems: 'center', justifyContent: 'center' },
-  segmentoAtivo: { backgroundColor: cores.marca },
+  opcoes: { flexDirection: 'row', gap: 10 },
+  opcao: { flex: 1, height: 52, borderRadius: raio.pill, backgroundColor: cores.superficie, borderWidth: 1.5, borderColor: cores.linha, alignItems: 'center', justifyContent: 'center', boxShadow: sombra.card },
+  opcaoAtiva: { backgroundColor: cores.marca, borderColor: cores.marca },
 });

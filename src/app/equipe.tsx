@@ -1,12 +1,12 @@
 import { Redirect, useRouter } from 'expo-router';
-import { Image, Linking, Pressable, StyleSheet, View } from 'react-native';
+import { Linking, Pressable, StyleSheet, View } from 'react-native';
 
 import { registrarEvento } from '@/api/cliente';
 import { BarraInferior, Icone, irPara, ItemLista } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
 import { Botao, Card, SetaDireita } from '@/components/ui';
-import { ILUSTRACOES } from '@/content/ilustracoes';
+import { CabecaFalante } from '@/components/animacao';
 import { FAIXAS } from '@/content/perguntas';
 import { RESPONSAVEL_TECNICA } from '@/content/resultados';
 import { formatarDataCurta, proximaTriagem } from '@/domain/acompanhamento';
@@ -40,12 +40,14 @@ export default function Equipe() {
 
   return (
     <Tela rodape={<BarraInferior />}>
-      <Texto variante="titulo" style={{ color: cores.marcaEscura, marginTop: 4 }}>
+      <Texto variante="titulo" style={{ color: cores.texto, marginTop: 4 }}>
         Cada conquista conta
       </Texto>
 
       <View style={s.heroi}>
-        <Image source={ILUSTRACOES.ler} style={s.heroiImagem} resizeMode="cover" accessibilityIgnoresInvertColors />
+        <View style={{ paddingTop: 12, paddingBottom: 34 }}>
+          <CabecaFalante tamanho={230} />
+        </View>
         <View style={s.heroiCartao}>
           {proxima.disponivel ? (
             <>
@@ -120,7 +122,6 @@ export default function Equipe() {
 
 const s = StyleSheet.create({
   heroi: { borderRadius: raio.xxl, backgroundColor: cores.ilustracao, overflow: 'hidden', boxShadow: sombra.card },
-  heroiImagem: { width: '100%', aspectRatio: 320 / 234 },
   heroiCartao: { marginTop: -30, marginHorizontal: 10, marginBottom: 10, borderRadius: 22, backgroundColor: cores.superficie, padding: 16, gap: 6 },
   heroiTitulo: { fontFamily: fonte.extra, fontSize: 18, lineHeight: 23, letterSpacing: -0.3, color: cores.texto },
   selo: { alignSelf: 'flex-start', height: 26, paddingHorizontal: 11, borderRadius: raio.pill, backgroundColor: cores.solFundo, justifyContent: 'center' },

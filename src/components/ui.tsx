@@ -105,7 +105,7 @@ export function Interruptor({ valor, onChange, titulo, descricao }: { valor: boo
         <Texto variante="rotulo">{titulo}</Texto>
         {descricao ? <Texto variante="legenda" style={{ color: cores.texto2, marginTop: 3 }}>{descricao}</Texto> : null}
       </View>
-      <Switch value={valor} onValueChange={onChange} trackColor={{ true: cores.marca, false: '#DCD5C6' }} thumbColor="#fff" />
+      <Switch value={valor} onValueChange={onChange} trackColor={{ true: cores.marca, false: '#D3DEDD' }} thumbColor="#fff" />
     </Pressable>
   );
 }
@@ -121,7 +121,7 @@ export function Segmentos({ total, atual }: { total: number; atual: number }) {
 }
 
 const s = StyleSheet.create({
-  card: { backgroundColor: cores.superficie, borderRadius: raio.xl, boxShadow: sombra.card },
+  card: { backgroundColor: cores.superficie, borderRadius: 24, boxShadow: sombra.card },
   botao: {
     height: 58,
     borderRadius: raio.lg,
