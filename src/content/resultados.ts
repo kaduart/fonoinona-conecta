@@ -60,6 +60,24 @@ export const CTA_RESULTADO = {
   apoio: 'Fale com a fono pelo WhatsApp',
 };
 
+/**
+ * Ponte para a clínica (card antes do botão do WhatsApp). Aprovada pelo Kadu em 31/10.
+ * Regra: nunca chamar de "laudo"; só o código da triagem sai do celular.
+ */
+export const PONTE_CLINICA = {
+  rotulo: 'Próximo passo',
+  titulo: 'Quem te responde é a equipe da fono',
+  passos: [
+    'Você envia o código da triagem de {nome} (e o resumo, se quiser)',
+    'A equipe da fono tira suas dúvidas',
+    'Vocês combinam o melhor horário para a avaliação',
+  ],
+  opcao: 'Incluir o resumo da triagem na mensagem',
+  opcaoApoio: 'Só as habilidades ainda em desenvolvimento. Ajuda a fono a te orientar mais rápido.',
+  privacidade: 'As respostas da triagem ficam só no seu celular. Pelo WhatsApp vai apenas o código.',
+  privacidadeComResumo: 'Você vai ver o resumo na mensagem antes de enviar. Nada é enviado sem você tocar em enviar.',
+};
+
 /** Horário em que a equipe responde no WhatsApp (seg–sex 8h–18h). Ajustar com a clínica. */
 export function equipeOnline(agora: Date = new Date()) {
   const dia = agora.getDay();

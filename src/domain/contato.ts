@@ -23,9 +23,22 @@ const MENSAGEM: Record<NivelResultado, string> = {
   avaliar: 'Olá, equipe Fono Inova! Fiz a triagem no app FonoInova Conecta para meu filho(a) de {idade} e gostaria de agendar uma avaliação. Código: {codigo}',
 };
 
-/** Link wa.me com a mensagem pronta. Usa o número da clínica. */
-export function linkWhatsApp(nivel: NivelResultado, idade: string, codigo: string, numero = numeroClinica()): string {
-  const texto = MENSAGEM[nivel].replace('{idade}', idade).replace('{codigo}', codigo);
+/**
+ * Resumo neutro da triagem, que só entra na mensagem se os pais marcarem a opção.
+ * Nunca usa "atraso", "laudo" ou diagnóstico: só as habilidades ainda em desenvolvimento.
+ */
+export function resumoTriagem(areasEmDesenvolvimento: string[], noEsperado: number, total: number): string {
+  const contagem = `${noEsperado} de ${total} habilidades no esperado`;
+  if (!areasEmDesenvolvimento.length) return `Resumo da triagem: ${contagem}.`;
+  const lista = areasEmDesenvolvimento.map((a) => a.toLowerCase());
+  const juntas = lista.length === 1 ? lista[0] : `${lista.slice(0, -1).join(', ')} e ${lista[lista.length - 1]}`;
+  return `Resumo da triagem: ${contagem}. Ainda em desenvolvimento: ${juntas}.`;
+}
+
+/** Link wa.me com a mensagem pronta. Usa o número da clínica. O resumo é opcional (escolha dos pais). */
+export function linkWhatsApp(nivel: NivelResultado, idade: string, codigo: string, numero = numeroClinica(), resumo?: string): string {
+  const base = MENSAGEM[nivel].replace('{idade}', idade).replace('{codigo}', codigo);
+  const texto = resumo ? `${base}\n\n${resumo}` : base;
   const destino = numero.replace(/\D/g, '');
   return `https://wa.me/${destino}?text=${encodeURIComponent(texto)}`;
 }
