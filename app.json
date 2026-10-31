@@ -8,16 +8,25 @@
     "scheme": "fonoinovaconecta",
     "userInterfaceStyle": "light",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "bundleIdentifier": "br.com.fonoinova.conecta",
+      "supportsTablet": false,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
+      "package": "br.com.fonoinova.conecta",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4F0",
+        "backgroundColor": "#1F7A6B",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.CAMERA",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ]
     },
     "web": {
       "output": "single",
@@ -30,7 +39,7 @@
         {
           "backgroundColor": "#F8F9FA",
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "imageWidth": 140
         }
       ],
       "expo-secure-store"
@@ -38,6 +47,7 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "description": "Triagem do desenvolvimento da fala e missões para fazer em casa, da Clínica Fono Inova."
   }
 }

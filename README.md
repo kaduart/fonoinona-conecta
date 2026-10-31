@@ -43,6 +43,19 @@ A API fica em [`server/`](server/README.md).
 | `server` | API (Express + MongoDB) |
 | `src/theme` | Tokens de design |
 
+## Build e lojas (EAS)
+
+```bash
+npm install -g eas-cli
+eas init                                   # uma vez: cria o projeto no Expo
+eas build -p android --profile preview     # APK para testar com famílias
+eas build -p all --profile production      # versão das lojas
+eas submit -p android --latest             # Play Console, teste interno
+eas submit -p ios --latest                 # TestFlight
+```
+
+Identificador: `br.com.fonoinova.conecta`. Guia completo, com textos das lojas e formulários de privacidade: https://claude.ai/artifact/9efxdBaRsTH9CmFdhA6ccZ
+
 ## Regra do resultado
 
 - **Avaliação recomendada:** alerta marcado (regressão ou audição) ou 2+ respostas "Ainda não".
@@ -56,4 +69,4 @@ Prematuros (< 37 semanas) usam idade corrigida até 24 meses. A mensagem do What
 1. **Sprint 1** — base, triagem por idade e resultado ✅
 2. **Sprint 2** — missões, evolução, várias crianças ✅
 3. **Sprint 3** — backend (MongoDB Atlas) e armazenamento criptografado ✅
-4. **Sprint 4** — beta nas lojas
+4. **Sprint 4** — build e configuração das lojas ✅ (publicar depende das contas da clínica)
