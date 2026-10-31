@@ -5,6 +5,7 @@ import { Linking, Pressable, StyleSheet, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Path, RadialGradient, Rect, Stop } from 'react-native-svg';
 
 import { registrarEvento, registrarLead } from '@/api/cliente';
+import { CelebracaoConquista } from '@/components/animacao';
 import { Medidor } from '@/components/medidor';
 import { irPara } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
@@ -117,7 +118,7 @@ function CardFoco({ a }: { a: ResultadoArea }) {
   );
 }
 
-/** CTA: degradê vivo verde → azul, ícone do WhatsApp e micro-texto dentro do botão. */
+/** CTA verde sólido da marca (#1F7A6B), ícone do WhatsApp e micro-texto dentro do botão. */
 function BotaoWhatsApp({ titulo, apoio, onPress }: { titulo: string; apoio: string; onPress: () => void }) {
   return (
     <Pressable
@@ -126,21 +127,6 @@ function BotaoWhatsApp({ titulo, apoio, onPress }: { titulo: string; apoio: stri
       onPress={onPress}
       style={({ pressed }) => [s.cta, pressed && { transform: [{ scale: 0.985 }], opacity: 0.96 }]}
     >
-      <Svg style={StyleSheet.absoluteFill} preserveAspectRatio="none" viewBox="0 0 100 100">
-        <Defs>
-          <LinearGradient id="cta" x1="0" y1="0" x2="1" y2="0.4">
-            <Stop offset="0" stopColor="#14C08F" />
-            <Stop offset="0.5" stopColor="#12A7B8" />
-            <Stop offset="1" stopColor="#2F74F5" />
-          </LinearGradient>
-          <LinearGradient id="ctaLuz" x1="0" y1="0" x2="0" y2="1">
-            <Stop offset="0" stopColor="#fff" stopOpacity={0.1} />
-            <Stop offset="0.5" stopColor="#fff" stopOpacity={0} />
-          </LinearGradient>
-        </Defs>
-        <Rect x={0} y={0} width={100} height={100} fill="url(#cta)" />
-        <Rect x={0} y={0} width={100} height={100} fill="url(#ctaLuz)" />
-      </Svg>
       <View style={s.wa}>
         <Svg width={24} height={24} viewBox="0 0 24 24" fill="#fff">
           <Path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4c1.7.7 2.3.8 3.2.7.5-.1 1.5-.6 1.8-1.2.2-.6.2-1.1.1-1.2l-.5-.3z" />
@@ -156,16 +142,35 @@ function BotaoWhatsApp({ titulo, apoio, onPress }: { titulo: string; apoio: stri
 
 export default function ResultadoTela() {
   const router = useRouter();
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, novo } = useLocalSearchParams<{ id: string; novo?: string }>();
   const { criancaAtual } = useApp();
   const [triagem, setTriagem] = useState<TriagemSalva | null>(null);
   const [incluirResumo, setIncluirResumo] = useState(false);
+  // Comemoração de ter feito a triagem (não do resultado): só ao chegar direto da triagem.
+  const [intro, setIntro] = useState(novo === '1');
+  useEffect(() => {
+    if (!intro) return;
+    const t = setTimeout(() => setIntro(false), 2600);
+    return () => clearTimeout(t);
+  }, [intro]);
 
   useEffect(() => {
     if (id) repositorio.lerTriagem(id).then(setTriagem);
   }, [id]);
 
   if (!triagem || !criancaAtual) return <Tela>{null}</Tela>;
+
+  if (intro) {
+    return (
+      <Pressable style={s.intro} onPress={() => setIntro(false)} accessibilityRole="button" accessibilityLabel="Ver resultado">
+        <CelebracaoConquista tamanho={280} />
+        <Texto style={{ fontFamily: fonte.extra, fontSize: 26, letterSpacing: -0.6, color: cores.texto, textAlign: 'center' }}>Triagem concluída!</Texto>
+        <Texto style={{ fontSize: 15, lineHeight: 22, color: cores.texto2, textAlign: 'center', maxWidth: 300 }}>
+          Obrigado por dedicar esse tempo a {criancaAtual.apelido}. Preparando o resultado…
+        </Texto>
+      </Pressable>
+    );
+  }
 
   const { resultado } = triagem;
   const faixa = FAIXAS.find((f) => f.id === triagem.faixaId);
@@ -373,9 +378,10 @@ const s = StyleSheet.create({
   caixaAtiva: { backgroundColor: cores.marca, borderColor: cores.marca },
   previa: { gap: 4, padding: 14, borderRadius: 14, backgroundColor: '#F2FAF7', borderLeftWidth: 3, borderLeftColor: cores.marca },
   privacidade: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#F4F8F7', borderRadius: 12, paddingVertical: 10, paddingHorizontal: 12 },
+  intro: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10, padding: 24, backgroundColor: cores.fundo },
   rt: { flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: '#fff', borderRadius: 20, padding: 16, boxShadow: '0px 12px 30px rgba(44, 62, 63, 0.05)' },
   rtAvatar: { width: 50, height: 50, borderRadius: 17, backgroundColor: cores.marcaSuave, alignItems: 'center', justifyContent: 'center' },
   luz: { width: 8, height: 8, borderRadius: 4 },
-  cta: { width: '100%', minHeight: 72, borderRadius: 24, overflow: 'hidden', paddingVertical: 14, paddingLeft: 14, paddingRight: 18, flexDirection: 'row', alignItems: 'center', gap: 14, boxShadow: '0px 18px 36px rgba(32, 140, 200, 0.35)' },
+  cta: { width: '100%', minHeight: 72, borderRadius: 24, overflow: 'hidden', backgroundColor: cores.marca, paddingVertical: 14, paddingLeft: 14, paddingRight: 18, flexDirection: 'row', alignItems: 'center', gap: 14, boxShadow: '0px 16px 32px rgba(31, 122, 107, 0.30)' },
   wa: { width: 44, height: 44, borderRadius: 15, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' },
 });
