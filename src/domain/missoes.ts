@@ -98,3 +98,46 @@ export function ponteProposito(
       : `Próximo passo: ${proxima.titulo}, para levar essa evolução para ${FRASE_AREA[proxima.areas[0]]}.`;
   return { feedback, proxima, motivo };
 }
+
+// ---------------- Gamificação ----------------
+
+/** Quantas missões formam uma fase da trilha. */
+export const MISSOES_POR_FASE = 4;
+/** Meta de dias com missão por semana, mostrada no Início. */
+export const META_SEMANAL = 3;
+
+export type Medalha = { nome: string; tom: 'bronze' | 'prata' | 'ouro' | 'esmeralda' | 'diamante' };
+
+const MEDALHAS: Medalha[] = [
+  { nome: 'Primeiros Passos', tom: 'bronze' },
+  { nome: 'Pequeno Explorador', tom: 'prata' },
+  { nome: 'Grande Comunicador', tom: 'ouro' },
+  { nome: 'Mestre das Palavras', tom: 'esmeralda' },
+  { nome: 'Estrela Fono Inova', tom: 'diamante' },
+];
+
+export type Fase = { numero: number; medalha: Medalha; itens: ItemTrilha[]; feitas: number; completa: boolean };
+
+/** Divide a trilha em fases de 4 missões; cada fase completa vale uma medalha. */
+export function fasesDaTrilha(trilha: ItemTrilha[]): Fase[] {
+  const fases: Fase[] = [];
+  for (let i = 0; i < trilha.length; i += MISSOES_POR_FASE) {
+    const itens = trilha.slice(i, i + MISSOES_POR_FASE);
+    const numero = fases.length + 1;
+    const feitas = itens.filter((t) => t.feitas > 0).length;
+    fases.push({ numero, medalha: MEDALHAS[Math.min(numero, MEDALHAS.length) - 1], itens, feitas, completa: feitas === itens.length });
+  }
+  return fases;
+}
+
+/** A fase que acabou de ser completada por esta conclusão (antes incompleta, agora completa), ou null. */
+export function faseConquistada(antes: ItemTrilha[], depois: ItemTrilha[]): Fase | null {
+  const a = fasesDaTrilha(antes);
+  return fasesDaTrilha(depois).find((f, i) => f.completa && !a[i]?.completa) ?? null;
+}
+
+/** Missão que esta conclusão acabou de liberar na trilha (a primeira que estava trancada e abriu). */
+export function missaoDesbloqueada(antes: ItemTrilha[], depois: ItemTrilha[]): Missao | null {
+  const trancadas = new Set(antes.filter((t) => !t.liberada).map((t) => t.missao.id));
+  return depois.find((t) => t.liberada && trancadas.has(t.missao.id))?.missao ?? null;
+}
