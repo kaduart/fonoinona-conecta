@@ -12,11 +12,15 @@ export type Conclusao = {
 
 export type ItemTrilha = { missao: Missao; liberada: boolean; feitas: number };
 
-/** Missões da idade, com a área de foco da triagem primeiro e depois a ordem base. */
+/**
+ * Missões da idade, com a área de foco da triagem primeiro.
+ * A partir de 3 anos, as missões feitas para a idade (de 2 anos para cima) vêm antes das de bebê.
+ */
 export function missoesParaIdade(meses: number, areaFoco?: Area | null, catalogo: Missao[] = MISSOES): Missao[] {
-  const daIdade = catalogo.filter((m) => m.idadeMinMeses <= meses);
+  const daIdade = catalogo.filter((m) => m.idadeMinMeses <= meses && (m.idadeMaxMeses === undefined || meses <= m.idadeMaxMeses));
   const peso = (m: Missao) => (areaFoco && m.areas.includes(areaFoco) ? 0 : 1);
-  return [...daIdade].sort((a, b) => peso(a) - peso(b) || a.ordem - b.ordem);
+  const daFase = (m: Missao) => (meses >= 36 && m.idadeMinMeses < 24 ? 1 : 0);
+  return [...daIdade].sort((a, b) => peso(a) - peso(b) || daFase(a) - daFase(b) || a.ordem - b.ordem);
 }
 
 /** Trilha sequencial: cada missão abre quando a anterior foi concluída pelo menos uma vez. */
