@@ -10,6 +10,7 @@ import { MISSOES, ROTULO_COMO_FOI } from '@/content/missoes';
 import { FAIXAS, ROTULO_AREA } from '@/content/perguntas';
 import { TEXTOS_RESULTADO } from '@/content/resultados';
 import { formatarDataCurta, proximaTriagem } from '@/domain/acompanhamento';
+import { EMOJI_HUMOR, marcasDeAtividade, resumir, rotuloAreaDiario } from '@/domain/diario';
 import { diasSeguidos } from '@/domain/missoes';
 import type { NivelResultado } from '@/domain/triagem';
 import { useApp } from '@/state/app';
@@ -71,6 +72,33 @@ function Numero({ valor, rotulo, cor }: { valor: number; rotulo: string; cor: st
   );
 }
 
+/** Barra empilhada com quantos dias foram bons, normais e difíceis (um humor por dia). */
+function HumorDoMes({ humor }: { humor: { bom: number; normal: number; dificil: number } }) {
+  const total = humor.bom + humor.normal + humor.dificil;
+  if (!total) return null;
+  const partes = [
+    { chave: 'bom' as const, n: humor.bom, cor: cores.esperado, rotulo: humor.bom === 1 ? 'bom' : 'bons' },
+    { chave: 'normal' as const, n: humor.normal, cor: '#C9D3D6', rotulo: humor.normal === 1 ? 'normal' : 'normais' },
+    { chave: 'dificil' as const, n: humor.dificil, cor: cores.sol, rotulo: humor.dificil === 1 ? 'difícil' : 'difíceis' },
+  ];
+  return (
+    <View style={{ gap: 8 }} accessibilityLabel={`${humor.bom} dias bons, ${humor.normal} normais e ${humor.dificil} difíceis`}>
+      <View style={[s.barra, { flexDirection: 'row', gap: 2, backgroundColor: 'transparent' }]}>
+        {partes.filter((p) => p.n).map((p) => (
+          <View key={p.chave} style={{ flex: p.n, height: '100%', borderRadius: 5, backgroundColor: p.cor }} />
+        ))}
+      </View>
+      <View style={{ flexDirection: 'row', gap: 14 }}>
+        {partes.map((p) => (
+          <Texto key={p.chave} variante="legenda">
+            {EMOJI_HUMOR[p.chave]} {p.n} {p.rotulo}
+          </Texto>
+        ))}
+      </View>
+    </View>
+  );
+}
+
 export default function Historico() {
   const router = useRouter();
   const { criancaAtual } = useApp();
@@ -84,7 +112,9 @@ export default function Historico() {
   const melhorou = triagens.length >= 2 && ALTURA[triagens[0].resultado.nivel] > ALTURA[triagens[1].resultado.nivel];
 
   const ultima = triagens[0];
-  const seguidos = diasSeguidos(conclusoes, new Date());
+  const diario = dados?.diario ?? [];
+  const seguidos = diasSeguidos([...conclusoes, ...marcasDeAtividade(diario)], new Date());
+  const mes = resumir(diario, 30, new Date());
   const missoesDiferentes = new Set(conclusoes.map((c) => c.missaoId)).size;
   const areas = ultima ? [...ultima.resultado.areas].sort((a, b) => b.pontuacao - a.pontuacao) : [];
 
@@ -134,6 +164,39 @@ export default function Historico() {
         <Numero valor={seguidos} rotulo={seguidos === 1 ? 'dia seguido' : 'dias seguidos'} cor={cores.terra} />
         <Numero valor={missoesDiferentes} rotulo={missoesDiferentes === 1 ? 'missão diferente' : 'missões diferentes'} cor="#C98A12" />
       </View>
+
+      <Card style={{ padding: 16, gap: 12 }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
+          <Texto variante="rotulo" style={{ fontSize: 14 }}>
+            Diário dos últimos 30 dias
+          </Texto>
+          <Botao variante="texto" titulo="Abrir" onPress={() => router.push('/diario')} />
+        </View>
+        {mes.diasAnotados ? (
+          <>
+            <Texto style={{ fontSize: 14 }}>
+              <Texto style={{ fontFamily: fonte.negrito, color: cores.texto, fontSize: 14 }}>{mes.diasAnotados}</Texto> {mes.diasAnotados === 1 ? 'dia anotado' : 'dias anotados'}
+              {mes.conquistas ? (
+                <>
+                  {' · '}
+                  <Texto style={{ fontFamily: fonte.negrito, color: '#C98A12', fontSize: 14 }}>⭐ {mes.conquistas}</Texto> {mes.conquistas === 1 ? 'conquista' : 'conquistas'}
+                </>
+              ) : null}
+            </Texto>
+            <HumorDoMes humor={mes.humor} />
+            {mes.areasMaisMarcadas.length ? (
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, alignItems: 'center' }}>
+                <Texto variante="legenda">Mais observado:</Texto>
+                {mes.areasMaisMarcadas.map((a) => (
+                  <Chip key={a} texto={rotuloAreaDiario(a)} tom="neutro" />
+                ))}
+              </View>
+            ) : null}
+          </>
+        ) : (
+          <Texto style={{ fontSize: 14 }}>Anote o dia a dia de {nome} no Diário e o resumo do mês aparece aqui.</Texto>
+        )}
+      </Card>
 
       {triagens.length ? (
         <Texto variante="rotulo" style={{ fontSize: 16, marginTop: 6 }}>

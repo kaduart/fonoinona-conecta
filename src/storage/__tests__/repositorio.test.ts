@@ -59,6 +59,15 @@ describe('repositorio cifrado', () => {
     expect(await repositorio.listarDiario('k1')).toEqual([]);
   });
 
+  it('exportar e importar a cópia: soma sem duplicar', async () => {
+    await repositorio.salvarCrianca(pedro);
+    const copia = await repositorio.exportar();
+    await repositorio.apagarTudo();
+    await repositorio.importar(copia);
+    await repositorio.importar(copia);
+    expect(await repositorio.listarCriancas()).toEqual([pedro]);
+  });
+
   it('apagar tudo descarta a chave', async () => {
     const { descartarChave } = jest.requireMock('@/storage/chave');
     await repositorio.salvarCrianca(pedro);

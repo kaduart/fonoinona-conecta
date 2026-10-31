@@ -110,6 +110,10 @@ export default function Perfil() {
       <Card style={{ paddingVertical: 4 }}>
         <ItemLista icone="grafico" titulo="Evolução" descricao={`Triagens e missões de ${criancaAtual?.apelido ?? ''}`} onPress={() => irPara(router, '/historico')} />
         <View style={s.divisor} />
+        <ItemLista icone="lapis" titulo="Lembrete do Diário" descricao="Um aviso por dia para anotar" onPress={() => router.push('/lembrete')} />
+        <View style={s.divisor} />
+        <ItemLista icone="livro" titulo="Cópia dos dados" descricao="Para trocar de celular sem perder nada" onPress={() => router.push('/meus-dados')} />
+        <View style={s.divisor} />
         <ItemLista icone="escudo" titulo="Privacidade e dados" descricao="Tudo fica no seu celular" onPress={() => setConfirmar(confirmar ? null : 'crianca')} />
         <View style={s.divisor} />
         <ItemLista icone="info" titulo="Sobre o app" descricao="Responsável técnica e fontes" onPress={() => router.push('/sobre')} />
