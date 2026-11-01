@@ -7,10 +7,12 @@ import { CelebracaoConquista } from '@/components/animacao';
 import { Icone, irPara } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
-import { Botao, Card } from '@/components/ui';
+import { Botao, Card, Interruptor } from '@/components/ui';
 import { MISSOES, ROTULO_COMO_FOI, type ComoFoi } from '@/content/missoes';
-import { diasSeguidos, faseConquistada, missaoDesbloqueada, missoesParaIdade, montarTrilha, ponteProposito, semana, type Conclusao } from '@/domain/missoes';
+import { marcasDeAtividade } from '@/domain/diario';
+import { diasSeguidos, faseConquistada, META_SEMANAL, missaoDesbloqueada, missoesParaIdade, montarTrilha, ponteProposito, semana, type Conclusao } from '@/domain/missoes';
 import { idadeDe } from '@/domain/idade';
+import { tocar, useSomAoAbrir } from '@/servicos/sons';
 import { useApp } from '@/state/app';
 import { useDadosCrianca } from '@/state/dados';
 import { novoId, repositorio } from '@/storage/repositorio';
@@ -25,17 +27,21 @@ export default function MissaoConcluida() {
   const dados = useDadosCrianca(criancaAtual?.id);
   const [como, setComo] = useState<ComoFoi | null>(null);
   const [salvando, setSalvando] = useState(false);
+  const [anotar, setAnotar] = useState(false);
   // id gerado uma vez: tocar duas vezes não duplica a conclusão
   const [conclusaoId] = useState(novoId);
   const [agora] = useState(() => new Date());
+
+  useSomAoAbrir('missao', true, 250);
 
   const missao = MISSOES.find((m) => m.id === id);
   if (!missao || !criancaAtual) return <Redirect href="/inicio" />;
 
   const nova: Conclusao = { id: conclusaoId, criancaId: criancaAtual.id, missaoId: missao.id, como: como ?? 'facil', em: agora.toISOString() };
   const todas = [nova, ...(dados?.conclusoes ?? []).filter((c) => c.id !== conclusaoId)];
-  const naSemana = semana(todas, agora).filter((d) => d.feito).length;
-  const seguidos = diasSeguidos(todas, agora);
+  const atividade = [...todas, ...marcasDeAtividade(dados?.diario ?? [])];
+  const naSemana = semana(atividade, agora).filter((d) => d.feito).length;
+  const seguidos = diasSeguidos(atividade, agora);
   const ultima = dados?.triagens[0] ?? null;
   const missoesIdade = missoesParaIdade(idadeDe(criancaAtual), ultima?.resultado.areaFoco);
   const ponte = ponteProposito(missao, criancaAtual.apelido, missoesIdade, todas);
@@ -49,9 +55,17 @@ export default function MissaoConcluida() {
       const antes = montarTrilha(missoesIdade, dados?.conclusoes ?? []);
       const depois = montarTrilha(missoesIdade, [{ ...nova, como }, ...(dados?.conclusoes ?? [])]);
       const fase = faseConquistada(antes, depois);
+      // meta da semana batida agora (sem medalha, que já tem a sua fanfarra)
+      const atividadeAntes = [...(dados?.conclusoes ?? []), ...marcasDeAtividade(dados?.diario ?? [])];
+      const antesNaSemana = semana(atividadeAntes, agora).filter((d) => d.feito).length;
+      if (!fase && antesNaSemana < META_SEMANAL && naSemana >= META_SEMANAL) void tocar('completo');
       const aberta = missaoDesbloqueada(antes, depois);
       const params = aberta ? { desbloqueou: aberta.id } : {};
-      if (fase) {
+      if (anotar) {
+        // o Diário abre já com a missão; ao salvar, segue para onde a missão levaria
+        const destino = fase ? `/conquista?fase=${fase.numero}${aberta ? `&desbloqueou=${aberta.id}` : ''}` : aberta ? `/trilha?desbloqueou=${aberta.id}` : '/inicio';
+        irPara(router, { pathname: '/diario-anotar', params: { missaoId: missao!.id, depois: destino } });
+      } else if (fase) {
         irPara(router, { pathname: '/conquista', params: { fase: String(fase.numero), ...params } });
       } else if (aberta) irPara(router, { pathname: '/trilha', params });
       else irPara(router, '/inicio');
@@ -114,6 +128,8 @@ export default function MissaoConcluida() {
           Isso ajuda a ajustar as próximas missões.
         </Texto>
       </View>
+
+      <Interruptor valor={anotar} onChange={setAnotar} titulo="Anotar no Diário" descricao="Conte em 20 segundos o que você reparou durante a brincadeira." />
     </Tela>
   );
 }

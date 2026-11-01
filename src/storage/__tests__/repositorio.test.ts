@@ -45,6 +45,29 @@ describe('repositorio cifrado', () => {
     expect(await repositorio.listarConclusoes('k1')).toEqual([]);
   });
 
+  it('Diário: grava cifrado, edita pelo id, apaga e some junto com a criança', async () => {
+    const r = { id: 'd1', criancaId: 'k1', data: '2026-10-31', contexto: 'casa' as const, humor: 'bom' as const, areas: ['fala' as const], conquista: true, nota: 'Falou água', criadoEm: '2026-10-31T10:00:00Z', editadoEm: '2026-10-31T10:00:00Z' };
+    await repositorio.salvarRegistroDiario(r);
+    await repositorio.salvarRegistroDiario({ ...r, nota: 'Falou água sozinha' });
+    expect(await AsyncStorage.getItem('conecta:diario:v1')).not.toContain('água');
+    expect(await repositorio.listarDiario('k1')).toEqual([{ ...r, nota: 'Falou água sozinha' }]);
+    expect(await repositorio.listarDiario('k2')).toEqual([]);
+    await repositorio.salvarRegistroDiario({ ...r, id: 'd2' });
+    await repositorio.removerRegistroDiario('d1');
+    expect((await repositorio.listarDiario('k1')).map((x) => x.id)).toEqual(['d2']);
+    await repositorio.removerCrianca('k1');
+    expect(await repositorio.listarDiario('k1')).toEqual([]);
+  });
+
+  it('exportar e importar a cópia: soma sem duplicar', async () => {
+    await repositorio.salvarCrianca(pedro);
+    const copia = await repositorio.exportar();
+    await repositorio.apagarTudo();
+    await repositorio.importar(copia);
+    await repositorio.importar(copia);
+    expect(await repositorio.listarCriancas()).toEqual([pedro]);
+  });
+
   it('apagar tudo descarta a chave', async () => {
     const { descartarChave } = jest.requireMock('@/storage/chave');
     await repositorio.salvarCrianca(pedro);

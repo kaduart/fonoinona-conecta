@@ -5,9 +5,10 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { Avatar, Icone, ItemLista, irPara } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
-import { Botao, BotaoVoltar, Card, Chip } from '@/components/ui';
+import { Botao, BotaoVoltar, Card, Chip, Interruptor } from '@/components/ui';
 import { TEXTOS_RESULTADO } from '@/content/resultados';
 import { formatarIdade, idadeDe } from '@/domain/idade';
+import { definirSons, sonsLigados, tocar } from '@/servicos/sons';
 import { useApp } from '@/state/app';
 import { repositorio, type TriagemSalva } from '@/storage/repositorio';
 import { cores, fonte, raio, sombra } from '@/theme/tokens';
@@ -29,6 +30,17 @@ export default function Perfil() {
   const [triagens, setTriagens] = useState<TriagemSalva[]>([]);
   const [confirmar, setConfirmar] = useState<Confirmacao>(null);
   const [apagando, setApagando] = useState(false);
+  const [sons, setSons] = useState(true);
+  useFocusEffect(
+    useCallback(() => {
+      sonsLigados().then(setSons).catch(() => undefined);
+    }, []),
+  );
+  async function alternarSons(v: boolean) {
+    setSons(v);
+    await definirSons(v);
+    if (v) void tocar('missao');
+  }
 
   useFocusEffect(
     useCallback(() => {
@@ -110,10 +122,16 @@ export default function Perfil() {
       <Card style={{ paddingVertical: 4 }}>
         <ItemLista icone="grafico" titulo="Evolução" descricao={`Triagens e missões de ${criancaAtual?.apelido ?? ''}`} onPress={() => irPara(router, '/historico')} />
         <View style={s.divisor} />
+        <ItemLista icone="lapis" titulo="Lembrete do Diário" descricao="Um aviso por dia para anotar" onPress={() => router.push('/lembrete')} />
+        <View style={s.divisor} />
+        <ItemLista icone="livro" titulo="Cópia dos dados" descricao="Para trocar de celular sem perder nada" onPress={() => router.push('/meus-dados')} />
+        <View style={s.divisor} />
         <ItemLista icone="escudo" titulo="Privacidade e dados" descricao="Tudo fica no seu celular" onPress={() => setConfirmar(confirmar ? null : 'crianca')} />
         <View style={s.divisor} />
         <ItemLista icone="info" titulo="Sobre o app" descricao="Responsável técnica e fontes" onPress={() => router.push('/sobre')} />
       </Card>
+
+      <Interruptor valor={sons} onChange={alternarSons} titulo="Sons do app" descricao="Sons curtos e vibração nas conquistas. No iPhone, seguem a chave de silêncio." />
 
       {confirmar ? (
         <Card style={{ padding: 16, gap: 12 }}>

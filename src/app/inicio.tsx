@@ -14,6 +14,7 @@ import { ROTULO_AREA } from '@/content/perguntas';
 import { formatarDataCurta, proximaTriagem } from '@/domain/acompanhamento';
 import { codigoContato, linkWhatsApp, linkWhatsAppGeral } from '@/domain/contato';
 import { formatarIdade, idadeDe } from '@/domain/idade';
+import { marcasDeAtividade } from '@/domain/diario';
 import { areasComDificuldade, diasSeguidos, META_SEMANAL, missaoDoDia, missoesParaIdade, montarTrilha, semana } from '@/domain/missoes';
 import { useApp } from '@/state/app';
 import { useDadosCrianca } from '@/state/dados';
@@ -51,8 +52,10 @@ export default function Inicio() {
   const conclusoes = dados?.conclusoes ?? [];
   const trilha = montarTrilha(missoesParaIdade(meses, ultima?.resultado.areaFoco), conclusoes);
   const doDia = missaoDoDia(trilha, conclusoes);
-  const seguidos = diasSeguidos(conclusoes, hoje);
-  const dias = semana(conclusoes, hoje);
+  // a sequência conta missão OU Diário: constância também em dia sem brincadeira prática
+  const atividade = [...conclusoes, ...marcasDeAtividade(dados?.diario ?? [])];
+  const seguidos = diasSeguidos(atividade, hoje);
+  const dias = semana(atividade, hoje);
   const feitosNaSemana = dias.filter((d) => d.feito).length;
   const metaBatida = feitosNaSemana >= META_SEMANAL;
   const dificeis = areasComDificuldade(conclusoes);
@@ -171,7 +174,7 @@ export default function Inicio() {
             </Texto>
           </View>
         </View>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }} accessibilityLabel={`${feitosNaSemana} dias com missão nesta semana`}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }} accessibilityLabel={`${feitosNaSemana} dias com missão ou Diário nesta semana`}>
           {dias.map((d, i) => {
             const ehHoje = i === dias.length - 1;
             return (
