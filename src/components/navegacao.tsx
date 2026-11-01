@@ -4,6 +4,7 @@ import { Image, Pressable, StyleSheet, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 
 import { Texto } from '@/components/texto';
+import { toqueLeve } from '@/servicos/sons';
 import { cores, fonte, raio, sombra, toque } from '@/theme/tokens';
 
 type NomeIcone = 'casa' | 'grafico' | 'pessoa' | 'seta' | 'cadeado' | 'check' | 'mais' | 'escudo' | 'info' | 'relogio' | 'chat' | 'lixo' | 'livro' | 'estrela' | 'fogo' | 'equipe' | 'play' | 'cronometro' | 'baixo' | 'lapis' | 'compartilhar' | 'presente' | 'escola' | 'terapia' | 'sol' | 'nuvem' | 'chuva' | 'ouvido' | 'musica' | 'boca' | 'colher' | 'espelho' | 'mao' | 'blocos' | 'letras';
@@ -229,7 +230,11 @@ export function BarraInferior() {
               key={a.rota}
               accessibilityRole="tab"
               accessibilityState={{ selected: ativa }}
-              onPress={() => !ativa && irPara(router, a.href)}
+              onPress={() => {
+                if (ativa) return;
+                toqueLeve();
+                irPara(router, a.href);
+              }}
               style={s.aba}
             >
               <View style={[s.abaIcone, ativa && { backgroundColor: cores.marca }]}>
