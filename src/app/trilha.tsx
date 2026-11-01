@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withDelay, withRepeat, withSequence, withSpring, withTiming } from 'react-native-reanimated';
 
 import { BarraInferior, Icone } from '@/components/navegacao';
+import { Preenchimento } from '@/components/grafico';
 import { Tela } from '@/components/tela';
 import { Numero } from '@/components/numero';
 import { Texto } from '@/components/texto';
@@ -59,7 +60,7 @@ export default function Trilha() {
           </Texto>
         </View>
         <View style={s.barra}>
-          <View style={[s.barraCheia, { width: `${Math.round(progresso * 100)}%` }]} />
+          <Preenchimento pct={Math.round(progresso * 100)} cor={cores.marca} />
         </View>
         {ultima?.resultado.areaFoco ? <Chip texto={`Foco: ${ROTULO_AREA[ultima.resultado.areaFoco].toLowerCase()}`} /> : null}
       </View>
@@ -204,7 +205,6 @@ const s = StyleSheet.create({
   fase: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 4 },
   progresso: { gap: 10, padding: 16, borderRadius: raio.xl, backgroundColor: cores.superficie, boxShadow: sombra.card },
   barra: { height: 9, borderRadius: 5, backgroundColor: cores.fundo2, overflow: 'hidden' },
-  barraCheia: { height: '100%', borderRadius: 5, backgroundColor: cores.marca },
   missao: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 14, borderRadius: raio.lg, backgroundColor: cores.superficie, boxShadow: sombra.card },
   missaoTrancada: { backgroundColor: vidro(0.5), boxShadow: 'none', borderWidth: 1, borderColor: cores.linha },
   numero: { width: 42, height: 42, borderRadius: 14, backgroundColor: cores.marcaSuave, alignItems: 'center', justifyContent: 'center' },

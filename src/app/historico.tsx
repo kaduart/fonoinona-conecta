@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import Svg, { Circle, G, Line, Path, Text as SvgText } from 'react-native-svg';
 
 import { BarraInferior, ICONE_HUMOR, Icone, ItemLista } from '@/components/navegacao';
+import { comprimento, LinhaDesenhada, Preenchimento } from '@/components/grafico';
 import { Tela } from '@/components/tela';
 import { Numero } from '@/components/numero';
 import { Texto } from '@/components/texto';
@@ -49,7 +50,7 @@ function Grafico({ triagens }: { triagens: TriagemSalva[] }) {
         </G>
       ))}
       {pontos.length > 1 ? <Path d={`${d} L${x(pontos.length - 1)} 112 L${x(0)} 112 Z`} fill={cores.marca} fillOpacity={0.08} /> : null}
-      <Path d={d} stroke={cores.marca} strokeWidth={3} fill="none" strokeLinejoin="round" strokeLinecap="round" />
+      <LinhaDesenhada d={d} tamanho={comprimento(pontos.map((p, i) => ({ x: x(i), y: y(p.resultado.nivel) })))} stroke={cores.marca} strokeWidth={3} fill="none" strokeLinejoin="round" strokeLinecap="round" />
       {pontos.map((p, i) => {
         const data = new Date(p.criadaEm);
         return (
@@ -147,14 +148,14 @@ export default function Historico() {
           <Texto variante="rotulo" style={{ fontSize: 14 }}>
             Por habilidade
           </Texto>
-          {areas.map((a) => (
+          {areas.map((a, i) => (
             <View key={a.area} style={{ gap: 6 }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                 <Texto style={{ fontFamily: fonte.semi, fontSize: 13, color: cores.texto }}>{a.rotulo}</Texto>
                 <Texto style={{ fontFamily: fonte.semi, fontSize: 13, color: TOM_AREA[a.nivel].texto }}>{TOM_AREA[a.nivel].rotulo}</Texto>
               </View>
               <View style={s.barra}>
-                <View style={[s.barraCheia, { width: `${Math.max(8, a.pontuacao)}%`, backgroundColor: TOM_AREA[a.nivel].cor }]} />
+                <Preenchimento pct={Math.max(8, a.pontuacao)} cor={TOM_AREA[a.nivel].cor} atraso={i * 70} />
               </View>
             </View>
           ))}
@@ -277,6 +278,5 @@ const s = StyleSheet.create({
   trilho: { flex: 1, width: 2, backgroundColor: cores.fundo2, marginTop: 4, marginBottom: -14 },
   proxima: { padding: 14, flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: raio.lg, backgroundColor: cores.marcaSuave, boxShadow: 'none' },
   barra: { height: 9, borderRadius: 5, backgroundColor: cores.fundo2, overflow: 'hidden' },
-  barraCheia: { height: '100%', borderRadius: 5 },
   conclusao: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 6 },
 });

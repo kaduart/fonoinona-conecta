@@ -5,6 +5,7 @@ import Animated, { FadeIn, LinearTransition } from 'react-native-reanimated';
 
 import { ConfeteAoRedor } from '@/components/animacao';
 import { BarraInferior, ICONE_CONTEXTO, Icone } from '@/components/navegacao';
+import { Lottie } from '@/components/lottie';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
 import { Botao, Card } from '@/components/ui';
@@ -220,7 +221,7 @@ function CartaoRegistro({ registro: r, destaque, onPress }: { registro: Registro
       style={({ pressed }) => [s.registro, r.conquista && s.registroConquista, destaque && s.registroDestaque, pressed && toque]}
     >
       <View style={[s.icone, r.conquista && { backgroundColor: cores.solFundo }]}>
-        {r.conquista ? <Icone nome="estrela" cor={cores.sol} tamanho={21} cheio /> : <Icone nome={ICONE_CONTEXTO[r.contexto]} cor={cores.marca} tamanho={21} />}
+        {r.conquista && destaque ? <Lottie nome="estrela" tamanho={44} loop={false} /> : r.conquista ? <Icone nome="estrela" cor={cores.sol} tamanho={21} cheio /> : <Icone nome={ICONE_CONTEXTO[r.contexto]} cor={cores.marca} tamanho={21} />}
       </View>
       <View style={{ flex: 1, gap: 4 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>

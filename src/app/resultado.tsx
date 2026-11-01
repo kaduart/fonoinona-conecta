@@ -11,6 +11,7 @@ import { Medidor } from '@/components/medidor';
 import { useProgresso } from '@/components/progresso';
 import { ICONE_AREA, Icone, irPara } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
+import { Lottie } from '@/components/lottie';
 import { Texto } from '@/components/texto';
 import { Botao } from '@/components/ui';
 import { FAIXAS } from '@/content/perguntas';
@@ -167,6 +168,9 @@ export default function ResultadoTela() {
     return (
       <Pressable style={s.intro} onPress={() => setIntro(false)} accessibilityRole="button" accessibilityLabel="Ver resultado">
         <Animated.View style={estiloVoo}>
+          <View pointerEvents="none" style={s.ondas}>
+            <Lottie nome="ondas" tamanho={380} />
+          </View>
           <CelebracaoConquista tamanho={280} />
         </Animated.View>
         <Animated.View style={[{ alignItems: 'center', gap: 10 }, estiloTextoVoo]}>
@@ -394,6 +398,7 @@ const s = StyleSheet.create({
   caixaAtiva: { backgroundColor: cores.marca, borderColor: cores.marca },
   previa: { gap: 4, padding: 14, borderRadius: 14, backgroundColor: tema('#F2FAF7', '#17302B'), borderLeftWidth: 3, borderLeftColor: cores.marca },
   privacidade: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: cores.fundo2, borderRadius: 12, paddingVertical: 10, paddingHorizontal: 12 },
+  ondas: { position: 'absolute', top: -50, left: -50, right: -50, bottom: -50, alignItems: 'center', justifyContent: 'center', opacity: 0.55 },
   intro: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10, padding: 24, backgroundColor: cores.fundo },
   rt: { flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: cores.superficie, borderRadius: 20, padding: 16, boxShadow: sombra.card },
   rtAvatar: { width: 50, height: 50, borderRadius: 17, backgroundColor: cores.marcaSuave, alignItems: 'center', justifyContent: 'center' },
