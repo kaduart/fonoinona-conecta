@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
+import Animated, { FadeInRight, ZoomIn } from 'react-native-reanimated';
 import Svg, { Circle, Path } from 'react-native-svg';
 
 import { registrarEvento } from '@/api/cliente';
@@ -10,9 +11,10 @@ import { Botao, BotaoVoltar, Card, Chip, Segmentos, SetaDireita } from '@/compon
 import { ALERTAS, ROTULO_AREA, VERSAO_CONTEUDO } from '@/content/perguntas';
 import { formatarIdade, idadeParaTriagem } from '@/domain/idade';
 import { avaliar, faixaPara, personalizar, type Resposta } from '@/domain/triagem';
+import { toqueLeve } from '@/servicos/sons';
 import { useApp } from '@/state/app';
 import { novoId, repositorio } from '@/storage/repositorio';
-import { cores, fonte, raio, sombra } from '@/theme/tokens';
+import { cores, fonte, raio, sombra, toque, vidro, tema } from '@/theme/tokens';
 
 type Opcao = { valor: string; titulo: string; descricao: string; cor: string; fundo: string; icone: React.ReactNode };
 
@@ -57,7 +59,7 @@ function OpcaoCard({ opcao, marcada, onPress }: { opcao: Opcao; marcada: boolean
       accessibilityRole="radio"
       accessibilityState={{ checked: marcada }}
       onPress={onPress}
-      style={[s.opcao, marcada && s.opcaoMarcada]}
+      style={({ pressed }) => [s.opcao, marcada && s.opcaoMarcada, pressed && toque]}
     >
       <View style={[s.opcaoIcone, { backgroundColor: opcao.fundo }]}>
         <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={opcao.cor} strokeWidth={2.2} strokeLinecap="round">
@@ -70,9 +72,11 @@ function OpcaoCard({ opcao, marcada, onPress }: { opcao: Opcao; marcada: boolean
       </View>
       <View style={[s.radio, marcada && s.radioMarcado]}>
         {marcada ? (
-          <Svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={3} strokeLinecap="round">
-            <Path d="M5 12l5 5 9-10" />
-          </Svg>
+          <Animated.View entering={ZoomIn.springify().damping(14)}>
+            <Svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={3} strokeLinecap="round">
+              <Path d="M5 12l5 5 9-10" />
+            </Svg>
+          </Animated.View>
         ) : null}
       </View>
     </Pressable>
@@ -121,6 +125,7 @@ export default function Triagem() {
     : (respostas[pergunta.id] ?? null);
 
   function escolher(valor: string) {
+    toqueLeve();
     if (ehAlerta) setAlertas((a) => ({ ...a, [pergunta.id]: valor === 'sim' }));
     else setRespostas((r) => ({ ...r, [pergunta.id]: valor as Resposta }));
     // avança sozinho para a próxima (a última espera o "Ver resultado"); a pausa deixa ver a marcação
@@ -185,20 +190,23 @@ export default function Triagem() {
           {nome} · {formatarIdade(meses)}
         </Texto>
       </View>
-      <Card elevado style={{ padding: 22, gap: 12, borderRadius: raio.xxl }}>
-        <Chip texto={ehAlerta ? 'Para todas as idades' : `${ROTULO_AREA[pergunta.area]} · ${faixa.rotulo}`} />
-        <Texto style={{ fontFamily: fonte.extra, fontSize: 23, lineHeight: 29, letterSpacing: -0.5, color: cores.texto }}>
-          {personalizar(pergunta.texto, { nome })}
-        </Texto>
-        <Texto variante="legenda" style={{ fontSize: 13.5 }}>
-          Pense no que você observou nas últimas duas semanas.
-        </Texto>
-      </Card>
-      <View accessibilityRole="radiogroup" style={{ gap: 12 }}>
-        {(ehAlerta ? OPCOES_ALERTA : OPCOES_FAIXA).map((o) => (
-          <OpcaoCard key={o.valor} opcao={o} marcada={marcada === o.valor} onPress={() => escolher(o.valor)} />
-        ))}
-      </View>
+      {/* a pergunta nova entra pela direita: dá a sensação de avançar */}
+      <Animated.View key={indice} entering={FadeInRight.duration(260)} style={{ gap: 14 }}>
+        <Card elevado style={{ padding: 22, gap: 12, borderRadius: raio.xxl }}>
+          <Chip texto={ehAlerta ? 'Para todas as idades' : `${ROTULO_AREA[pergunta.area]} · ${faixa.rotulo}`} />
+          <Texto style={{ fontFamily: fonte.extra, fontSize: 23, lineHeight: 29, letterSpacing: -0.5, color: cores.texto }}>
+            {personalizar(pergunta.texto, { nome })}
+          </Texto>
+          <Texto variante="legenda" style={{ fontSize: 13.5 }}>
+            Pense no que você observou nas últimas duas semanas.
+          </Texto>
+        </Card>
+        <View accessibilityRole="radiogroup" style={{ gap: 12 }}>
+          {(ehAlerta ? OPCOES_ALERTA : OPCOES_FAIXA).map((o) => (
+            <OpcaoCard key={o.valor} opcao={o} marcada={marcada === o.valor} onPress={() => escolher(o.valor)} />
+          ))}
+        </View>
+      </Animated.View>
     </Tela>
   );
 }
@@ -209,7 +217,7 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    backgroundColor: 'rgba(255,255,255,0.8)',
+    backgroundColor: vidro(0.8),
     paddingVertical: 6,
     paddingLeft: 6,
     paddingRight: 14,
@@ -232,6 +240,6 @@ const s = StyleSheet.create({
   },
   opcaoMarcada: { borderColor: cores.marca, boxShadow: '0px 14px 30px rgba(31, 122, 107, 0.16)' },
   opcaoIcone: { width: 42, height: 42, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
-  radio: { width: 26, height: 26, borderRadius: 13, borderWidth: 2, borderColor: '#D3DEDD', alignItems: 'center', justifyContent: 'center' },
+  radio: { width: 26, height: 26, borderRadius: 13, borderWidth: 2, borderColor: tema('#D3DEDD', '#3A4849'), alignItems: 'center', justifyContent: 'center' },
   radioMarcado: { backgroundColor: cores.marca, borderColor: cores.marca },
 });

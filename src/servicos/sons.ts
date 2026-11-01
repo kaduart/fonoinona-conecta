@@ -47,6 +47,14 @@ function prepararModo() {
   return modoPronto;
 }
 
+/** Vibração bem leve de seleção (marcar resposta, trocar aba). Só no celular e só com "Sons do app" ligado. */
+export function toqueLeve(): void {
+  if (Platform.OS === 'web') return;
+  sonsLigados()
+    .then((ok) => (ok ? Haptics.selectionAsync() : undefined))
+    .catch(() => undefined);
+}
+
 /** Toca um som de comemoração (e vibra). Nunca lança erro: som é enfeite. */
 export async function tocar(som: Som): Promise<void> {
   try {

@@ -8,7 +8,7 @@ import { Texto } from '@/components/texto';
 import { Botao, BotaoVoltar, Card, Interruptor, SetaDireita } from '@/components/ui';
 import { useApp } from '@/state/app';
 import { novoId, repositorio } from '@/storage/repositorio';
-import { cores } from '@/theme/tokens';
+import { cores, tema } from '@/theme/tokens';
 
 export const VERSAO_TERMO = '2026-10-rascunho';
 
@@ -36,7 +36,7 @@ const ITENS = [
     titulo: 'Orientação, não diagnóstico',
     texto: 'Na dúvida, procure um especialista.',
     cor: '#F08A4B',
-    fundo: '#FFF3E6',
+    fundo: tema('#FFF3E6', '#3A2A1A'),
     icone: (c: string) => (
       <>
         <Circle cx={12} cy={12} r={9} stroke={c} strokeWidth={2} fill="none" />
