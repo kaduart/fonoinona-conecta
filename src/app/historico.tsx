@@ -2,7 +2,7 @@ import { Redirect, useRouter } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import Svg, { Circle, G, Line, Path, Text as SvgText } from 'react-native-svg';
 
-import { BarraInferior, ICONE_HUMOR, Icone } from '@/components/navegacao';
+import { BarraInferior, ICONE_HUMOR, Icone, ItemLista } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
 import { Numero } from '@/components/numero';
 import { Texto } from '@/components/texto';
@@ -166,6 +166,10 @@ export default function Historico() {
         <Indicador valor={seguidos} rotulo={seguidos === 1 ? 'dia seguido' : 'dias seguidos'} cor={cores.terraTexto} />
         <Indicador valor={medalhas} rotulo={medalhas === 1 ? 'medalha' : 'medalhas'} cor="#B07A10" />
       </View>
+
+      <Card style={{ paddingVertical: 4 }}>
+        <ItemLista icone="estrela" cor={cores.solTexto} fundo={cores.solFundo} titulo="Linha do tempo de conquistas" descricao="Tudo o que vocês celebraram, pronto para mandar à família" onPress={() => router.push('/conquistas')} />
+      </Card>
 
       <Card style={{ padding: 16, gap: 12 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
