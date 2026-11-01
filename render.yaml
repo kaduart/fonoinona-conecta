@@ -1,0 +1,24 @@
+# Deploy da API do Conecta (pasta server/) no Render, via Blueprint.
+# Render → New → Blueprint → este repositório. Preencha MONGODB_URI quando pedir.
+# Segredos nunca entram aqui: MONGODB_URI é digitada no painel; ADMIN_API_KEY é gerada pelo Render.
+services:
+  - type: web
+    name: conecta-api
+    runtime: node
+    rootDir: server
+    region: virginia # mais perto do Atlas em São Paulo entre as regiões do Render
+    plan: free # dorme após 15 min sem uso; a 1ª chamada depois disso demora ~1 min
+    branch: main
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /saude
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: MONGODB_URI
+        sync: false
+      - key: ADMIN_API_KEY
+        generateValue: true
+      - key: CORS_ORIGENS
+        value: https://clinicafonoinova.com.br,https://www.clinicafonoinova.com.br,https://conecta.clinicafonoinova.com.br,https://fonoinona-conecta.clinicafonoinova.workers.dev
