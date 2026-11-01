@@ -31,7 +31,7 @@ import {
 import type { Area } from '@/content/perguntas';
 import { idadeDe } from '@/domain/idade';
 import { META_SEMANAL, missoesParaIdade, montarTrilha, semana } from '@/domain/missoes';
-import { tocar, toqueLeve } from '@/servicos/sons';
+import { marcar, tocar } from '@/servicos/sons';
 import { useApp } from '@/state/app';
 import { useDadosCrianca } from '@/state/dados';
 import { novoId, repositorio } from '@/storage/repositorio';
@@ -158,7 +158,7 @@ export default function DiarioAnotar() {
   }
 
   function alternarArea(a: Area) {
-    toqueLeve();
+    marcar();
     setAreas((atual) => (atual.includes(a) ? atual.filter((x) => x !== a) : [...atual, a]));
   }
 
@@ -206,7 +206,7 @@ export default function DiarioAnotar() {
       <Pergunta titulo="Onde foi?">
         <View style={s.linha} accessibilityRole="radiogroup">
           {CONTEXTOS.map((c) => (
-            <Opcao key={c} ativa={contexto === c} icone={ICONE_CONTEXTO[c]} rotulo={ROTULO_CONTEXTO[c]} onPress={() => (toqueLeve(), setContexto(c))} />
+            <Opcao key={c} ativa={contexto === c} icone={ICONE_CONTEXTO[c]} rotulo={ROTULO_CONTEXTO[c]} onPress={() => (marcar(), setContexto(c))} />
           ))}
         </View>
       </Pergunta>
@@ -214,7 +214,7 @@ export default function DiarioAnotar() {
       <Pergunta titulo="Como foi?">
         <View style={s.linha} accessibilityRole="radiogroup">
           {HUMORES.map((h) => (
-            <Opcao key={h} ativa={humor === h} icone={ICONE_HUMOR[h]} rotulo={ROTULO_HUMOR_CURTO[h]} acessivel={ROTULO_HUMOR[h]} onPress={() => (toqueLeve(), setHumor(humor === h ? null : h))} />
+            <Opcao key={h} ativa={humor === h} icone={ICONE_HUMOR[h]} rotulo={ROTULO_HUMOR_CURTO[h]} acessivel={ROTULO_HUMOR[h]} onPress={() => (marcar(), setHumor(humor === h ? null : h))} />
           ))}
         </View>
         {humor === 'dificil' ? <Texto variante="legenda">Dia difícil acontece. Anotar já ajuda a enxergar o caminho.</Texto> : null}
