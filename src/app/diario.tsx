@@ -3,14 +3,13 @@ import { useState } from 'react';
 import { Image, Pressable, ScrollView, Share, StyleSheet, View } from 'react-native';
 
 import { ConfeteAoRedor } from '@/components/animacao';
-import { BarraInferior, Icone } from '@/components/navegacao';
+import { BarraInferior, ICONE_CONTEXTO, Icone } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
 import { Botao, Card } from '@/components/ui';
 import { MISSOES } from '@/content/missoes';
 import {
   agruparPorDia,
-  EMOJI_CONTEXTO,
   filtrar,
   marcasDeAtividade,
   ROTULO_CONTEXTO,
@@ -30,10 +29,10 @@ import { cores, fonte, raio, sombra } from '@/theme/tokens';
 const LETRA_DIA = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 const FILTROS: { id: FiltroDiario; rotulo: string }[] = [
   { id: 'todos', rotulo: 'Todos' },
-  { id: 'casa', rotulo: '🏠 Casa' },
-  { id: 'escola', rotulo: '🏫 Escola' },
-  { id: 'terapia', rotulo: '🩺 Terapia' },
-  { id: 'conquistas', rotulo: '⭐ Conquistas' },
+  { id: 'casa', rotulo: 'Casa' },
+  { id: 'escola', rotulo: 'Escola' },
+  { id: 'terapia', rotulo: 'Terapia' },
+  { id: 'conquistas', rotulo: 'Conquistas' },
 ];
 
 export default function Diario() {
@@ -220,7 +219,7 @@ function CartaoRegistro({ registro: r, destaque, onPress }: { registro: Registro
       style={({ pressed }) => [s.registro, r.conquista && s.registroConquista, destaque && s.registroDestaque, pressed && { opacity: 0.9 }]}
     >
       <View style={[s.icone, r.conquista && { backgroundColor: cores.solFundo }]}>
-        <Texto style={{ fontSize: 19 }}>{r.conquista ? '⭐' : EMOJI_CONTEXTO[r.contexto]}</Texto>
+        {r.conquista ? <Icone nome="estrela" cor={cores.sol} tamanho={21} cheio /> : <Icone nome={ICONE_CONTEXTO[r.contexto]} cor={cores.marca} tamanho={21} />}
       </View>
       <View style={{ flex: 1, gap: 4 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
@@ -242,7 +241,7 @@ function CartaoRegistro({ registro: r, destaque, onPress }: { registro: Registro
             {r.conquista ? (
               <View style={s.chip}>
                 <Texto style={s.chipTexto}>
-                  {EMOJI_CONTEXTO[r.contexto]} {ROTULO_CONTEXTO[r.contexto]}
+                  {ROTULO_CONTEXTO[r.contexto]}
                 </Texto>
               </View>
             ) : null}

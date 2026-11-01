@@ -3,7 +3,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 import { registrarEvento } from '@/api/cliente';
-import { irPara } from '@/components/navegacao';
+import { ICONE_AREA, ICONE_CONTEXTO, ICONE_HUMOR, Icone, irPara, type NomeIcone } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
 import { Botao, BotaoVoltar, Interruptor } from '@/components/ui';
@@ -12,8 +12,6 @@ import {
   AREAS_DIARIO,
   datasParaAnotar,
   dataLocal,
-  EMOJI_CONTEXTO,
-  EMOJI_HUMOR,
   GATILHOS_NOTA,
   inserirGatilho,
   marcasDeAtividade,
@@ -196,7 +194,7 @@ export default function DiarioAnotar() {
       <Pergunta titulo="Onde foi?">
         <View style={s.linha} accessibilityRole="radiogroup">
           {CONTEXTOS.map((c) => (
-            <Opcao key={c} ativa={contexto === c} emoji={EMOJI_CONTEXTO[c]} rotulo={ROTULO_CONTEXTO[c]} onPress={() => setContexto(c)} />
+            <Opcao key={c} ativa={contexto === c} icone={ICONE_CONTEXTO[c]} rotulo={ROTULO_CONTEXTO[c]} onPress={() => setContexto(c)} />
           ))}
         </View>
       </Pergunta>
@@ -204,7 +202,7 @@ export default function DiarioAnotar() {
       <Pergunta titulo="Como foi?">
         <View style={s.linha} accessibilityRole="radiogroup">
           {HUMORES.map((h) => (
-            <Opcao key={h} ativa={humor === h} emoji={EMOJI_HUMOR[h]} rotulo={ROTULO_HUMOR_CURTO[h]} acessivel={ROTULO_HUMOR[h]} onPress={() => setHumor(humor === h ? null : h)} />
+            <Opcao key={h} ativa={humor === h} icone={ICONE_HUMOR[h]} rotulo={ROTULO_HUMOR_CURTO[h]} acessivel={ROTULO_HUMOR[h]} onPress={() => setHumor(humor === h ? null : h)} />
           ))}
         </View>
         {humor === 'dificil' ? <Texto variante="legenda">Dia difícil acontece. Anotar já ajuda a enxergar o caminho.</Texto> : null}
@@ -251,9 +249,8 @@ export default function DiarioAnotar() {
               }}
               style={s.gatilho}
             >
-              <Texto style={{ fontFamily: fonte.semi, fontSize: 13, color: cores.texto2 }}>
-                {g.emoji} {g.texto}
-              </Texto>
+              <Icone nome={ICONE_AREA[g.area] ?? 'lapis'} cor={cores.texto2} tamanho={15} />
+              <Texto style={{ fontFamily: fonte.semi, fontSize: 13, color: cores.texto2 }}>{g.texto}</Texto>
             </Pressable>
           ))}
           <View style={{ width: 12 }} />
@@ -290,10 +287,10 @@ function Pergunta({ titulo, opcional, children }: { titulo: string; opcional?: b
   );
 }
 
-function Opcao({ ativa, emoji, rotulo, acessivel, onPress }: { ativa: boolean; emoji: string; rotulo: string; acessivel?: string; onPress: () => void }) {
+function Opcao({ ativa, icone, rotulo, acessivel, onPress }: { ativa: boolean; icone: NomeIcone; rotulo: string; acessivel?: string; onPress: () => void }) {
   return (
     <Pressable accessibilityRole="radio" accessibilityLabel={acessivel ?? rotulo} accessibilityState={{ checked: ativa }} onPress={onPress} style={[s.opcao, ativa && s.opcaoAtiva]}>
-      <Texto style={{ fontSize: 21 }}>{emoji}</Texto>
+      <Icone nome={icone} cor={ativa ? cores.marca : cores.texto2} tamanho={24} />
       <Texto style={{ fontFamily: fonte.semi, fontSize: 13, color: ativa ? cores.marca : cores.texto2 }}>{rotulo}</Texto>
     </Pressable>
   );
@@ -308,6 +305,6 @@ const s = StyleSheet.create({
   nota: { minHeight: 84, borderRadius: raio.md, borderWidth: 1.5, borderColor: cores.linha, backgroundColor: cores.superficie, padding: 12, fontFamily: fonte.regular, fontSize: 15, color: cores.texto, textAlignVertical: 'top' },
   pilula: { paddingHorizontal: 13, height: 36, borderRadius: raio.pill, backgroundColor: cores.superficie, borderWidth: 1, borderColor: cores.linha, justifyContent: 'center' },
   pilulaAtiva: { backgroundColor: cores.marca, borderColor: cores.marca },
-  gatilho: { paddingHorizontal: 11, paddingVertical: 7, borderRadius: raio.pill, borderWidth: 1, borderStyle: 'dashed', borderColor: cores.linha, backgroundColor: cores.fundo },
+  gatilho: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 11, paddingVertical: 7, borderRadius: raio.pill, borderWidth: 1, borderStyle: 'dashed', borderColor: cores.linha, backgroundColor: cores.fundo },
   apagar: { alignSelf: 'center', paddingVertical: 10 },
 });

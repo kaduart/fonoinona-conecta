@@ -77,12 +77,14 @@ export default function Sobre() {
         <Texto>Revisa e aprova as perguntas, os resultados e as missões do app.</Texto>
       </Card>
 
-      {SECOES.map((sec) => (
-        <Card key={sec.titulo} style={{ padding: 16, gap: 6 }}>
-          <Texto variante="rotulo">{sec.titulo}</Texto>
-          <Texto>{sec.texto}</Texto>
-        </Card>
-      ))}
+      <View style={{ paddingHorizontal: 4 }}>
+        {SECOES.map((sec, i) => (
+          <View key={sec.titulo} style={[{ gap: 6, paddingVertical: 16 }, i > 0 && { borderTopWidth: 1, borderTopColor: cores.linha }]}>
+            <Texto variante="rotulo">{sec.titulo}</Texto>
+            <Texto>{sec.texto}</Texto>
+          </View>
+        ))}
+      </View>
 
       <Texto variante="legenda" style={{ textAlign: 'center' }}>
         Conteúdo {VERSAO_CONTEUDO} · Missões {VERSAO_MISSOES}

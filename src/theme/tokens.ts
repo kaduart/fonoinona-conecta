@@ -7,7 +7,7 @@ export const cores = {
   superficie: '#FFFFFF',
   /** grafite clínico: títulos e textos fortes */
   texto: '#1F2C2D',
-  texto2: '#5B6B6C',
+  texto2: '#4A5B5C',
   texto3: '#667677',
   linha: '#E9EFEE',
   marca: '#1F7A6B',
