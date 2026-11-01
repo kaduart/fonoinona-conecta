@@ -43,6 +43,17 @@ Tipos aceitos: `app_aberto`, `triagem_concluida` (com `faixaId`), `missao_conclu
 - **Limite:** 60 requisições por minuto por IP nas rotas de escrita.
 - **Segurança:** helmet, CORS fechado por padrão, corpo de até 32 KB, comparação da chave em tempo constante, e logs sem corpo de requisição.
 
-## Hospedagem gratuita sugerida
+## Deploy no Render (piloto)
 
-Render (Free Web Service) ou Fly.io. Use `npm start` como comando de início e configure as variáveis do `.env` no painel. No Atlas, em Network Access, libere o IP de saída do serviço.
+O `render.yaml` na raiz do repositório descreve o serviço `conecta-api` (pasta `server/`, branch `main`, health check em `/saude`).
+
+1. No Render: New → Blueprint → escolha o repositório `fonoinona-conecta`.
+2. Quando pedir `MONGODB_URI`, cole a connection string do usuário `conecta_api`, com o banco `conecta` no caminho (`...mongodb.net/conecta?...`). Ela fica só no painel.
+3. `ADMIN_API_KEY` é gerada pelo Render (Environment → ver valor). É a chave do `GET /v1/pre-cadastros`.
+4. No Atlas, em Network Access, libere `0.0.0.0/0`: o plano gratuito do Render não tem IP de saída fixo. A proteção fica no usuário e na senha do banco.
+5. Teste: `https://<seu-servico>.onrender.com/saude` deve responder `{"ok":true}`.
+6. Opcional: publicar o conteúdo com `npm run seed:conteudo` (com o `.env` apontando para o Atlas).
+
+Depois, no app: `EXPO_PUBLIC_API_URL=https://<seu-servico>.onrender.com` nas variáveis de build da Cloudflare.
+
+No plano gratuito o serviço dorme após 15 minutos sem uso, e a primeira chamada depois disso leva cerca de 1 minuto. O app não trava com isso, porque a telemetria vai numa fila e é reenviada depois.
