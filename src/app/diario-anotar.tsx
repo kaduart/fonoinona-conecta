@@ -14,6 +14,7 @@ import {
   dataLocal,
   EMOJI_CONTEXTO,
   EMOJI_HUMOR,
+  marcasDeAtividade,
   NOTA_MAX,
   normalizarRegistro,
   ROTULO_CONTEXTO,
@@ -25,6 +26,8 @@ import {
   type RegistroDiario,
 } from '@/domain/diario';
 import type { Area } from '@/content/perguntas';
+import { META_SEMANAL, semana } from '@/domain/missoes';
+import { tocar } from '@/servicos/sons';
 import { useApp } from '@/state/app';
 import { useDadosCrianca } from '@/state/dados';
 import { novoId, repositorio } from '@/storage/repositorio';
@@ -105,7 +108,14 @@ export default function DiarioAnotar() {
     setSalvando(true);
     try {
       await repositorio.salvarRegistroDiario(r);
-      if (!existente) registrarEvento({ tipo: 'diario_registro', contexto: r.contexto });
+      if (!existente) {
+        registrarEvento({ tipo: 'diario_registro', contexto: r.contexto });
+        // meta da semana batida com este registro
+        const antes = [...(dados?.conclusoes ?? []), ...marcasDeAtividade(dados?.diario ?? [])];
+        const depois = [...antes, ...marcasDeAtividade([r])];
+        const n = (l: { em: string }[]) => semana(l, hoje).filter((d) => d.feito).length;
+        if (!r.conquista && n(antes) < META_SEMANAL && n(depois) >= META_SEMANAL) void tocar('completo');
+      }
       sair(r);
     } catch (e) {
       console.error('[diario-anotar] falha ao salvar', e);
