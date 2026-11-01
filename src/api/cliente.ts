@@ -12,7 +12,7 @@ const TIMEOUT_MS = 8_000;
 
 export const apiAtiva = () => base().length > 0;
 
-async function chamar(caminho: string, init: RequestInit = {}): Promise<Response> {
+export async function chamar(caminho: string, init: RequestInit = {}): Promise<Response> {
   const controle = new AbortController();
   const timer = setTimeout(() => controle.abort(), TIMEOUT_MS);
   try {

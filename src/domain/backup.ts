@@ -1,3 +1,4 @@
+import type { AtividadeCasa, Ciclo } from '@/domain/casa';
 import type { RegistroDiario } from '@/domain/diario';
 import type { Conclusao } from '@/domain/missoes';
 import type { Crianca, TriagemSalva } from '@/storage/repositorio';
@@ -16,6 +17,9 @@ export type Backup = {
   triagens: TriagemSalva[];
   conclusoes: Conclusao[];
   diario: RegistroDiario[];
+  /** opcionais: cópias antigas não têm */
+  ciclos?: Ciclo[];
+  atividades?: AtividadeCasa[];
 };
 
 export type ConteudoBackup = Omit<Backup, 'formato' | 'versao' | 'exportadoEm'>;
@@ -50,7 +54,9 @@ export function lerBackup(texto: string): { ok: true; backup: Backup } | { ok: f
   const listas = [b.criancas, b.triagens, b.conclusoes, b.diario];
   if (!listas.every(ehLista)) return { ok: false, erro: 'conteudo' };
   const criancasOk = (b.criancas as unknown[]).every((c) => comId(c) && ehTexto((c as Crianca).apelido) && ehTexto((c as Crianca).nascimento));
-  const filhosOk = [b.triagens, b.conclusoes, b.diario].every((l) => (l as unknown[]).every(comCrianca));
+  const extras = [b.ciclos, b.atividades].filter((l) => l !== undefined);
+  if (!extras.every(ehLista)) return { ok: false, erro: 'conteudo' };
+  const filhosOk = [b.triagens, b.conclusoes, b.diario, ...extras].every((l) => (l as unknown[]).every(comCrianca));
   if (!criancasOk || !filhosOk) return { ok: false, erro: 'conteudo' };
   return { ok: true, backup: b as Backup };
 }
