@@ -12,6 +12,7 @@ import { temaDaFase } from '@/content/fases';
 import { ROTULO_AREA } from '@/content/perguntas';
 import { idadeDe } from '@/domain/idade';
 import { fasesDaTrilha, MISSOES_POR_FASE, missoesParaIdade, montarTrilha, type ItemTrilha } from '@/domain/missoes';
+import { useSomAoAbrir } from '@/servicos/sons';
 import { useApp } from '@/state/app';
 import { useDadosCrianca } from '@/state/dados';
 import { cores, fonte, raio, sombra } from '@/theme/tokens';
@@ -21,6 +22,8 @@ export default function Trilha() {
   const { desbloqueou } = useLocalSearchParams<{ desbloqueou?: string }>();
   const { criancaAtual } = useApp();
   const dados = useDadosCrianca(criancaAtual?.id);
+
+  useSomAoAbrir('desbloqueio', !!desbloqueou, 600);
 
   if (!criancaAtual) return <Redirect href="/" />;
 

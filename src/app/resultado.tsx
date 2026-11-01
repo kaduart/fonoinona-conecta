@@ -29,6 +29,7 @@ import { formatarDataCurta } from '@/domain/acompanhamento';
 import { codigoContato, linkWhatsApp, resumoTriagem } from '@/domain/contato';
 import { formatarIdade } from '@/domain/idade';
 import { contarHabilidades, personalizar, type NivelResultado, type ResultadoArea } from '@/domain/triagem';
+import { useSomAoAbrir } from '@/servicos/sons';
 import { useApp } from '@/state/app';
 import { repositorio, type TriagemSalva } from '@/storage/repositorio';
 import { cores, fonte, raio } from '@/theme/tokens';
@@ -169,6 +170,10 @@ export default function ResultadoTela() {
       clearTimeout(t2);
     };
   }, [intro, voo]);
+
+  // "Triagem concluída!" comemora o fim da triagem; a revelação do resultado tem um som neutro
+  useSomAoAbrir('completo', revelar, 150);
+  useSomAoAbrir('revelacao', revelar, 2700);
 
   useEffect(() => {
     if (id) repositorio.lerTriagem(id).then(setTriagem);

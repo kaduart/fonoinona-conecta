@@ -47,6 +47,7 @@ const CHAVES = {
   diario: 'conecta:diario:v1',
   kitInteresse: 'conecta:kit-interesse:v1',
   lembrete: 'conecta:lembrete:v1',
+  sons: 'conecta:sons:v1',
 } as const;
 
 export type Lembrete = { ativo: boolean; hora: number; minuto: number; notificacaoId: string | null };
@@ -142,6 +143,9 @@ export const repositorio = {
     const atual = await repositorio.listarKitInteresse();
     if (!atual.includes(fase)) await gravar(CHAVES.kitInteresse, [...atual, fase]);
   },
+
+  lerSons: () => ler<boolean>(CHAVES.sons, true),
+  salvarSons: (v: boolean) => gravar(CHAVES.sons, v),
 
   lerLembrete: () => ler<Lembrete>(CHAVES.lembrete, LEMBRETE_PADRAO),
   salvarLembrete: (l: Lembrete) => gravar(CHAVES.lembrete, l),

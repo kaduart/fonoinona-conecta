@@ -22,6 +22,7 @@ import {
   type RegistroDiario,
 } from '@/domain/diario';
 import { diasSeguidos, semana } from '@/domain/missoes';
+import { useSomAoAbrir } from '@/servicos/sons';
 import { useApp } from '@/state/app';
 import { useDadosCrianca } from '@/state/dados';
 import { cores, fonte, raio, sombra } from '@/theme/tokens';
@@ -42,6 +43,8 @@ export default function Diario() {
   const dados = useDadosCrianca(criancaAtual?.id);
   const [filtro, setFiltro] = useState<FiltroDiario>('todos');
   const [largura, setLargura] = useState(0);
+
+  useSomAoAbrir('conquista', !!conquista, 150);
 
   if (!criancaAtual) return <Redirect href="/" />;
 

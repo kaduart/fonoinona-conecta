@@ -12,6 +12,7 @@ import { Botao } from '@/components/ui';
 import { temaDaFase } from '@/content/fases';
 import { idadeDe } from '@/domain/idade';
 import { fasesDaTrilha, missoesParaIdade, montarTrilha } from '@/domain/missoes';
+import { useSomAoAbrir } from '@/servicos/sons';
 import { useApp } from '@/state/app';
 import { useDadosCrianca } from '@/state/dados';
 import { cores, fonte, raio } from '@/theme/tokens';
@@ -38,6 +39,8 @@ export default function Conquista() {
   }, [reduzir, escala, giro, brilho]);
   const estiloMedalha = useAnimatedStyle(() => ({ transform: [{ scale: escala.value }, { rotateY: `${giro.value}deg` }] }));
   const estiloBrilho = useAnimatedStyle(() => ({ opacity: reduzir ? 0.7 : brilho.value, transform: [{ scale: 0.9 + brilho.value * 0.15 }] }));
+
+  useSomAoAbrir('medalha', true, 200);
 
   if (!criancaAtual) return <Redirect href="/" />;
 

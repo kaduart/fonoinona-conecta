@@ -10,8 +10,9 @@ import { Texto } from '@/components/texto';
 import { Botao, Card, Interruptor } from '@/components/ui';
 import { MISSOES, ROTULO_COMO_FOI, type ComoFoi } from '@/content/missoes';
 import { marcasDeAtividade } from '@/domain/diario';
-import { diasSeguidos, faseConquistada, missaoDesbloqueada, missoesParaIdade, montarTrilha, ponteProposito, semana, type Conclusao } from '@/domain/missoes';
+import { diasSeguidos, faseConquistada, META_SEMANAL, missaoDesbloqueada, missoesParaIdade, montarTrilha, ponteProposito, semana, type Conclusao } from '@/domain/missoes';
 import { idadeDe } from '@/domain/idade';
+import { tocar, useSomAoAbrir } from '@/servicos/sons';
 import { useApp } from '@/state/app';
 import { useDadosCrianca } from '@/state/dados';
 import { novoId, repositorio } from '@/storage/repositorio';
@@ -30,6 +31,8 @@ export default function MissaoConcluida() {
   // id gerado uma vez: tocar duas vezes não duplica a conclusão
   const [conclusaoId] = useState(novoId);
   const [agora] = useState(() => new Date());
+
+  useSomAoAbrir('missao', true, 250);
 
   const missao = MISSOES.find((m) => m.id === id);
   if (!missao || !criancaAtual) return <Redirect href="/inicio" />;
@@ -52,6 +55,10 @@ export default function MissaoConcluida() {
       const antes = montarTrilha(missoesIdade, dados?.conclusoes ?? []);
       const depois = montarTrilha(missoesIdade, [{ ...nova, como }, ...(dados?.conclusoes ?? [])]);
       const fase = faseConquistada(antes, depois);
+      // meta da semana batida agora (sem medalha, que já tem a sua fanfarra)
+      const atividadeAntes = [...(dados?.conclusoes ?? []), ...marcasDeAtividade(dados?.diario ?? [])];
+      const antesNaSemana = semana(atividadeAntes, agora).filter((d) => d.feito).length;
+      if (!fase && antesNaSemana < META_SEMANAL && naSemana >= META_SEMANAL) void tocar('completo');
       const aberta = missaoDesbloqueada(antes, depois);
       const params = aberta ? { desbloqueou: aberta.id } : {};
       if (anotar) {
