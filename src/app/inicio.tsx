@@ -1,4 +1,5 @@
 import { Redirect, useRouter } from 'expo-router';
+import { useEffect } from 'react';
 import { Linking, Pressable, StyleSheet, View } from 'react-native';
 
 import { registrarEvento } from '@/api/cliente';
@@ -17,6 +18,7 @@ import { codigoContato, linkWhatsApp, linkWhatsAppGeral } from '@/domain/contato
 import { formatarIdade, idadeDe } from '@/domain/idade';
 import { marcasDeAtividade } from '@/domain/diario';
 import { areasComDificuldade, diasSeguidos, META_SEMANAL, missaoDoDia, missoesParaIdade, montarTrilha, semana } from '@/domain/missoes';
+import { agendarAvisoTriagem } from '@/servicos/lembrete';
 import { useApp } from '@/state/app';
 import { useDadosCrianca } from '@/state/dados';
 import { cores, fonte, raio, sombra, toque } from '@/theme/tokens';
@@ -37,6 +39,15 @@ export default function Inicio() {
   const router = useRouter();
   const { criancaAtual, criancas } = useApp();
   const dados = useDadosCrianca(criancaAtual?.id);
+
+  // agenda (ou cancela) o aviso do dia em que a próxima triagem libera; só se a família já liberou notificações
+  const ultimaId = dados?.triagens[0]?.id;
+  useEffect(() => {
+    if (!criancaAtual || !dados) return;
+    const p = proximaTriagem(criancaAtual, dados.triagens[0] ?? null);
+    void agendarAvisoTriagem(criancaAtual.id, p.data, p.disponivel);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [criancaAtual?.id, ultimaId, !!dados]);
 
   if (!criancaAtual) return <Redirect href="/" />;
 
