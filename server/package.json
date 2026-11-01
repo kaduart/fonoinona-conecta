@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "description": "API do FonoInova Conecta: conteúdo, eventos anônimos e leads",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "tsx watch --env-file=.env src/index.ts",
     "start": "tsx src/index.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "seed:conteudo": "tsx scripts/publicar-conteudo.ts"
+    "seed:conteudo": "tsx --env-file=.env scripts/publicar-conteudo.ts"
   },
   "dependencies": {
     "cors": "^2.8.6",
