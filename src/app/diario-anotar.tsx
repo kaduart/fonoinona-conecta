@@ -14,6 +14,8 @@ import {
   dataLocal,
   EMOJI_CONTEXTO,
   EMOJI_HUMOR,
+  GATILHOS_NOTA,
+  inserirGatilho,
   marcasDeAtividade,
   NOTA_MAX,
   normalizarRegistro,
@@ -21,12 +23,14 @@ import {
   ROTULO_HUMOR,
   rotuloAreaDiario,
   rotuloDia,
+  sugerirMissao,
   type ContextoDiario,
   type HumorDiario,
   type RegistroDiario,
 } from '@/domain/diario';
 import type { Area } from '@/content/perguntas';
-import { META_SEMANAL, semana } from '@/domain/missoes';
+import { idadeDe } from '@/domain/idade';
+import { META_SEMANAL, missoesParaIdade, montarTrilha, semana } from '@/domain/missoes';
 import { tocar } from '@/servicos/sons';
 import { useApp } from '@/state/app';
 import { useDadosCrianca } from '@/state/dados';
@@ -94,8 +98,16 @@ export default function DiarioAnotar() {
 
   function sair(salvo?: RegistroDiario) {
     if (depois) return irPara(router, depois as Href);
-    if (salvo?.conquista && !existente?.conquista) return irPara(router, { pathname: '/diario', params: { conquista: salvo.id } });
-    irPara(router, '/diario');
+    const params: Record<string, string> = {};
+    if (salvo?.conquista && !existente?.conquista) params.conquista = salvo.id;
+    // dia difícil anotado agora (não vindo de uma missão): sugere uma brincadeira liberada da área marcada
+    if (salvo && !existente && !salvo.missaoId && criancaAtual) {
+      const ultima = dados?.triagens[0] ?? null;
+      const trilha = montarTrilha(missoesParaIdade(idadeDe(criancaAtual), ultima?.resultado.areaFoco), dados?.conclusoes ?? []);
+      const sugerida = sugerirMissao(salvo, trilha);
+      if (sugerida) params.sugestao = sugerida.id;
+    }
+    irPara(router, Object.keys(params).length ? { pathname: '/diario', params } : '/diario');
   }
 
   async function salvar() {
@@ -221,6 +233,25 @@ export default function DiarioAnotar() {
           accessibilityLabel="Anotação"
           style={s.nota}
         />
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+          {GATILHOS_NOTA.map((g) => (
+            <Pressable
+              key={g.texto}
+              accessibilityRole="button"
+              accessibilityLabel={`Escrever: ${g.texto}`}
+              onPress={() => {
+                setNota((n) => inserirGatilho(n, g.texto));
+                setAreas((atual) => (atual.includes(g.area) ? atual : [...atual, g.area]));
+                setErro(null);
+              }}
+              style={s.gatilho}
+            >
+              <Texto style={{ fontFamily: fonte.semi, fontSize: 13, color: cores.texto2 }}>
+                {g.emoji} {g.texto}
+              </Texto>
+            </Pressable>
+          ))}
+        </View>
         <Texto variante="legenda" style={{ textAlign: 'right' }}>
           {nota.length}/{NOTA_MAX}
         </Texto>
@@ -271,5 +302,6 @@ const s = StyleSheet.create({
   nota: { minHeight: 84, borderRadius: raio.md, borderWidth: 1.5, borderColor: cores.linha, backgroundColor: cores.superficie, padding: 12, fontFamily: fonte.regular, fontSize: 15, color: cores.texto, textAlignVertical: 'top' },
   pilula: { paddingHorizontal: 13, height: 36, borderRadius: raio.pill, backgroundColor: cores.superficie, borderWidth: 1, borderColor: cores.linha, justifyContent: 'center' },
   pilulaAtiva: { backgroundColor: cores.marca, borderColor: cores.marca },
+  gatilho: { paddingHorizontal: 11, paddingVertical: 7, borderRadius: raio.pill, borderWidth: 1, borderStyle: 'dashed', borderColor: cores.linha, backgroundColor: cores.fundo },
   apagar: { alignSelf: 'center', paddingVertical: 10 },
 });
