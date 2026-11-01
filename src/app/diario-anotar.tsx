@@ -169,6 +169,10 @@ export default function DiarioAnotar() {
             <Texto variante="legenda" style={{ color: cores.avaliarTexto, textAlign: 'center' }}>
               {erro}
             </Texto>
+          ) : !podeSalvar && carregado ? (
+            <Texto variante="legenda" style={{ textAlign: 'center' }}>
+              Marque como foi o dia, uma área ou escreva algo para salvar.
+            </Texto>
           ) : null}
           <Botao titulo={existente ? 'Salvar alterações' : 'Salvar no Diário'} onPress={salvar} desabilitado={!podeSalvar || !carregado} carregando={salvando} />
         </View>
@@ -183,7 +187,7 @@ export default function DiarioAnotar() {
         <View style={{ width: 12 }} />
         {datas.map((d) => (
           <Pressable key={d} accessibilityRole="button" accessibilityState={{ selected: data === d }} onPress={() => setData(d)} style={[s.pilula, data === d && s.pilulaAtiva]}>
-            <Texto style={{ fontFamily: fonte.semi, fontSize: 13, color: data === d ? '#fff' : cores.texto2 }}>📅 {rotuloDia(d, hoje).split(' · ')[0]}</Texto>
+            <Texto style={{ fontFamily: fonte.semi, fontSize: 13, color: data === d ? '#fff' : cores.texto2 }}>{rotuloDia(d, hoje).split(' · ')[0]}</Texto>
           </Pressable>
         ))}
         <View style={{ width: 12 }} />
@@ -233,7 +237,8 @@ export default function DiarioAnotar() {
           accessibilityLabel="Anotação"
           style={s.nota}
         />
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }} style={{ marginHorizontal: -20 }}>
+          <View style={{ width: 12 }} />
           {GATILHOS_NOTA.map((g) => (
             <Pressable
               key={g.texto}
@@ -251,7 +256,8 @@ export default function DiarioAnotar() {
               </Texto>
             </Pressable>
           ))}
-        </View>
+          <View style={{ width: 12 }} />
+        </ScrollView>
         <Texto variante="legenda" style={{ textAlign: 'right' }}>
           {nota.length}/{NOTA_MAX}
         </Texto>

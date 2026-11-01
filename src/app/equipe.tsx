@@ -41,40 +41,9 @@ export default function Equipe() {
   return (
     <Tela rodape={<BarraInferior />}>
       <Texto variante="titulo" style={{ color: cores.texto, marginTop: 4 }}>
-        Cada conquista conta
+        Sua equipe Fono Inova
       </Texto>
-
-      <View style={s.heroi}>
-        <View style={{ paddingTop: 12, paddingBottom: 34 }}>
-          <CabecaFalante tamanho={230} />
-        </View>
-        <View style={s.heroiCartao}>
-          {proxima.disponivel ? (
-            <>
-              <View style={s.selo}>
-                <Texto style={{ fontFamily: fonte.semi, fontSize: 11.5, color: cores.solTexto }}>{selo}</Texto>
-              </View>
-              <Texto style={s.heroiTitulo}>
-                Vamos ver como {nome} está {meses < 24 ? `com ${formatarIdade(meses)}` : `aos ${formatarIdade(meses)}`}?
-              </Texto>
-              <Texto variante="legenda" style={{ fontSize: 12.5 }}>
-                {perguntas} perguntas · 3 minutos · fica só no seu celular
-              </Texto>
-              <View style={{ marginTop: 6 }}>
-                <Botao titulo="Iniciar triagem" icone={null} onPress={() => router.push('/triagem')} />
-              </View>
-            </>
-          ) : (
-            <>
-              <Texto style={s.heroiTitulo}>Próxima triagem em {formatarDataCurta(proxima.data)}</Texto>
-              <Texto variante="legenda" style={{ fontSize: 12.5 }}>
-                Enquanto isso, as missões da trilha ajudam {nome} a avançar.
-              </Texto>
-              <Botao variante="texto" titulo="Ver a evolução" onPress={() => irPara(router, '/historico')} />
-            </>
-          )}
-        </View>
-      </View>
+      <Texto style={{ marginTop: -8 }}>Quem cuida do conteúdo do app e como falar com a clínica.</Texto>
 
       <Card style={s.rt}>
         <View style={s.iniciais}>
@@ -106,6 +75,38 @@ export default function Equipe() {
         </View>
         <SetaDireita />
       </Pressable>
+
+      <View style={s.heroi}>
+        <View style={{ paddingTop: 12, paddingBottom: 34 }}>
+          <CabecaFalante tamanho={230} />
+        </View>
+        <View style={s.heroiCartao}>
+          {proxima.disponivel ? (
+            <>
+              <View style={s.selo}>
+                <Texto style={{ fontFamily: fonte.semi, fontSize: 12, color: cores.solTexto }}>{selo}</Texto>
+              </View>
+              <Texto style={s.heroiTitulo}>
+                Vamos ver como {nome} está {meses < 24 ? `com ${formatarIdade(meses)}` : `aos ${formatarIdade(meses)}`}?
+              </Texto>
+              <Texto variante="legenda" style={{ fontSize: 12.5 }}>
+                {perguntas} perguntas · 3 minutos · fica só no seu celular
+              </Texto>
+              <View style={{ marginTop: 6 }}>
+                <Botao titulo="Iniciar triagem" icone={null} onPress={() => router.push('/triagem')} />
+              </View>
+            </>
+          ) : (
+            <>
+              <Texto style={s.heroiTitulo}>Próxima triagem em {formatarDataCurta(proxima.data)}</Texto>
+              <Texto variante="legenda" style={{ fontSize: 12.5 }}>
+                Enquanto isso, as missões da trilha ajudam {nome} a avançar.
+              </Texto>
+              <Botao variante="texto" titulo="Ver a evolução" onPress={() => irPara(router, '/historico')} />
+            </>
+          )}
+        </View>
+      </View>
 
       <Card style={{ paddingVertical: 4 }}>
         <ItemLista icone="pessoa" titulo="Crianças e privacidade" descricao="Trocar, adicionar ou apagar dados" onPress={() => router.push('/perfil')} />
