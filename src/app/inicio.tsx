@@ -4,6 +4,7 @@ import { Linking, Pressable, StyleSheet, View } from 'react-native';
 import { registrarEvento } from '@/api/cliente';
 import { BarraInferior, Icone, irPara, Marca, SeletorCrianca } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
+import { Numero } from '@/components/numero';
 import { Texto } from '@/components/texto';
 import { Botao, Card, Chip } from '@/components/ui';
 import { TEXTOS_RESULTADO } from '@/content/resultados';
@@ -192,9 +193,12 @@ export default function Inicio() {
             <Texto style={{ fontFamily: fonte.semi, fontSize: 13, color: cores.texto }}>
               {metaBatida ? 'Meta da semana batida! 🎉' : `Meta: ${META_SEMANAL} dias na semana`}
             </Texto>
-            <Texto variante="legenda" style={{ fontFamily: fonte.negrito, color: metaBatida ? cores.marca : cores.texto2 }}>
-              {Math.min(feitosNaSemana, META_SEMANAL)}/{META_SEMANAL}
-            </Texto>
+            <View style={{ flexDirection: 'row' }} accessible accessibilityLabel={`${Math.min(feitosNaSemana, META_SEMANAL)} de ${META_SEMANAL}`}>
+              <Numero valor={Math.min(feitosNaSemana, META_SEMANAL)} style={{ fontFamily: fonte.negrito, fontSize: 12.5, lineHeight: 18, color: metaBatida ? cores.marca : cores.texto2 }} />
+              <Texto variante="legenda" style={{ fontFamily: fonte.negrito, color: metaBatida ? cores.marca : cores.texto2 }}>
+                /{META_SEMANAL}
+              </Texto>
+            </View>
           </View>
           <View style={{ flexDirection: 'row', gap: 6 }}>
             {Array.from({ length: META_SEMANAL }, (_, i) => (

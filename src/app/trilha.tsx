@@ -5,6 +5,7 @@ import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withDelay
 
 import { BarraInferior, Icone } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
+import { Numero } from '@/components/numero';
 import { Texto } from '@/components/texto';
 import { Medalha } from '@/components/medalha';
 import { Chip } from '@/components/ui';
@@ -47,9 +48,12 @@ export default function Trilha() {
 
       <View style={s.progresso}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
-          <Texto variante="rotulo" style={{ fontSize: 14 }}>
-            {feitas} de {trilha.length} missões
-          </Texto>
+          <View style={{ flexDirection: 'row', alignItems: 'baseline' }} accessible accessibilityLabel={`${feitas} de ${trilha.length} missões`}>
+            <Numero valor={feitas} style={{ fontFamily: fonte.semi, fontSize: 14, lineHeight: 20, color: cores.texto }} />
+            <Texto variante="rotulo" style={{ fontSize: 14 }}>
+              {' '}de {trilha.length} missões
+            </Texto>
+          </View>
           <Texto variante="legenda">
             {medalhas} {medalhas === 1 ? 'medalha' : 'medalhas'}
           </Texto>

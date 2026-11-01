@@ -4,6 +4,8 @@ import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native
 
 import { registrarEvento } from '@/api/cliente';
 import { ICONE_AREA, ICONE_CONTEXTO, ICONE_HUMOR, Icone, irPara, type NomeIcone } from '@/components/navegacao';
+import { useAviso } from '@/components/aviso';
+import { Confirmacao } from '@/components/folha';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
 import { Botao, BotaoVoltar, Interruptor } from '@/components/ui';
@@ -57,6 +59,8 @@ export default function DiarioAnotar() {
   const [salvando, setSalvando] = useState(false);
   const [confirmarApagar, setConfirmarApagar] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const [apagando, setApagando] = useState(false);
+  const { mostrar } = useAviso();
 
   const existente = id ? dados?.diario.find((r) => r.id === id) : undefined;
   useEffect(() => {
@@ -126,6 +130,7 @@ export default function DiarioAnotar() {
         const n = (l: { em: string }[]) => semana(l, hoje).filter((d) => d.feito).length;
         if (!r.conquista && n(antes) < META_SEMANAL && n(depois) >= META_SEMANAL) void tocar('completo');
       }
+      mostrar(existente ? 'Anotação atualizada' : 'Anotação salva no Diário');
       sair(r);
     } catch (e) {
       console.error('[diario-anotar] falha ao salvar', e);
@@ -137,12 +142,18 @@ export default function DiarioAnotar() {
   async function apagar() {
     if (!existente) return;
     if (!confirmarApagar) return setConfirmarApagar(true);
+    setApagando(true);
     try {
       await repositorio.removerRegistroDiario(existente.id);
+      setConfirmarApagar(false);
+      mostrar('Anotação apagada');
       irPara(router, '/diario');
     } catch (e) {
       console.error('[diario-anotar] falha ao apagar', e);
+      setConfirmarApagar(false);
       setErro('Não deu para apagar agora. Tente de novo.');
+    } finally {
+      setApagando(false);
     }
   }
 
@@ -268,9 +279,19 @@ export default function DiarioAnotar() {
 
       {existente ? (
         <Pressable accessibilityRole="button" onPress={apagar} style={s.apagar} hitSlop={8}>
-          <Texto style={{ fontFamily: fonte.semi, fontSize: 14, color: cores.avaliarTexto }}>{confirmarApagar ? 'Toque de novo para apagar' : 'Apagar anotação'}</Texto>
+          <Texto style={{ fontFamily: fonte.semi, fontSize: 14, color: cores.avaliarTexto }}>Apagar anotação</Texto>
         </Pressable>
       ) : null}
+
+      <Confirmacao
+        aberta={confirmarApagar}
+        titulo="Apagar esta anotação?"
+        texto="Ela sai do Diário e do resumo do mês. Não dá para desfazer."
+        acao="Apagar anotação"
+        onConfirmar={apagar}
+        onFechar={() => setConfirmarApagar(false)}
+        carregando={apagando}
+      />
     </Tela>
   );
 }

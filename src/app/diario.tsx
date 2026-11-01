@@ -1,6 +1,7 @@
 import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Image, Pressable, ScrollView, Share, StyleSheet, View } from 'react-native';
+import Animated, { FadeIn, LinearTransition } from 'react-native-reanimated';
 
 import { ConfeteAoRedor } from '@/components/animacao';
 import { BarraInferior, ICONE_CONTEXTO, Icone } from '@/components/navegacao';
@@ -172,14 +173,14 @@ export default function Diario() {
       {registros.length && !grupos.length ? <Texto style={{ textAlign: 'center', marginTop: 8 }}>Nada anotado neste filtro ainda.</Texto> : null}
 
       {grupos.map((g) => (
-        <View key={g.data} style={{ gap: 10 }}>
+        <Animated.View key={g.data} style={{ gap: 10 }} entering={FadeIn.duration(220)} layout={LinearTransition.duration(220)}>
           <Texto variante="legenda" style={s.data}>
             {rotuloDia(g.data, hoje).toUpperCase()}
           </Texto>
           {g.registros.map((r) => (
             <CartaoRegistro key={r.id} registro={r} destaque={r.id === conquista} onPress={() => router.push({ pathname: '/diario-anotar', params: { id: r.id } })} />
           ))}
-        </View>
+        </Animated.View>
       ))}
 
       {dados ? (

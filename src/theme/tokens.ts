@@ -44,9 +44,9 @@ export const sombra = {
 } as const;
 
 export const fonte = {
-  regular: 'Inter_400Regular',
-  media: 'Inter_500Medium',
-  semi: 'Inter_600SemiBold',
-  negrito: 'Inter_700Bold',
-  extra: 'Inter_800ExtraBold',
+  regular: 'Figtree_400Regular',
+  media: 'Figtree_500Medium',
+  semi: 'Figtree_600SemiBold',
+  negrito: 'Figtree_700Bold',
+  extra: 'Figtree_800ExtraBold',
 } as const;

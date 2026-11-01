@@ -4,6 +4,7 @@ import Svg, { Circle, G, Line, Path, Text as SvgText } from 'react-native-svg';
 
 import { BarraInferior, ICONE_HUMOR, Icone } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
+import { Numero } from '@/components/numero';
 import { Texto } from '@/components/texto';
 import { Botao, Card, Chip } from '@/components/ui';
 import { MISSOES, ROTULO_COMO_FOI } from '@/content/missoes';
@@ -64,10 +65,10 @@ function Grafico({ triagens }: { triagens: TriagemSalva[] }) {
   );
 }
 
-function Numero({ valor, rotulo, cor }: { valor: number; rotulo: string; cor: string }) {
+function Indicador({ valor, rotulo, cor }: { valor: number; rotulo: string; cor: string }) {
   return (
     <Card style={{ flex: 1, padding: 14, gap: 2, borderRadius: raio.lg }}>
-      <Texto style={{ fontFamily: fonte.extra, fontSize: 24, color: cor }}>{valor}</Texto>
+      <Numero valor={valor} style={{ fontFamily: fonte.extra, fontSize: 24, color: cor }} />
       <Texto variante="legenda">{rotulo}</Texto>
     </Card>
   );
@@ -164,9 +165,9 @@ export default function Historico() {
       ) : null}
 
       <View style={{ flexDirection: 'row', gap: 10 }}>
-        <Numero valor={conclusoes.length} rotulo={conclusoes.length === 1 ? 'missão feita' : 'missões feitas'} cor={cores.marca} />
-        <Numero valor={seguidos} rotulo={seguidos === 1 ? 'dia seguido' : 'dias seguidos'} cor={cores.terraTexto} />
-        <Numero valor={medalhas} rotulo={medalhas === 1 ? 'medalha' : 'medalhas'} cor="#B07A10" />
+        <Indicador valor={conclusoes.length} rotulo={conclusoes.length === 1 ? 'missão feita' : 'missões feitas'} cor={cores.marca} />
+        <Indicador valor={seguidos} rotulo={seguidos === 1 ? 'dia seguido' : 'dias seguidos'} cor={cores.terraTexto} />
+        <Indicador valor={medalhas} rotulo={medalhas === 1 ? 'medalha' : 'medalhas'} cor="#B07A10" />
       </View>
 
       <Card style={{ padding: 16, gap: 12 }}>
