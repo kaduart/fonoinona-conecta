@@ -3,14 +3,13 @@ import { useState } from 'react';
 import { Image, Pressable, ScrollView, Share, StyleSheet, View } from 'react-native';
 
 import { ConfeteAoRedor } from '@/components/animacao';
-import { BarraInferior, Icone } from '@/components/navegacao';
+import { BarraInferior, ICONE_CONTEXTO, Icone } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
-import { Card } from '@/components/ui';
+import { Botao, Card } from '@/components/ui';
 import { MISSOES } from '@/content/missoes';
 import {
   agruparPorDia,
-  EMOJI_CONTEXTO,
   filtrar,
   marcasDeAtividade,
   ROTULO_CONTEXTO,
@@ -30,15 +29,16 @@ import { cores, fonte, raio, sombra } from '@/theme/tokens';
 const LETRA_DIA = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 const FILTROS: { id: FiltroDiario; rotulo: string }[] = [
   { id: 'todos', rotulo: 'Todos' },
-  { id: 'casa', rotulo: '🏠 Casa' },
-  { id: 'escola', rotulo: '🏫 Escola' },
-  { id: 'terapia', rotulo: '🩺 Terapia' },
-  { id: 'conquistas', rotulo: '⭐ Conquistas' },
+  { id: 'casa', rotulo: 'Casa' },
+  { id: 'escola', rotulo: 'Escola' },
+  { id: 'terapia', rotulo: 'Terapia' },
+  { id: 'conquistas', rotulo: 'Conquistas' },
 ];
 
 export default function Diario() {
   const router = useRouter();
-  const { conquista } = useLocalSearchParams<{ conquista?: string }>();
+  const { conquista, sugestao } = useLocalSearchParams<{ conquista?: string; sugestao?: string }>();
+  const [sugestaoFechada, setSugestaoFechada] = useState(false);
   const { criancaAtual } = useApp();
   const dados = useDadosCrianca(criancaAtual?.id);
   const [filtro, setFiltro] = useState<FiltroDiario>('todos');
@@ -56,6 +56,7 @@ export default function Diario() {
   const ativosNaSemana = dias.filter((d) => d.feito).length;
   const seguidos = diasSeguidos(atividade, hoje);
   const grupos = agruparPorDia(filtrar(registros, filtro));
+  const missaoSugerida = !sugestaoFechada && sugestao ? MISSOES.find((m) => m.id === sugestao) : undefined;
 
   const fab = (
     <Pressable
@@ -95,7 +96,7 @@ export default function Diario() {
           <Texto variante="rotulo" style={{ fontSize: 14 }}>
             Sequência desta semana 🔥
           </Texto>
-          <Texto style={{ fontFamily: fonte.negrito, fontSize: 12.5, color: seguidos ? cores.terra : cores.texto3 }}>
+          <Texto style={{ fontFamily: fonte.negrito, fontSize: 12.5, color: seguidos ? cores.terraTexto : cores.texto3 }}>
             {seguidos === 1 ? '1 dia seguido' : `${seguidos} dias seguidos`}
           </Texto>
         </View>
@@ -116,6 +117,22 @@ export default function Diario() {
         </View>
         <Texto variante="legenda">Vale missão feita ou dia anotado no Diário.</Texto>
       </Card>
+
+      {missaoSugerida ? (
+        <Card style={{ padding: 16, gap: 10, borderWidth: 1.5, borderColor: cores.marcaSuave }}>
+          <Texto variante="legenda">Anotado. Uma brincadeira que pode ajudar:</Texto>
+          <Texto variante="rotulo">🎯 {missaoSugerida.titulo}</Texto>
+          <Texto variante="legenda">
+            {missaoSugerida.duracao} · {missaoSugerida.rotuloArea}
+          </Texto>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <View style={{ flex: 1 }}>
+              <Botao titulo="Ver a missão" onPress={() => router.push({ pathname: '/missao/[id]', params: { id: missaoSugerida.id } })} />
+            </View>
+            <Botao variante="texto" titulo="Agora não" onPress={() => setSugestaoFechada(true)} />
+          </View>
+        </Card>
+      ) : null}
 
       {registros.length ? (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }} style={{ marginHorizontal: -20 }} contentInset={{ left: 20, right: 20 }}>
@@ -141,9 +158,14 @@ export default function Diario() {
             <Image source={require('../../assets/images/ilustracoes/mae-livro.png')} style={{ width: 200, height: 160 }} resizeMode="contain" accessibilityIgnoresInvertColors />
           </View>
           <Texto variante="rotulo" style={{ textAlign: 'center' }}>
-            Anote uma coisa boa de hoje
+            Sua cápsula do tempo
           </Texto>
-          <Texto style={{ textAlign: 'center' }}>Em 20 segundos você guarda o que {nome} fez em casa, na escola ou na terapia. Fica só no seu celular.</Texto>
+          <Texto style={{ textAlign: 'center' }}>
+            O desenvolvimento é feito de pequenas grandes conquistas. Anote o primeiro registro de {nome} hoje e comece a construir a memória da sua evolução.
+          </Texto>
+          <Texto variante="legenda" style={{ textAlign: 'center' }}>
+            Leva 20 segundos e fica só no seu celular.
+          </Texto>
         </Card>
       ) : null}
 
@@ -197,14 +219,14 @@ function CartaoRegistro({ registro: r, destaque, onPress }: { registro: Registro
       style={({ pressed }) => [s.registro, r.conquista && s.registroConquista, destaque && s.registroDestaque, pressed && { opacity: 0.9 }]}
     >
       <View style={[s.icone, r.conquista && { backgroundColor: cores.solFundo }]}>
-        <Texto style={{ fontSize: 19 }}>{r.conquista ? '⭐' : EMOJI_CONTEXTO[r.contexto]}</Texto>
+        {r.conquista ? <Icone nome="estrela" cor={cores.sol} tamanho={21} cheio /> : <Icone nome={ICONE_CONTEXTO[r.contexto]} cor={cores.marca} tamanho={21} />}
       </View>
       <View style={{ flex: 1, gap: 4 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
           <Texto variante="rotulo">{r.conquista ? 'Conquista!' : ROTULO_CONTEXTO[r.contexto]}</Texto>
           {r.humor ? (
             <View style={[s.humor, r.humor === 'dificil' ? { backgroundColor: cores.observarFundo } : r.humor === 'normal' ? { backgroundColor: cores.neutroFundo } : null]}>
-              <Texto style={{ fontFamily: fonte.negrito, fontSize: 11, color: r.humor === 'dificil' ? cores.observarTexto : r.humor === 'normal' ? cores.texto2 : cores.marca }}>{ROTULO_HUMOR[r.humor]}</Texto>
+              <Texto style={{ fontFamily: fonte.negrito, fontSize: 12, color: r.humor === 'dificil' ? cores.observarTexto : r.humor === 'normal' ? cores.texto2 : cores.marca }}>{ROTULO_HUMOR[r.humor]}</Texto>
             </View>
           ) : null}
         </View>
@@ -219,7 +241,7 @@ function CartaoRegistro({ registro: r, destaque, onPress }: { registro: Registro
             {r.conquista ? (
               <View style={s.chip}>
                 <Texto style={s.chipTexto}>
-                  {EMOJI_CONTEXTO[r.contexto]} {ROTULO_CONTEXTO[r.contexto]}
+                  {ROTULO_CONTEXTO[r.contexto]}
                 </Texto>
               </View>
             ) : null}
@@ -257,7 +279,7 @@ const s = StyleSheet.create({
   icone: { width: 40, height: 40, borderRadius: 14, backgroundColor: cores.marcaSuave, alignItems: 'center', justifyContent: 'center' },
   humor: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: raio.pill, backgroundColor: cores.marcaSuave },
   chip: { paddingHorizontal: 9, paddingVertical: 4, borderRadius: raio.pill, backgroundColor: cores.fundo2 },
-  chipTexto: { fontFamily: fonte.semi, fontSize: 11.5, color: cores.texto2 },
+  chipTexto: { fontFamily: fonte.semi, fontSize: 12, color: cores.texto2 },
   compartilhar: { flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start', marginTop: 6, paddingHorizontal: 10, paddingVertical: 6, borderRadius: raio.pill, backgroundColor: cores.solFundo },
   fab: {
     position: 'absolute',

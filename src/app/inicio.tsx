@@ -28,12 +28,6 @@ function saudacao(h: number) {
   return 'Boa noite';
 }
 
-/** Idade curta para a pílula: "8 meses", "2 anos". */
-function idadeCurta(meses: number) {
-  if (meses < 24) return meses === 1 ? '1 mês' : `${meses} meses`;
-  return `${Math.floor(meses / 12)} anos`;
-}
-
 function diasAte(data: Date, hoje: Date) {
   return Math.max(1, Math.ceil((data.getTime() - hoje.getTime()) / 86_400_000));
 }
@@ -74,7 +68,7 @@ export default function Inicio() {
     <Tela rodape={<BarraInferior />}>
       <View style={s.cabecalho}>
         <Marca />
-        <SeletorCrianca nome={nome} idade={idadeCurta(meses)} indice={indice} />
+        <SeletorCrianca nome={nome} idade={formatarIdade(meses)} indice={indice} />
       </View>
 
       <View>
@@ -89,11 +83,11 @@ export default function Inicio() {
           <IlustracaoViva fonte={ilustracaoDaArea(doDia.areas[0])} proporcao={PROPORCAO[chaveDaArea(doDia.areas[0])]} video={videoDaArea(doDia.areas[0])} style={{ marginTop: 18 }} />
           <View style={[s.selo, { left: 14 }]}>
             <Icone nome="estrela" cor={cores.marca} tamanho={12} cheio />
-            <Texto style={{ fontFamily: fonte.semi, fontSize: 11.5, color: cores.marca }}>Missão do dia</Texto>
+            <Texto style={{ fontFamily: fonte.semi, fontSize: 12, color: cores.marca }}>Missão do dia</Texto>
           </View>
           {seguidos > 0 ? (
             <View style={[s.selo, { right: 14, backgroundColor: 'rgba(255,255,255,0.9)' }]}>
-              <Texto style={{ fontFamily: fonte.negrito, fontSize: 12, color: cores.terra }}>🔥 {seguidos === 1 ? '1 dia' : `${seguidos} dias`}</Texto>
+              <Texto style={{ fontFamily: fonte.negrito, fontSize: 12, color: cores.terraTexto }}>🔥 {seguidos === 1 ? '1 dia' : `${seguidos} dias`}</Texto>
             </View>
           ) : null}
           <Pressable
@@ -168,7 +162,7 @@ export default function Inicio() {
             Sua semana
           </Texto>
           <View style={[s.chama, seguidos === 0 && { backgroundColor: cores.fundo2 }]} accessibilityLabel={`${seguidos} dias seguidos`}>
-            <Texto style={{ fontFamily: fonte.negrito, fontSize: 12, color: seguidos ? cores.terra : cores.texto3 }}>
+            <Texto style={{ fontFamily: fonte.negrito, fontSize: 12, color: seguidos ? cores.terraTexto : cores.texto3 }}>
               {seguidos ? '🔥 ' : ''}
               {seguidos === 1 ? '1 dia seguido' : `${seguidos} dias seguidos`}
             </Texto>
@@ -183,7 +177,7 @@ export default function Inicio() {
                   {d.feito ? (
                     <Icone nome="check" cor="#fff" tamanho={15} espessura={2.8} />
                   ) : ehHoje ? (
-                    <Texto style={{ fontFamily: fonte.negrito, fontSize: 10.5, color: cores.marca }}>hoje</Texto>
+                    <Texto style={{ fontFamily: fonte.negrito, fontSize: 12, color: cores.marca }}>hoje</Texto>
                   ) : null}
                 </View>
                 <Texto variante="legenda" style={ehHoje && { color: cores.marca, fontFamily: fonte.negrito }}>

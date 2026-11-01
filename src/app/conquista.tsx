@@ -102,7 +102,7 @@ export default function Conquista() {
           {fases.map((f) => (
             <View key={f.numero} style={{ alignItems: 'center', gap: 2, opacity: f.completa ? 1 : 0.8 }}>
               <Medalha tom={f.medalha.tom} trancada={!f.completa} tamanho={46} />
-              <Texto variante="legenda" style={{ fontSize: 11 }}>Fase {f.numero}</Texto>
+              <Texto variante="legenda" style={{ fontSize: 12 }}>Fase {f.numero}</Texto>
             </View>
           ))}
         </View>

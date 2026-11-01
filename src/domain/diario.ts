@@ -202,3 +202,38 @@ export function textoConquista(r: RegistroDiario): string {
   const nota = r.nota.trim();
   return `⭐ Conquista de hoje: ${nota || 'mais um passo no desenvolvimento!'}\n\nRegistrado no app FonoInova Conecta.`;
 }
+
+/**
+ * Atalhos de texto da nota: um toque escreve a frase e marca a área ligada a ela.
+ * RASCUNHO para revisão da RT: frases do dia a dia, sem termo clínico.
+ */
+export const GATILHOS_NOTA: { emoji: string; texto: string; area: Area }[] = [
+  { emoji: '🗣️', texto: 'Falou uma palavra nova', area: 'fala' },
+  { emoji: '👉', texto: 'Apontou para pedir', area: 'gestos' },
+  { emoji: '👀', texto: 'Manteve mais contato visual', area: 'interacao' },
+  { emoji: '👂', texto: 'Atendeu ao ser chamado', area: 'audicao' },
+];
+
+/** Acrescenta a frase do atalho à nota, sem repetir e sem passar de NOTA_MAX. */
+export function inserirGatilho(nota: string, texto: string): string {
+  const atual = nota.trimEnd();
+  if (!atual) return texto;
+  if (atual.toLowerCase().includes(texto.toLowerCase())) return nota;
+  const junto = `${atual}${/[.!?…]$/.test(atual) ? ' ' : '. '}${texto}`;
+  return junto.length > NOTA_MAX ? nota : junto;
+}
+
+/**
+ * Brincadeira sugerida depois de um dia marcado como difícil: só missão já liberada na trilha
+ * e ligada a uma área marcada no registro. Prefere a menos feita; empate segue a ordem da trilha.
+ * Sem área marcada ou sem missão que combine, não sugere nada (o app não interpreta o dia).
+ */
+export function sugerirMissao<M extends { id: string; areas: Area[] }>(
+  registro: Pick<RegistroDiario, 'humor' | 'areas'>,
+  trilha: { missao: M; liberada: boolean; feitas: number }[],
+): M | null {
+  if (registro.humor !== 'dificil' || !registro.areas.length) return null;
+  const candidatas = trilha.filter((t) => t.liberada && t.missao.areas.some((a) => registro.areas.includes(a)));
+  if (!candidatas.length) return null;
+  return candidatas.reduce((melhor, t) => (t.feitas < melhor.feitas ? t : melhor)).missao;
+}

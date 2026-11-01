@@ -2,7 +2,7 @@ import { Redirect, useRouter } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import Svg, { Circle, G, Line, Path, Text as SvgText } from 'react-native-svg';
 
-import { BarraInferior, Icone } from '@/components/navegacao';
+import { BarraInferior, ICONE_HUMOR, Icone } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
 import { Botao, Card, Chip } from '@/components/ui';
@@ -10,8 +10,9 @@ import { MISSOES, ROTULO_COMO_FOI } from '@/content/missoes';
 import { FAIXAS, ROTULO_AREA } from '@/content/perguntas';
 import { TEXTOS_RESULTADO } from '@/content/resultados';
 import { formatarDataCurta, proximaTriagem } from '@/domain/acompanhamento';
-import { EMOJI_HUMOR, marcasDeAtividade, resumir, rotuloAreaDiario } from '@/domain/diario';
-import { diasSeguidos } from '@/domain/missoes';
+import { marcasDeAtividade, resumir, rotuloAreaDiario } from '@/domain/diario';
+import { idadeDe } from '@/domain/idade';
+import { diasSeguidos, fasesDaTrilha, missoesParaIdade, montarTrilha } from '@/domain/missoes';
 import type { NivelResultado } from '@/domain/triagem';
 import { useApp } from '@/state/app';
 import { useDadosCrianca } from '@/state/dados';
@@ -90,9 +91,12 @@ function HumorDoMes({ humor }: { humor: { bom: number; normal: number; dificil: 
       </View>
       <View style={{ flexDirection: 'row', gap: 14 }}>
         {partes.map((p) => (
-          <Texto key={p.chave} variante="legenda">
-            {EMOJI_HUMOR[p.chave]} {p.n} {p.rotulo}
-          </Texto>
+          <View key={p.chave} style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+            <Icone nome={ICONE_HUMOR[p.chave]} cor={cores.texto2} tamanho={15} />
+            <Texto variante="legenda">
+              {p.n} {p.rotulo}
+            </Texto>
+          </View>
         ))}
       </View>
     </View>
@@ -112,10 +116,10 @@ export default function Historico() {
   const melhorou = triagens.length >= 2 && ALTURA[triagens[0].resultado.nivel] > ALTURA[triagens[1].resultado.nivel];
 
   const ultima = triagens[0];
+  const medalhas = fasesDaTrilha(montarTrilha(missoesParaIdade(idadeDe(criancaAtual), ultima?.resultado.areaFoco), conclusoes)).filter((f) => f.completa).length;
   const diario = dados?.diario ?? [];
   const seguidos = diasSeguidos([...conclusoes, ...marcasDeAtividade(diario)], new Date());
   const mes = resumir(diario, 30, new Date());
-  const missoesDiferentes = new Set(conclusoes.map((c) => c.missaoId)).size;
   const areas = ultima ? [...ultima.resultado.areas].sort((a, b) => b.pontuacao - a.pontuacao) : [];
 
   return (
@@ -161,8 +165,8 @@ export default function Historico() {
 
       <View style={{ flexDirection: 'row', gap: 10 }}>
         <Numero valor={conclusoes.length} rotulo={conclusoes.length === 1 ? 'missão feita' : 'missões feitas'} cor={cores.marca} />
-        <Numero valor={seguidos} rotulo={seguidos === 1 ? 'dia seguido' : 'dias seguidos'} cor={cores.terra} />
-        <Numero valor={missoesDiferentes} rotulo={missoesDiferentes === 1 ? 'missão diferente' : 'missões diferentes'} cor="#C98A12" />
+        <Numero valor={seguidos} rotulo={seguidos === 1 ? 'dia seguido' : 'dias seguidos'} cor={cores.terraTexto} />
+        <Numero valor={medalhas} rotulo={medalhas === 1 ? 'medalha' : 'medalhas'} cor="#B07A10" />
       </View>
 
       <Card style={{ padding: 16, gap: 12 }}>
@@ -231,7 +235,8 @@ export default function Historico() {
         })}
       </View>
 
-      <Card style={s.proxima}>
+      {ultima ? (
+        <Card style={s.proxima}>
         <Icone nome="relogio" cor={cores.marca} tamanho={18} />
         <Texto style={{ flex: 1, fontSize: 13.5 }}>
           {proxima.disponivel ? (
@@ -243,7 +248,8 @@ export default function Historico() {
           )}
         </Texto>
       </Card>
-      <Botao titulo="Fazer nova triagem" onPress={() => router.push('/triagem')} />
+      ) : null}
+      <Botao titulo={ultima ? 'Fazer nova triagem' : 'Fazer a primeira triagem'} onPress={() => router.push('/triagem')} />
 
       <View style={{ gap: 10, marginTop: 8 }}>
         <Texto variante="rotulo" style={{ fontSize: 16 }}>

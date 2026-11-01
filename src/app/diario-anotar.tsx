@@ -3,7 +3,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 import { registrarEvento } from '@/api/cliente';
-import { irPara } from '@/components/navegacao';
+import { ICONE_AREA, ICONE_CONTEXTO, ICONE_HUMOR, Icone, irPara, type NomeIcone } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
 import { Botao, BotaoVoltar, Interruptor } from '@/components/ui';
@@ -12,8 +12,8 @@ import {
   AREAS_DIARIO,
   datasParaAnotar,
   dataLocal,
-  EMOJI_CONTEXTO,
-  EMOJI_HUMOR,
+  GATILHOS_NOTA,
+  inserirGatilho,
   marcasDeAtividade,
   NOTA_MAX,
   normalizarRegistro,
@@ -21,12 +21,14 @@ import {
   ROTULO_HUMOR,
   rotuloAreaDiario,
   rotuloDia,
+  sugerirMissao,
   type ContextoDiario,
   type HumorDiario,
   type RegistroDiario,
 } from '@/domain/diario';
 import type { Area } from '@/content/perguntas';
-import { META_SEMANAL, semana } from '@/domain/missoes';
+import { idadeDe } from '@/domain/idade';
+import { META_SEMANAL, missoesParaIdade, montarTrilha, semana } from '@/domain/missoes';
 import { tocar } from '@/servicos/sons';
 import { useApp } from '@/state/app';
 import { useDadosCrianca } from '@/state/dados';
@@ -94,8 +96,16 @@ export default function DiarioAnotar() {
 
   function sair(salvo?: RegistroDiario) {
     if (depois) return irPara(router, depois as Href);
-    if (salvo?.conquista && !existente?.conquista) return irPara(router, { pathname: '/diario', params: { conquista: salvo.id } });
-    irPara(router, '/diario');
+    const params: Record<string, string> = {};
+    if (salvo?.conquista && !existente?.conquista) params.conquista = salvo.id;
+    // dia difícil anotado agora (não vindo de uma missão): sugere uma brincadeira liberada da área marcada
+    if (salvo && !existente && !salvo.missaoId && criancaAtual) {
+      const ultima = dados?.triagens[0] ?? null;
+      const trilha = montarTrilha(missoesParaIdade(idadeDe(criancaAtual), ultima?.resultado.areaFoco), dados?.conclusoes ?? []);
+      const sugerida = sugerirMissao(salvo, trilha);
+      if (sugerida) params.sugestao = sugerida.id;
+    }
+    irPara(router, Object.keys(params).length ? { pathname: '/diario', params } : '/diario');
   }
 
   async function salvar() {
@@ -157,6 +167,10 @@ export default function DiarioAnotar() {
             <Texto variante="legenda" style={{ color: cores.avaliarTexto, textAlign: 'center' }}>
               {erro}
             </Texto>
+          ) : !podeSalvar && carregado ? (
+            <Texto variante="legenda" style={{ textAlign: 'center' }}>
+              Marque como foi o dia, uma área ou escreva algo para salvar.
+            </Texto>
           ) : null}
           <Botao titulo={existente ? 'Salvar alterações' : 'Salvar no Diário'} onPress={salvar} desabilitado={!podeSalvar || !carregado} carregando={salvando} />
         </View>
@@ -171,7 +185,7 @@ export default function DiarioAnotar() {
         <View style={{ width: 12 }} />
         {datas.map((d) => (
           <Pressable key={d} accessibilityRole="button" accessibilityState={{ selected: data === d }} onPress={() => setData(d)} style={[s.pilula, data === d && s.pilulaAtiva]}>
-            <Texto style={{ fontFamily: fonte.semi, fontSize: 13, color: data === d ? '#fff' : cores.texto2 }}>📅 {rotuloDia(d, hoje).split(' · ')[0]}</Texto>
+            <Texto style={{ fontFamily: fonte.semi, fontSize: 13, color: data === d ? '#fff' : cores.texto2 }}>{rotuloDia(d, hoje).split(' · ')[0]}</Texto>
           </Pressable>
         ))}
         <View style={{ width: 12 }} />
@@ -180,7 +194,7 @@ export default function DiarioAnotar() {
       <Pergunta titulo="Onde foi?">
         <View style={s.linha} accessibilityRole="radiogroup">
           {CONTEXTOS.map((c) => (
-            <Opcao key={c} ativa={contexto === c} emoji={EMOJI_CONTEXTO[c]} rotulo={ROTULO_CONTEXTO[c]} onPress={() => setContexto(c)} />
+            <Opcao key={c} ativa={contexto === c} icone={ICONE_CONTEXTO[c]} rotulo={ROTULO_CONTEXTO[c]} onPress={() => setContexto(c)} />
           ))}
         </View>
       </Pergunta>
@@ -188,7 +202,7 @@ export default function DiarioAnotar() {
       <Pergunta titulo="Como foi?">
         <View style={s.linha} accessibilityRole="radiogroup">
           {HUMORES.map((h) => (
-            <Opcao key={h} ativa={humor === h} emoji={EMOJI_HUMOR[h]} rotulo={ROTULO_HUMOR_CURTO[h]} acessivel={ROTULO_HUMOR[h]} onPress={() => setHumor(humor === h ? null : h)} />
+            <Opcao key={h} ativa={humor === h} icone={ICONE_HUMOR[h]} rotulo={ROTULO_HUMOR_CURTO[h]} acessivel={ROTULO_HUMOR[h]} onPress={() => setHumor(humor === h ? null : h)} />
           ))}
         </View>
         {humor === 'dificil' ? <Texto variante="legenda">Dia difícil acontece. Anotar já ajuda a enxergar o caminho.</Texto> : null}
@@ -221,6 +235,26 @@ export default function DiarioAnotar() {
           accessibilityLabel="Anotação"
           style={s.nota}
         />
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }} style={{ marginHorizontal: -20 }}>
+          <View style={{ width: 12 }} />
+          {GATILHOS_NOTA.map((g) => (
+            <Pressable
+              key={g.texto}
+              accessibilityRole="button"
+              accessibilityLabel={`Escrever: ${g.texto}`}
+              onPress={() => {
+                setNota((n) => inserirGatilho(n, g.texto));
+                setAreas((atual) => (atual.includes(g.area) ? atual : [...atual, g.area]));
+                setErro(null);
+              }}
+              style={s.gatilho}
+            >
+              <Icone nome={ICONE_AREA[g.area] ?? 'lapis'} cor={cores.texto2} tamanho={15} />
+              <Texto style={{ fontFamily: fonte.semi, fontSize: 13, color: cores.texto2 }}>{g.texto}</Texto>
+            </Pressable>
+          ))}
+          <View style={{ width: 12 }} />
+        </ScrollView>
         <Texto variante="legenda" style={{ textAlign: 'right' }}>
           {nota.length}/{NOTA_MAX}
         </Texto>
@@ -253,10 +287,10 @@ function Pergunta({ titulo, opcional, children }: { titulo: string; opcional?: b
   );
 }
 
-function Opcao({ ativa, emoji, rotulo, acessivel, onPress }: { ativa: boolean; emoji: string; rotulo: string; acessivel?: string; onPress: () => void }) {
+function Opcao({ ativa, icone, rotulo, acessivel, onPress }: { ativa: boolean; icone: NomeIcone; rotulo: string; acessivel?: string; onPress: () => void }) {
   return (
     <Pressable accessibilityRole="radio" accessibilityLabel={acessivel ?? rotulo} accessibilityState={{ checked: ativa }} onPress={onPress} style={[s.opcao, ativa && s.opcaoAtiva]}>
-      <Texto style={{ fontSize: 21 }}>{emoji}</Texto>
+      <Icone nome={icone} cor={ativa ? cores.marca : cores.texto2} tamanho={24} />
       <Texto style={{ fontFamily: fonte.semi, fontSize: 13, color: ativa ? cores.marca : cores.texto2 }}>{rotulo}</Texto>
     </Pressable>
   );
@@ -271,5 +305,6 @@ const s = StyleSheet.create({
   nota: { minHeight: 84, borderRadius: raio.md, borderWidth: 1.5, borderColor: cores.linha, backgroundColor: cores.superficie, padding: 12, fontFamily: fonte.regular, fontSize: 15, color: cores.texto, textAlignVertical: 'top' },
   pilula: { paddingHorizontal: 13, height: 36, borderRadius: raio.pill, backgroundColor: cores.superficie, borderWidth: 1, borderColor: cores.linha, justifyContent: 'center' },
   pilulaAtiva: { backgroundColor: cores.marca, borderColor: cores.marca },
+  gatilho: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 11, paddingVertical: 7, borderRadius: raio.pill, borderWidth: 1, borderStyle: 'dashed', borderColor: cores.linha, backgroundColor: cores.fundo },
   apagar: { alignSelf: 'center', paddingVertical: 10 },
 });
