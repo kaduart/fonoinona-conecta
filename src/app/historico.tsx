@@ -18,7 +18,7 @@ import type { NivelResultado } from '@/domain/triagem';
 import { useApp } from '@/state/app';
 import { useDadosCrianca } from '@/state/dados';
 import type { TriagemSalva } from '@/storage/repositorio';
-import { cores, fonte, raio } from '@/theme/tokens';
+import { cores, fonte, raio, tema } from '@/theme/tokens';
 
 const ALTURA: Record<NivelResultado, number> = { avaliar: 0, observar: 1, esperado: 2 };
 const COR: Record<NivelResultado, string> = { avaliar: cores.terra, observar: cores.sol, esperado: cores.esperado };
@@ -54,7 +54,7 @@ function Grafico({ triagens }: { triagens: TriagemSalva[] }) {
         const data = new Date(p.criadaEm);
         return (
           <G key={p.id}>
-            <Circle cx={x(i)} cy={y(p.resultado.nivel)} r={6} fill="#fff" stroke={COR[p.resultado.nivel]} strokeWidth={3} />
+            <Circle cx={x(i)} cy={y(p.resultado.nivel)} r={6} fill={cores.superficie} stroke={COR[p.resultado.nivel]} strokeWidth={3} />
             <SvgText x={x(i)} y={126} fontSize={10} fontFamily={fonte.media} fill={cores.texto3} textAnchor="middle">
               {MESES[data.getMonth()]}
             </SvgText>
@@ -80,7 +80,7 @@ function HumorDoMes({ humor }: { humor: { bom: number; normal: number; dificil: 
   if (!total) return null;
   const partes = [
     { chave: 'bom' as const, n: humor.bom, cor: cores.esperado, rotulo: humor.bom === 1 ? 'bom' : 'bons' },
-    { chave: 'normal' as const, n: humor.normal, cor: '#C9D3D6', rotulo: humor.normal === 1 ? 'normal' : 'normais' },
+    { chave: 'normal' as const, n: humor.normal, cor: tema('#C9D3D6', '#4A5B5C'), rotulo: humor.normal === 1 ? 'normal' : 'normais' },
     { chave: 'dificil' as const, n: humor.dificil, cor: cores.sol, rotulo: humor.dificil === 1 ? 'difícil' : 'difíceis' },
   ];
   return (
@@ -185,7 +185,7 @@ export default function Historico() {
               {mes.conquistas ? (
                 <>
                   {' · '}
-                  <Texto style={{ fontFamily: fonte.negrito, color: '#C98A12', fontSize: 14 }}>⭐ {mes.conquistas}</Texto> {mes.conquistas === 1 ? 'conquista' : 'conquistas'}
+                  <Texto style={{ fontFamily: fonte.negrito, color: cores.solTexto, fontSize: 14 }}>⭐ {mes.conquistas}</Texto> {mes.conquistas === 1 ? 'conquista' : 'conquistas'}
                 </>
               ) : null}
             </Texto>
@@ -273,7 +273,7 @@ export default function Historico() {
 }
 
 const s = StyleSheet.create({
-  marco: { width: 16, height: 16, borderRadius: 8, borderWidth: 2, borderColor: '#D3DEDD', backgroundColor: '#fff', marginTop: 16 },
+  marco: { width: 16, height: 16, borderRadius: 8, borderWidth: 2, borderColor: tema('#D3DEDD', '#3A4849'), backgroundColor: cores.superficie, marginTop: 16 },
   trilho: { flex: 1, width: 2, backgroundColor: cores.fundo2, marginTop: 4, marginBottom: -14 },
   proxima: { padding: 14, flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: raio.lg, backgroundColor: cores.marcaSuave, boxShadow: 'none' },
   barra: { height: 9, borderRadius: 5, backgroundColor: cores.fundo2, overflow: 'hidden' },

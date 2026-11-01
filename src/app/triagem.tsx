@@ -14,7 +14,7 @@ import { avaliar, faixaPara, personalizar, type Resposta } from '@/domain/triage
 import { toqueLeve } from '@/servicos/sons';
 import { useApp } from '@/state/app';
 import { novoId, repositorio } from '@/storage/repositorio';
-import { cores, fonte, raio, sombra, toque } from '@/theme/tokens';
+import { cores, fonte, raio, sombra, toque, vidro, tema } from '@/theme/tokens';
 
 type Opcao = { valor: string; titulo: string; descricao: string; cor: string; fundo: string; icone: React.ReactNode };
 
@@ -217,7 +217,7 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    backgroundColor: 'rgba(255,255,255,0.8)',
+    backgroundColor: vidro(0.8),
     paddingVertical: 6,
     paddingLeft: 6,
     paddingRight: 14,
@@ -240,6 +240,6 @@ const s = StyleSheet.create({
   },
   opcaoMarcada: { borderColor: cores.marca, boxShadow: '0px 14px 30px rgba(31, 122, 107, 0.16)' },
   opcaoIcone: { width: 42, height: 42, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
-  radio: { width: 26, height: 26, borderRadius: 13, borderWidth: 2, borderColor: '#D3DEDD', alignItems: 'center', justifyContent: 'center' },
+  radio: { width: 26, height: 26, borderRadius: 13, borderWidth: 2, borderColor: tema('#D3DEDD', '#3A4849'), alignItems: 'center', justifyContent: 'center' },
   radioMarcado: { backgroundColor: cores.marca, borderColor: cores.marca },
 });

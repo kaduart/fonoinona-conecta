@@ -13,7 +13,7 @@ import { formatarIdade, idadeDe } from '@/domain/idade';
 import { definirSons, sonsLigados, tocar } from '@/servicos/sons';
 import { useApp } from '@/state/app';
 import { repositorio, type TriagemSalva } from '@/storage/repositorio';
-import { cores, fonte, raio, sombra } from '@/theme/tokens';
+import { cores, fonte, raio, sombra, tema, fixas } from '@/theme/tokens';
 
 type Confirmacao = 'crianca' | 'tudo' | null;
 
@@ -163,9 +163,9 @@ export default function Perfil() {
 const s = StyleSheet.create({
   crianca: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: raio.lg, backgroundColor: cores.superficie, boxShadow: sombra.card, borderWidth: 1.5, borderColor: 'transparent' },
   criancaAtiva: { borderColor: cores.marca },
-  adicionar: { height: 54, borderRadius: raio.lg, borderWidth: 1.5, borderStyle: 'dashed', borderColor: '#BFDCD5', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
+  adicionar: { height: 54, borderRadius: raio.lg, borderWidth: 1.5, borderStyle: 'dashed', borderColor: tema('#BFDCD5', '#2A4A44'), flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
   divisor: { height: 1, backgroundColor: cores.linha, marginLeft: 68 },
   opcao: { flex: 1, height: 42, borderRadius: raio.md, backgroundColor: cores.neutroFundo, alignItems: 'center', justifyContent: 'center' },
-  opcaoAtiva: { backgroundColor: cores.texto },
+  opcaoAtiva: { backgroundColor: fixas.grafite, borderWidth: tema(0, 1), borderColor: cores.marca },
   opcaoTexto: { fontFamily: fonte.semi, fontSize: 13.5, color: cores.texto2 },
 });

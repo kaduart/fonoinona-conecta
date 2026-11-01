@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icone } from '@/components/navegacao';
 import { Texto } from '@/components/texto';
-import { cores, fonte, raio, sombra } from '@/theme/tokens';
+import { cores, fonte, raio, sombra, fixas } from '@/theme/tokens';
 
 /**
  * Aviso curto no topo (estilo Sonner), sem dependência nova: Reanimated, que o app já usa.
@@ -56,9 +56,9 @@ function Camada({ aviso, fechar }: { aviso: Aviso | null; fechar: () => void }) 
   const { top } = useSafeAreaInsets();
   if (!aviso) return null;
   const paleta = {
-    ok: { fundo: cores.texto, icone: cores.marcaClara, nome: 'check' as const },
-    erro: { fundo: cores.avaliarTexto, icone: '#fff', nome: 'info' as const },
-    info: { fundo: cores.marcaEscura, icone: '#fff', nome: 'info' as const },
+    ok: { fundo: fixas.grafite, icone: cores.marcaClara, nome: 'check' as const },
+    erro: { fundo: fixas.perigo, icone: '#fff', nome: 'info' as const },
+    info: { fundo: fixas.marcaProfunda, icone: '#fff', nome: 'info' as const },
   }[aviso.tipo];
   return (
     <View pointerEvents="box-none" style={[s.camada, { top: top + 8 }]}>

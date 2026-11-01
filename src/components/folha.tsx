@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Icone } from '@/components/navegacao';
 import { Texto } from '@/components/texto';
 import { Botao } from '@/components/ui';
-import { cores, fonte, raio, toque } from '@/theme/tokens';
+import { cores, fonte, raio, toque, fixas, tema } from '@/theme/tokens';
 
 /**
  * Folha que sobe de baixo (estilo Vaul), feita com Modal + Reanimated: fecha tocando fora ou no voltar do Android.
@@ -100,9 +100,9 @@ const s = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 10,
     gap: 16,
-    boxShadow: '0px -12px 40px rgba(44, 62, 63, 0.14)',
+    boxShadow: tema('0px -12px 40px rgba(44, 62, 63, 0.14)', '0px -12px 40px rgba(0, 0, 0, 0.5)'),
   },
   alca: { alignSelf: 'center', width: 40, height: 5, borderRadius: 3, backgroundColor: cores.linha, marginBottom: 4 },
   selo: { width: 44, height: 44, borderRadius: 22, backgroundColor: cores.avaliarFundo, alignItems: 'center', justifyContent: 'center' },
-  perigo: { height: 54, borderRadius: raio.lg, backgroundColor: cores.avaliarTexto, alignItems: 'center', justifyContent: 'center' },
+  perigo: { height: 54, borderRadius: raio.lg, backgroundColor: fixas.perigo, alignItems: 'center', justifyContent: 'center' },
 });

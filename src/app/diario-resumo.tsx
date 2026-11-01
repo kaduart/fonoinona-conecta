@@ -11,7 +11,7 @@ import { codigoContato, linkWhatsAppTexto } from '@/domain/contato';
 import { dataLocal, resumir, textoResumo } from '@/domain/diario';
 import { useApp } from '@/state/app';
 import { useDadosCrianca } from '@/state/dados';
-import { cores, fonte, raio } from '@/theme/tokens';
+import { cores, fonte, raio, tema } from '@/theme/tokens';
 
 const PERIODOS = [7, 15, 30];
 
@@ -73,7 +73,7 @@ export default function DiarioResumo() {
         <Texto variante="rotulo">Prévia da mensagem</Texto>
         {resumo.diasAnotados ? (
           <View style={s.mensagem}>
-            <Texto style={{ fontSize: 14, lineHeight: 21, color: '#1D2B22' }}>{texto}</Texto>
+            <Texto style={{ fontSize: 14, lineHeight: 21, color: cores.texto }}>{texto}</Texto>
           </View>
         ) : (
           <Vazio icone={<Icone nome="lapis" cor={cores.marca} tamanho={22} />} titulo="Nada anotado nesse período" texto="Nenhum dia anotado nesse período. Escolha um período maior ou anote o dia primeiro." />
@@ -95,7 +95,7 @@ export default function DiarioResumo() {
 const s = StyleSheet.create({
   pilula: { paddingHorizontal: 14, height: 38, borderRadius: raio.pill, backgroundColor: cores.superficie, borderWidth: 1, borderColor: cores.linha, justifyContent: 'center' },
   pilulaAtiva: { backgroundColor: cores.marca, borderColor: cores.marca },
-  mensagem: { padding: 14, borderRadius: 18, borderBottomRightRadius: 4, backgroundColor: '#E7F7EE' },
+  mensagem: { padding: 14, borderRadius: 18, borderBottomRightRadius: 4, backgroundColor: tema('#E7F7EE', '#17302B') },
   check: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 4 },
   caixa: { width: 24, height: 24, borderRadius: 7, borderWidth: 2, borderColor: cores.texto3, alignItems: 'center', justifyContent: 'center' },
 });

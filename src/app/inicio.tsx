@@ -21,7 +21,7 @@ import { areasComDificuldade, diasSeguidos, META_SEMANAL, missaoDoDia, missoesPa
 import { agendarAvisoTriagem } from '@/servicos/lembrete';
 import { useApp } from '@/state/app';
 import { useDadosCrianca } from '@/state/dados';
-import { cores, fonte, raio, sombra, toque } from '@/theme/tokens';
+import { cores, fonte, raio, sombra, toque, vidro, tema } from '@/theme/tokens';
 
 const LETRA_DIA = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 
@@ -98,7 +98,7 @@ export default function Inicio() {
             <Texto style={{ fontFamily: fonte.semi, fontSize: 12, color: cores.marca }}>Missão do dia</Texto>
           </View>
           {seguidos > 0 ? (
-            <View style={[s.selo, { right: 14, backgroundColor: 'rgba(255,255,255,0.9)' }]}>
+            <View style={[s.selo, { right: 14, backgroundColor: vidro(0.9) }]}>
               <Texto style={{ fontFamily: fonte.negrito, fontSize: 12, color: cores.terraTexto }}>🔥 {seguidos === 1 ? '1 dia' : `${seguidos} dias`}</Texto>
             </View>
           ) : null}
@@ -291,7 +291,7 @@ const s = StyleSheet.create({
     boxShadow: '0px 10px 24px rgba(44, 62, 63, 0.08)',
   },
   play: { width: 52, height: 52, borderRadius: 18, backgroundColor: cores.marca, alignItems: 'center', justifyContent: 'center', boxShadow: sombra.botao },
-  chama: { flexDirection: 'row', alignItems: 'center', gap: 5, height: 26, paddingHorizontal: 10, borderRadius: raio.pill, backgroundColor: '#FCE9E3' },
+  chama: { flexDirection: 'row', alignItems: 'center', gap: 5, height: 26, paddingHorizontal: 10, borderRadius: raio.pill, backgroundColor: tema('#FCE9E3', '#3A231C') },
   meta: { gap: 8, paddingTop: 12, borderTopWidth: 1, borderTopColor: cores.linha },
   metaPasso: { flex: 1, height: 8, borderRadius: 4, backgroundColor: cores.fundo2 },
   dia: { width: 36, height: 36, borderRadius: 12, backgroundColor: cores.fundo2, alignItems: 'center', justifyContent: 'center' },

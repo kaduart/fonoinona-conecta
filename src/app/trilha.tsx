@@ -16,7 +16,7 @@ import { fasesDaTrilha, MISSOES_POR_FASE, missoesParaIdade, montarTrilha, type I
 import { useSomAoAbrir } from '@/servicos/sons';
 import { useApp } from '@/state/app';
 import { useDadosCrianca } from '@/state/dados';
-import { cores, fonte, raio, sombra, toque } from '@/theme/tokens';
+import { cores, fonte, raio, sombra, toque, vidro } from '@/theme/tokens';
 
 export default function Trilha() {
   const router = useRouter();
@@ -184,7 +184,7 @@ function CartaoMissao({ item, numero, recemAberta, onPress }: { item: ItemTrilha
         </View>
         <View style={{ flex: 1 }}>
           {ativo ? (
-            <Texto style={{ fontFamily: fonte.negrito, fontSize: 11, letterSpacing: 0.5, color: '#C98A12' }}>NOVA MISSÃO LIBERADA</Texto>
+            <Texto style={{ fontFamily: fonte.negrito, fontSize: 11, letterSpacing: 0.5, color: cores.solTexto }}>NOVA MISSÃO LIBERADA</Texto>
           ) : null}
           <Texto variante="rotulo" style={!liberada && { color: cores.texto3 }}>
             {missao.titulo}
@@ -206,6 +206,6 @@ const s = StyleSheet.create({
   barra: { height: 9, borderRadius: 5, backgroundColor: cores.fundo2, overflow: 'hidden' },
   barraCheia: { height: '100%', borderRadius: 5, backgroundColor: cores.marca },
   missao: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 14, borderRadius: raio.lg, backgroundColor: cores.superficie, boxShadow: sombra.card },
-  missaoTrancada: { backgroundColor: 'rgba(255,255,255,0.5)', boxShadow: 'none', borderWidth: 1, borderColor: cores.linha },
+  missaoTrancada: { backgroundColor: vidro(0.5), boxShadow: 'none', borderWidth: 1, borderColor: cores.linha },
   numero: { width: 42, height: 42, borderRadius: 14, backgroundColor: cores.marcaSuave, alignItems: 'center', justifyContent: 'center' },
 });

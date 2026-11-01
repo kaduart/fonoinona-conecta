@@ -25,7 +25,7 @@ import { diasSeguidos, semana } from '@/domain/missoes';
 import { useSomAoAbrir } from '@/servicos/sons';
 import { useApp } from '@/state/app';
 import { useDadosCrianca } from '@/state/dados';
-import { cores, fonte, raio, sombra, toque } from '@/theme/tokens';
+import { cores, fonte, raio, sombra, toque, tema } from '@/theme/tokens';
 
 const LETRA_DIA = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 const FILTROS: { id: FiltroDiario; rotulo: string }[] = [
@@ -275,7 +275,7 @@ const s = StyleSheet.create({
   filtroAtivo: { backgroundColor: cores.marca, borderColor: cores.marca },
   data: { fontFamily: fonte.negrito, letterSpacing: 0.6, color: cores.texto3, marginTop: 4 },
   registro: { flexDirection: 'row', gap: 12, padding: 16, borderRadius: raio.xl, backgroundColor: cores.superficie, boxShadow: sombra.card },
-  registroConquista: { borderWidth: 1.5, borderColor: '#F6DFA6' },
+  registroConquista: { borderWidth: 1.5, borderColor: tema('#F6DFA6', '#4A3A14') },
   registroDestaque: { boxShadow: '0px 0px 24px rgba(242,184,75,0.45)' },
   icone: { width: 40, height: 40, borderRadius: 14, backgroundColor: cores.marcaSuave, alignItems: 'center', justifyContent: 'center' },
   humor: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: raio.pill, backgroundColor: cores.marcaSuave },
