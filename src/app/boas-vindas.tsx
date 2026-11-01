@@ -69,7 +69,7 @@ export default function BoasVindas() {
           <Texto variante="titulo">Quem mais vamos acompanhar?</Texto>
         ) : (
           <Texto variante="titulo">
-            Acompanhe cada <Texto variante="titulo" style={{ color: cores.marca }}>conquista</Texto> do seu filho.
+            Acompanhe cada <Texto variante="titulo" style={{ color: cores.marca }}>conquista</Texto> da sua criança.
           </Texto>
         )}
         <Texto>Triagem do desenvolvimento e brincadeiras diárias criadas por fonoaudiólogas.</Texto>

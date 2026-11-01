@@ -77,22 +77,21 @@ function Check({ cor = cores.marca, tamanho = 12 }: { cor?: string; tamanho?: nu
 }
 
 function CardFoco({ a, animar = false, atraso = 0 }: { a: ResultadoArea; animar?: boolean; atraso?: number }) {
-  const falta = Math.max(0, 100 - a.pontuacao);
   const barra = useProgresso(animar, 900, atraso);
   return (
     <View style={s.foco}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 12, rowGap: 8 }}>
         <View style={s.focoIcone}>
           <Texto style={{ fontSize: 19 }}>{ICONE_AREA[a.area] ?? '⭐'}</Texto>
         </View>
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, minWidth: 140 }}>
           <Texto style={{ fontFamily: fonte.extra, fontSize: 15.5, letterSpacing: -0.2, color: cores.texto }}>{a.rotulo}</Texto>
           <Texto variante="legenda">{DESCRICAO_AREA[a.area]}</Texto>
         </View>
         <Badge nivel={a.nivel} />
       </View>
       <View style={{ gap: 8 }}>
-        <View style={s.trilho} accessibilityLabel={`${a.rotulo}: ${a.pontuacao}% desenvolvido, faltam ${falta}%`}>
+        <View style={s.trilho} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
           <Svg width={`${Math.max(6, a.pontuacao) * barra}%`} height={8}>
             <Defs>
               <LinearGradient id={`b-${a.area}`} x1="0" y1="0" x2="1" y2="0">
@@ -104,10 +103,6 @@ function CardFoco({ a, animar = false, atraso = 0 }: { a: ResultadoArea; animar?
             <Rect x={0} y={0} width="100%" height={8} rx={4} fill={`url(#b-${a.area})`} />
           </Svg>
         </View>
-        <Texto style={{ fontSize: 12.5, color: cores.texto2 }}>
-          <Texto style={{ fontFamily: fonte.negrito, fontSize: 12.5, color: cores.texto }}>{a.pontuacao}% desenvolvido</Texto>
-          {falta > 0 ? `  •  faltam ${falta}%` : ''}
-        </Texto>
       </View>
       {DICA_AREA[a.area] ? (
         <View style={s.dica}>
@@ -304,10 +299,6 @@ export default function ResultadoTela() {
         </View>
       ) : null}
 
-      {resultado.alertaMarcado ? (
-        <Texto style={{ fontFamily: fonte.semi, color: cores.avaliarTexto, textAlign: 'center' }}>{personalizar(AVISO_PEDIATRA, vars)}</Texto>
-      ) : null}
-
       {/* 4. Ponte para a clínica: quem responde e o que acontece ao tocar no botão */}
       <Animated.View style={s.ponte} entering={revelar ? FadeInUp.delay(2800).duration(450) : undefined}>
         <Texto style={s.ponteRotulo}>{PONTE_CLINICA.rotulo.toUpperCase()}</Texto>
@@ -346,6 +337,12 @@ export default function ResultadoTela() {
             </View>
           ))}
         </View>
+        {resultado.alertaMarcado ? (
+          <View style={s.pediatra}>
+            <Texto style={{ fontSize: 15 }}>🩺</Texto>
+            <Texto style={{ flex: 1, fontSize: 13, lineHeight: 19, color: cores.texto2 }}>{personalizar(AVISO_PEDIATRA, vars)}</Texto>
+          </View>
+        ) : null}
         <Pressable
           accessibilityRole="checkbox"
           accessibilityState={{ checked: incluirResumo }}
@@ -369,13 +366,13 @@ export default function ResultadoTela() {
             <Rect x={5} y={11} width={14} height={10} rx={2.5} />
             <Path d="M8 11V8a4 4 0 0 1 8 0v3" />
           </Svg>
-          <Texto style={{ flex: 1, fontSize: 11.5, lineHeight: 16, color: cores.texto2 }}>
+          <Texto style={{ flex: 1, fontSize: 12, lineHeight: 16, color: cores.texto2 }}>
             {incluirResumo ? PONTE_CLINICA.privacidadeComResumo : PONTE_CLINICA.privacidade}
           </Texto>
         </View>
       </Animated.View>
 
-      <Texto style={{ textAlign: 'center', fontSize: 11.5, lineHeight: 17, color: cores.texto2 }}>
+      <Texto style={{ textAlign: 'center', fontSize: 12, lineHeight: 17, color: cores.texto2 }}>
         {AVISO_RESULTADO}
       </Texto>
     </Tela>
@@ -398,6 +395,7 @@ const s = StyleSheet.create({
   dica: { backgroundColor: '#FFF9EC', borderRadius: 14, paddingVertical: 12, paddingHorizontal: 14, borderWidth: 1, borderColor: 'rgba(242,184,75,0.22)' },
   ponte: { backgroundColor: '#fff', borderRadius: 24, padding: 20, gap: 14, borderWidth: 1, borderColor: 'rgba(31,122,107,0.12)', boxShadow: '0px 14px 34px rgba(44, 62, 63, 0.07)' },
   ponteRotulo: { fontFamily: fonte.extra, fontSize: 11, letterSpacing: 1.2, color: cores.marca },
+  pediatra: { flexDirection: 'row', gap: 10, alignItems: 'flex-start', padding: 12, borderRadius: raio.md, backgroundColor: cores.fundo2 },
   ponteDivisor: { height: 1, backgroundColor: '#EDF3F2' },
   luzAvatar: { position: 'absolute', right: -2, bottom: -2, width: 14, height: 14, borderRadius: 7, borderWidth: 2.5, borderColor: '#fff' },
   passoNum: { width: 24, height: 24, borderRadius: 12, backgroundColor: cores.marca, alignItems: 'center', justifyContent: 'center' },

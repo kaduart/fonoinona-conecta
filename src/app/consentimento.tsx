@@ -82,7 +82,16 @@ export default function ConsentimentoTela() {
   return (
     <Tela
       topo={<BotaoVoltar onPress={() => (router.canGoBack() ? router.back() : router.replace('/boas-vindas'))} />}
-      rodape={<Botao titulo="Concordo e continuar" onPress={concordar} desabilitado={!aceito} carregando={salvando} icone={<SetaDireita />} />}
+      rodape={
+        <View style={{ gap: 6 }}>
+          {!aceito ? (
+            <Texto variante="legenda" style={{ textAlign: 'center' }}>
+              Marque &quot;Sou o responsável legal&quot; para continuar.
+            </Texto>
+          ) : null}
+          <Botao titulo="Concordo e continuar" onPress={concordar} desabilitado={!aceito} carregando={salvando} icone={<SetaDireita />} />
+        </View>
+      }
     >
       <View style={{ gap: 10 }}>
         <View style={{ width: 52, height: 52, borderRadius: 18, backgroundColor: cores.marca, alignItems: 'center', justifyContent: 'center' }}>
@@ -92,7 +101,7 @@ export default function ConsentimentoTela() {
           </Svg>
         </View>
         <Texto variante="subtitulo">Seus dados, protegidos.</Texto>
-        <Texto>Antes de começar, veja como cuidamos das informações do seu filho.</Texto>
+        <Texto>Antes de começar, veja como cuidamos das informações da sua criança.</Texto>
       </View>
       <Card style={{ paddingHorizontal: 16, paddingVertical: 4 }}>
         {ITENS.map((it, i) => (
@@ -111,7 +120,7 @@ export default function ConsentimentoTela() {
           </View>
         ))}
       </Card>
-      <Interruptor valor={aceito} onChange={setAceito} titulo="Sou o responsável legal" descricao="e autorizo o uso das respostas para gerar orientações." />
+      <Interruptor tipo="caixa" valor={aceito} onChange={setAceito} titulo="Sou o responsável legal" descricao="e autorizo o uso das respostas para gerar orientações." />
       <Botao variante="texto" titulo="Ler a política de privacidade" onPress={() => {}} />
     </Tela>
   );

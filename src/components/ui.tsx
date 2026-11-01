@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Switch, TextInput, View, type StyleProp, type TextInputProps, type ViewStyle } from 'react-native';
+import { useState, type ReactNode } from 'react';
+import { ActivityIndicator, Pressable, StyleSheet, TextInput, View, type StyleProp, type TextInputProps, type ViewStyle } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import { Texto } from '@/components/texto';
@@ -86,26 +86,69 @@ export function Chip({ texto, tom = 'marca' }: { texto: string; tom?: 'marca' | 
   );
 }
 
-export function Campo({ rotulo, icone, ...props }: TextInputProps & { rotulo: string; icone?: ReactNode }) {
+export function Campo({ rotulo, icone, onFocus, onBlur, ...props }: TextInputProps & { rotulo: string; icone?: ReactNode }) {
+  const [foco, setFoco] = useState(false);
   return (
-    <View style={s.campo}>
+    <View style={[s.campo, foco && s.campoFoco]}>
       {icone ? <View style={s.campoIcone}>{icone}</View> : null}
       <View style={{ flex: 1 }}>
         <Texto variante="legenda">{rotulo}</Texto>
-        <TextInput placeholderTextColor={cores.texto3} {...props} style={s.campoInput} accessibilityLabel={rotulo} />
+        <TextInput
+          placeholderTextColor={cores.texto3}
+          {...props}
+          onFocus={(e) => {
+            setFoco(true);
+            onFocus?.(e);
+          }}
+          onBlur={(e) => {
+            setFoco(false);
+            onBlur?.(e);
+          }}
+          style={s.campoInput}
+          accessibilityLabel={rotulo}
+        />
       </View>
     </View>
   );
 }
 
-export function Interruptor({ valor, onChange, titulo, descricao }: { valor: boolean; onChange: (v: boolean) => void; titulo: string; descricao?: string }) {
+/**
+ * Opção liga/desliga num card. Um único controle acessível (o card todo): a chave e a caixa são só desenho,
+ * para o leitor de tela não anunciar dois controles. `tipo="caixa"` para aceites (consentimento).
+ */
+export function Interruptor({
+  valor,
+  onChange,
+  titulo,
+  descricao,
+  tipo = 'chave',
+}: {
+  valor: boolean;
+  onChange: (v: boolean) => void;
+  titulo: string;
+  descricao?: string;
+  tipo?: 'chave' | 'caixa';
+}) {
   return (
-    <Pressable onPress={() => onChange(!valor)} style={[s.interruptor, valor && s.interruptorAtivo]} accessibilityRole="switch" accessibilityState={{ checked: valor }}>
+    <Pressable
+      onPress={() => onChange(!valor)}
+      style={[s.interruptor, valor && tipo === 'caixa' && s.interruptorAtivo]}
+      accessibilityRole={tipo === 'caixa' ? 'checkbox' : 'switch'}
+      accessibilityState={{ checked: valor }}
+      accessibilityLabel={descricao ? `${titulo}. ${descricao}` : titulo}
+    >
+      {tipo === 'caixa' ? (
+        <View style={[s.caixa, valor && s.caixaAtiva]}>{valor ? <Texto style={{ color: '#fff', fontSize: 14, lineHeight: 16, fontFamily: fonte.extra }}>✓</Texto> : null}</View>
+      ) : null}
       <View style={{ flex: 1 }}>
         <Texto variante="rotulo">{titulo}</Texto>
         {descricao ? <Texto variante="legenda" style={{ color: cores.texto2, marginTop: 3 }}>{descricao}</Texto> : null}
       </View>
-      <Switch value={valor} onValueChange={onChange} trackColor={{ true: cores.marca, false: '#D3DEDD' }} thumbColor="#fff" />
+      {tipo === 'chave' ? (
+        <View style={[s.trilhoChave, valor && { backgroundColor: cores.marca }]}>
+          <View style={[s.bolinhaChave, valor && { transform: [{ translateX: 20 }] }]} />
+        </View>
+      ) : null}
     </Pressable>
   );
 }
@@ -121,6 +164,10 @@ export function Segmentos({ total, atual }: { total: number; atual: number }) {
 }
 
 const s = StyleSheet.create({
+  caixa: { width: 24, height: 24, borderRadius: 7, borderWidth: 2, borderColor: '#B8C6C5', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff' },
+  caixaAtiva: { backgroundColor: cores.marca, borderColor: cores.marca },
+  trilhoChave: { width: 48, height: 28, borderRadius: 14, backgroundColor: '#C9D6D5', padding: 3, justifyContent: 'center' },
+  bolinhaChave: { width: 22, height: 22, borderRadius: 11, backgroundColor: '#fff', boxShadow: '0px 1px 3px rgba(0,0,0,0.18)' },
   card: { backgroundColor: cores.superficie, borderRadius: 24, boxShadow: sombra.card },
   botao: {
     height: 58,
@@ -155,9 +202,12 @@ const s = StyleSheet.create({
     gap: 12,
     paddingHorizontal: 16,
     paddingVertical: 10,
+    borderWidth: 1.5,
+    borderColor: 'transparent',
   },
   campoIcone: { width: 36, height: 36, borderRadius: raio.sm, backgroundColor: cores.marcaSuave, alignItems: 'center', justifyContent: 'center' },
-  campoInput: { fontFamily: fonte.semi, fontSize: 16, color: cores.texto, paddingVertical: 2, outlineWidth: 0 } as never,
+  campoInput: { fontFamily: fonte.semi, fontSize: 16, color: cores.texto, paddingVertical: 2, outlineWidth: 0, outlineStyle: 'none' } as never,
+  campoFoco: { borderColor: cores.marca },
   interruptor: {
     borderRadius: 22,
     padding: 16,

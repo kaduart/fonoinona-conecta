@@ -97,7 +97,7 @@ export default function Diario() {
           <Texto variante="rotulo" style={{ fontSize: 14 }}>
             Sequência desta semana 🔥
           </Texto>
-          <Texto style={{ fontFamily: fonte.negrito, fontSize: 12.5, color: seguidos ? cores.terra : cores.texto3 }}>
+          <Texto style={{ fontFamily: fonte.negrito, fontSize: 12.5, color: seguidos ? cores.terraTexto : cores.texto3 }}>
             {seguidos === 1 ? '1 dia seguido' : `${seguidos} dias seguidos`}
           </Texto>
         </View>
@@ -227,7 +227,7 @@ function CartaoRegistro({ registro: r, destaque, onPress }: { registro: Registro
           <Texto variante="rotulo">{r.conquista ? 'Conquista!' : ROTULO_CONTEXTO[r.contexto]}</Texto>
           {r.humor ? (
             <View style={[s.humor, r.humor === 'dificil' ? { backgroundColor: cores.observarFundo } : r.humor === 'normal' ? { backgroundColor: cores.neutroFundo } : null]}>
-              <Texto style={{ fontFamily: fonte.negrito, fontSize: 11, color: r.humor === 'dificil' ? cores.observarTexto : r.humor === 'normal' ? cores.texto2 : cores.marca }}>{ROTULO_HUMOR[r.humor]}</Texto>
+              <Texto style={{ fontFamily: fonte.negrito, fontSize: 12, color: r.humor === 'dificil' ? cores.observarTexto : r.humor === 'normal' ? cores.texto2 : cores.marca }}>{ROTULO_HUMOR[r.humor]}</Texto>
             </View>
           ) : null}
         </View>
@@ -280,7 +280,7 @@ const s = StyleSheet.create({
   icone: { width: 40, height: 40, borderRadius: 14, backgroundColor: cores.marcaSuave, alignItems: 'center', justifyContent: 'center' },
   humor: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: raio.pill, backgroundColor: cores.marcaSuave },
   chip: { paddingHorizontal: 9, paddingVertical: 4, borderRadius: raio.pill, backgroundColor: cores.fundo2 },
-  chipTexto: { fontFamily: fonte.semi, fontSize: 11.5, color: cores.texto2 },
+  chipTexto: { fontFamily: fonte.semi, fontSize: 12, color: cores.texto2 },
   compartilhar: { flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start', marginTop: 6, paddingHorizontal: 10, paddingVertical: 6, borderRadius: raio.pill, backgroundColor: cores.solFundo },
   fab: {
     position: 'absolute',

@@ -32,7 +32,8 @@ export const TEXTOS_RESULTADO: Record<NivelResultado, TextoResultado> = {
   },
 };
 
-export const AVISO_PEDIATRA = 'Converse também com o pediatra de {nome}.';
+/** Aparece dentro do Próximo passo quando a família marcou um alerta. RASCUNHO para a RT. */
+export const AVISO_PEDIATRA = 'Na próxima consulta, vale contar ao pediatra de {nome} o que você observou aqui.';
 
 /**
  * Chamada da tela de resultado (manchete + apoio). {nome} e {areas} são preenchidos pelo app.

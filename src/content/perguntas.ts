@@ -60,11 +60,11 @@ export const FAIXAS: Faixa[] = [
     perguntas: [
       { id: 'f0-1', texto: '{nome} se acalma ou fica atento quando ouve a sua voz?', area: 'audicao', base: 'cdc' },
       { id: 'f0-2', texto: '{nome} se assusta, pisca ou para quando ouve um barulho alto?', area: 'audicao', base: 'fono' },
-      { id: 'f0-3', texto: '{nome} sorri quando você conversa ou sorri para ele(a)?', area: 'interacao', base: 'cdc' },
-      { id: 'f0-4', texto: '{nome} olha para o seu rosto quando você fala com ele(a)?', area: 'interacao', base: 'cdc' },
+      { id: 'f0-3', texto: '{nome} sorri de volta quando você conversa ou sorri?', area: 'interacao', base: 'cdc' },
+      { id: 'f0-4', texto: '{nome} olha para o seu rosto enquanto você fala?', area: 'interacao', base: 'cdc' },
       { id: 'f0-5', texto: '{nome} faz sons além do choro, como "aaa" e "ooo"?', area: 'fala', base: 'cdc' },
       { id: 'f0-6', texto: '{nome} mama ou toma a mamadeira sem engasgar com frequência?', area: 'alimentacao', base: 'fono' },
-      { id: 'f0-7', texto: 'Quando você conversa com {nome}, ele(a) faz sons de volta, como se respondesse?', area: 'fala', base: 'cdc' },
+      { id: 'f0-7', texto: '{nome} faz sons de volta quando você conversa, como se respondesse?', area: 'fala', base: 'cdc' },
       { id: 'f0-8', texto: '{nome} leva as mãos à boca e chupa os dedinhos?', area: 'motricidade_oral', base: 'cdc' },
     ],
   },
@@ -90,7 +90,7 @@ export const FAIXAS: Faixa[] = [
     minMeses: 12,
     maxMeses: 18,
     perguntas: [
-      { id: 'f12-1', texto: 'Quando você chama {nome} pelo nome, ele(a) olha para você?', area: 'interacao', base: 'cdc' },
+      { id: 'f12-1', texto: '{nome} olha para você quando ouve o próprio nome?', area: 'interacao', base: 'cdc' },
       { id: 'f12-2', texto: '{nome} chama "mamã", "papá" ou outro nome especial para alguém da família?', area: 'fala', base: 'cdc' },
       { id: 'f12-3', texto: '{nome} dá tchau com a mão?', area: 'gestos', base: 'cdc' },
       { id: 'f12-4', texto: '{nome} para, mesmo que só por um instante, quando ouve "não"?', area: 'compreensao', base: 'cdc' },

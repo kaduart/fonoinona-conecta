@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 
@@ -84,6 +84,10 @@ export default function Triagem() {
   const { criancaAtual } = useApp();
   const [indice, setIndice] = useState(0);
   const [respostas, setRespostas] = useState<Record<string, Resposta>>({});
+  const avancoAuto = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (avancoAuto.current) clearTimeout(avancoAuto.current);
+  }, []);
   const [alertas, setAlertas] = useState<Record<string, boolean>>({});
   const [salvando, setSalvando] = useState(false);
 
@@ -119,6 +123,12 @@ export default function Triagem() {
   function escolher(valor: string) {
     if (ehAlerta) setAlertas((a) => ({ ...a, [pergunta.id]: valor === 'sim' }));
     else setRespostas((r) => ({ ...r, [pergunta.id]: valor as Resposta }));
+    // avança sozinho para a próxima (a última espera o "Ver resultado"); a pausa deixa ver a marcação
+    if (indice < total - 1) {
+      if (avancoAuto.current) clearTimeout(avancoAuto.current);
+      const daqui = indice;
+      avancoAuto.current = setTimeout(() => setIndice((i) => (i === daqui ? i + 1 : i)), 350);
+    }
   }
 
   async function avancar() {

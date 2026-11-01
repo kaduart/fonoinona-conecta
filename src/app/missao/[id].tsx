@@ -161,7 +161,7 @@ export default function MissaoTela() {
           <View style={{ flex: 1 }}>
             <Texto style={{ fontFamily: fonte.extra, fontSize: 15, color: cores.solTexto }}>Dica da Fono</Texto>
             {DICAS_REVISADAS ? (
-              <Texto style={{ fontSize: 11.5, color: cores.texto2 }}>Revisado por {RESPONSAVEL_TECNICA.nome.split(' ')[0]} • {RESPONSAVEL_TECNICA.registro}</Texto>
+              <Texto style={{ fontSize: 12, color: cores.texto2 }}>Revisado por {RESPONSAVEL_TECNICA.nome.split(' ')[0]} • {RESPONSAVEL_TECNICA.registro}</Texto>
             ) : null}
           </View>
           <View style={{ transform: [{ rotate: dicaAberta ? '180deg' : '0deg' }] }}>

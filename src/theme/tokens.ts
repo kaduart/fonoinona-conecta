@@ -8,7 +8,7 @@ export const cores = {
   /** grafite clínico: títulos e textos fortes */
   texto: '#1F2C2D',
   texto2: '#5B6B6C',
-  texto3: '#97A5A6',
+  texto3: '#667677',
   linha: '#E9EFEE',
   marca: '#1F7A6B',
   marcaEscura: '#14564B',
@@ -20,15 +20,17 @@ export const cores = {
   esperadoTexto: '#1F7A6B',
   observar: '#FFC24B',
   observarFundo: '#FFF4E3',
-  observarTexto: '#B86E00',
+  observarTexto: '#96590A',
   avaliar: '#FF7A6B',
   avaliarFundo: '#FFECE8',
   avaliarTexto: '#C2412D',
   neutroFundo: '#EDF3F2',
   terra: '#E07A5F',
+  /** terra para texto (contraste AA sobre branco) */
+  terraTexto: '#B5513A',
   sol: '#F2B84B',
   solFundo: '#FDF3DC',
-  solTexto: '#9A6A0B',
+  solTexto: '#8A5E08',
 } as const;
 
 export const raio = { sm: 12, md: 16, lg: 20, xl: 24, xxl: 28, pill: 999 } as const;
