@@ -6,7 +6,7 @@ import { ConfeteAoRedor } from '@/components/animacao';
 import { BarraInferior, Icone } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
-import { Card } from '@/components/ui';
+import { Botao, Card } from '@/components/ui';
 import { MISSOES } from '@/content/missoes';
 import {
   agruparPorDia,
@@ -38,7 +38,8 @@ const FILTROS: { id: FiltroDiario; rotulo: string }[] = [
 
 export default function Diario() {
   const router = useRouter();
-  const { conquista } = useLocalSearchParams<{ conquista?: string }>();
+  const { conquista, sugestao } = useLocalSearchParams<{ conquista?: string; sugestao?: string }>();
+  const [sugestaoFechada, setSugestaoFechada] = useState(false);
   const { criancaAtual } = useApp();
   const dados = useDadosCrianca(criancaAtual?.id);
   const [filtro, setFiltro] = useState<FiltroDiario>('todos');
@@ -56,6 +57,7 @@ export default function Diario() {
   const ativosNaSemana = dias.filter((d) => d.feito).length;
   const seguidos = diasSeguidos(atividade, hoje);
   const grupos = agruparPorDia(filtrar(registros, filtro));
+  const missaoSugerida = !sugestaoFechada && sugestao ? MISSOES.find((m) => m.id === sugestao) : undefined;
 
   const fab = (
     <Pressable
@@ -117,6 +119,22 @@ export default function Diario() {
         <Texto variante="legenda">Vale missão feita ou dia anotado no Diário.</Texto>
       </Card>
 
+      {missaoSugerida ? (
+        <Card style={{ padding: 16, gap: 10, borderWidth: 1.5, borderColor: cores.marcaSuave }}>
+          <Texto variante="legenda">Anotado. Uma brincadeira que pode ajudar:</Texto>
+          <Texto variante="rotulo">🎯 {missaoSugerida.titulo}</Texto>
+          <Texto variante="legenda">
+            {missaoSugerida.duracao} · {missaoSugerida.rotuloArea}
+          </Texto>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <View style={{ flex: 1 }}>
+              <Botao titulo="Ver a missão" onPress={() => router.push({ pathname: '/missao/[id]', params: { id: missaoSugerida.id } })} />
+            </View>
+            <Botao variante="texto" titulo="Agora não" onPress={() => setSugestaoFechada(true)} />
+          </View>
+        </Card>
+      ) : null}
+
       {registros.length ? (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }} style={{ marginHorizontal: -20 }} contentInset={{ left: 20, right: 20 }}>
           <View style={{ width: 12 }} />
@@ -141,9 +159,14 @@ export default function Diario() {
             <Image source={require('../../assets/images/ilustracoes/mae-livro.png')} style={{ width: 200, height: 160 }} resizeMode="contain" accessibilityIgnoresInvertColors />
           </View>
           <Texto variante="rotulo" style={{ textAlign: 'center' }}>
-            Anote uma coisa boa de hoje
+            Sua cápsula do tempo
           </Texto>
-          <Texto style={{ textAlign: 'center' }}>Em 20 segundos você guarda o que {nome} fez em casa, na escola ou na terapia. Fica só no seu celular.</Texto>
+          <Texto style={{ textAlign: 'center' }}>
+            O desenvolvimento é feito de pequenas grandes conquistas. Anote o primeiro registro de {nome} hoje e comece a construir a memória da sua evolução.
+          </Texto>
+          <Texto variante="legenda" style={{ textAlign: 'center' }}>
+            Leva 20 segundos e fica só no seu celular.
+          </Texto>
         </Card>
       ) : null}
 

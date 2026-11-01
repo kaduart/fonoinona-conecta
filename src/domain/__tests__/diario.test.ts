@@ -1,4 +1,4 @@
-import { agruparPorDia, dataPermitida, diasComRegistro, filtrar, normalizarRegistro, resumir, textoResumo, NOTA_MAX, type RegistroDiario } from '@/domain/diario';
+import { agruparPorDia, AREAS_DIARIO, dataPermitida, diasComRegistro, filtrar, GATILHOS_NOTA, inserirGatilho, normalizarRegistro, resumir, sugerirMissao, textoResumo, NOTA_MAX, type RegistroDiario } from '@/domain/diario';
 
 const HOJE = new Date(2026, 9, 31, 15, 0); // sáb 31/10/2026, horário local
 
@@ -118,5 +118,44 @@ describe('apoio às telas', () => {
     expect(t).toContain('falou "água" sozinha');
     expect(t).toContain('Registrado no app FonoInova Conecta');
     expect(t).not.toMatch(/verificad/i);
+  });
+});
+
+describe('inserirGatilho', () => {
+  it('escreve na nota vazia e emenda com ponto na nota com texto', () => {
+    expect(inserirGatilho('', 'Apontou para pedir')).toBe('Apontou para pedir');
+    expect(inserirGatilho('Brincou bem', 'Apontou para pedir')).toBe('Brincou bem. Apontou para pedir');
+    expect(inserirGatilho('Brincou bem!  ', 'Apontou para pedir')).toBe('Brincou bem! Apontou para pedir');
+  });
+  it('não repete a frase nem passa do limite', () => {
+    expect(inserirGatilho('Apontou para pedir', 'apontou para pedir')).toBe('Apontou para pedir');
+    const cheia = 'a'.repeat(NOTA_MAX - 5);
+    expect(inserirGatilho(cheia, 'Falou uma palavra nova')).toBe(cheia);
+  });
+  it('todo atalho aponta para uma área oferecida no Diário', () => {
+    for (const g of GATILHOS_NOTA) expect(AREAS_DIARIO).toContain(g.area);
+  });
+});
+
+describe('sugerirMissao', () => {
+  const m = (id: string, areas: RegistroDiario['areas']) => ({ id, areas });
+  const trilha = [
+    { missao: m('a', ['fala']), liberada: true, feitas: 2 },
+    { missao: m('b', ['brincar', 'gestos']), liberada: true, feitas: 0 },
+    { missao: m('c', ['brincar']), liberada: true, feitas: 0 },
+    { missao: m('d', ['interacao']), liberada: false, feitas: 0 },
+  ];
+  it('só sugere em dia difícil com área marcada', () => {
+    expect(sugerirMissao({ humor: 'bom', areas: ['brincar'] }, trilha)).toBeNull();
+    expect(sugerirMissao({ humor: null, areas: ['brincar'] }, trilha)).toBeNull();
+    expect(sugerirMissao({ humor: 'dificil', areas: [] }, trilha)).toBeNull();
+  });
+  it('escolhe a liberada menos feita que combina, na ordem da trilha', () => {
+    expect(sugerirMissao({ humor: 'dificil', areas: ['brincar'] }, trilha)?.id).toBe('b');
+    expect(sugerirMissao({ humor: 'dificil', areas: ['fala'] }, trilha)?.id).toBe('a');
+  });
+  it('nunca sugere missão bloqueada nem inventa quando nada combina', () => {
+    expect(sugerirMissao({ humor: 'dificil', areas: ['interacao'] }, trilha)).toBeNull();
+    expect(sugerirMissao({ humor: 'dificil', areas: ['alimentacao'] }, trilha)).toBeNull();
   });
 });
