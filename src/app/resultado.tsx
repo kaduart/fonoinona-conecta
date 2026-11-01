@@ -3,13 +3,13 @@ import { Image } from 'expo-image';
 import { useEffect, useState } from 'react';
 import { Linking, Pressable, StyleSheet, View } from 'react-native';
 import Animated, { FadeInUp, useAnimatedStyle, useSharedValue, withTiming, ZoomIn, Easing } from 'react-native-reanimated';
-import Svg, { Defs, LinearGradient, Path, RadialGradient, Rect, Stop } from 'react-native-svg';
+import Svg, { Defs, Path, RadialGradient, Rect, Stop } from 'react-native-svg';
 
 import { registrarEvento, registrarLead } from '@/api/cliente';
 import { CelebracaoConquista } from '@/components/animacao';
 import { Medidor } from '@/components/medidor';
 import { useProgresso } from '@/components/progresso';
-import { irPara } from '@/components/navegacao';
+import { ICONE_AREA, Icone, irPara } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
 import { Botao } from '@/components/ui';
@@ -47,10 +47,6 @@ const BADGE_CLARO: Record<NivelResultado, { fundo: string; borda: string; texto:
   avaliar: { fundo: 'rgba(255,122,107,0.12)', borda: 'rgba(255,122,107,0.28)', texto: cores.avaliarTexto, ponto: cores.avaliar },
 };
 
-const ICONE_AREA: Record<string, string> = {
-  fala: '🗣️', compreensao: '👂', interacao: '🤝', audicao: '🎵', motricidade_oral: '👄', alimentacao: '🥄',
-  imitacao: '🪞', gestos: '👉', brincar: '🧸', narrativa: '📖', inteligibilidade: '💬', consciencia_fonologica: '🔤',
-};
 
 /** "fala e motricidade oral" / "fala, brincar e gestos". */
 function juntar(itens: string[]) {
@@ -82,7 +78,7 @@ function CardFoco({ a, animar = false, atraso = 0 }: { a: ResultadoArea; animar?
     <View style={s.foco}>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 12, rowGap: 8 }}>
         <View style={s.focoIcone}>
-          <Texto style={{ fontSize: 19 }}>{ICONE_AREA[a.area] ?? '⭐'}</Texto>
+          <Icone nome={ICONE_AREA[a.area] ?? 'estrela'} cor={cores.solTexto} tamanho={22} />
         </View>
         <View style={{ flex: 1, minWidth: 140 }}>
           <Texto style={{ fontFamily: fonte.extra, fontSize: 15.5, letterSpacing: -0.2, color: cores.texto }}>{a.rotulo}</Texto>
@@ -92,16 +88,7 @@ function CardFoco({ a, animar = false, atraso = 0 }: { a: ResultadoArea; animar?
       </View>
       <View style={{ gap: 8 }}>
         <View style={s.trilho} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-          <Svg width={`${Math.max(6, a.pontuacao) * barra}%`} height={8}>
-            <Defs>
-              <LinearGradient id={`b-${a.area}`} x1="0" y1="0" x2="1" y2="0">
-                <Stop offset="0" stopColor="#FFB27A" />
-                <Stop offset="0.55" stopColor="#F2B84B" />
-                <Stop offset="1" stopColor="#3CC4A6" />
-              </LinearGradient>
-            </Defs>
-            <Rect x={0} y={0} width="100%" height={8} rx={4} fill={`url(#b-${a.area})`} />
-          </Svg>
+          <View style={{ width: `${Math.max(6, a.pontuacao) * barra}%`, height: 8, borderRadius: 4, backgroundColor: BADGE_CLARO[a.nivel].ponto }} />
         </View>
       </View>
       {DICA_AREA[a.area] ? (
@@ -339,7 +326,7 @@ export default function ResultadoTela() {
         </View>
         {resultado.alertaMarcado ? (
           <View style={s.pediatra}>
-            <Texto style={{ fontSize: 15 }}>🩺</Texto>
+            <Icone nome="terapia" cor={cores.texto2} tamanho={18} />
             <Texto style={{ flex: 1, fontSize: 13, lineHeight: 19, color: cores.texto2 }}>{personalizar(AVISO_PEDIATRA, vars)}</Texto>
           </View>
         ) : null}

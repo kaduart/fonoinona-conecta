@@ -6,7 +6,7 @@ import Svg, { Circle, Path } from 'react-native-svg';
 import { Texto } from '@/components/texto';
 import { cores, fonte, raio, sombra } from '@/theme/tokens';
 
-type NomeIcone = 'casa' | 'grafico' | 'pessoa' | 'seta' | 'cadeado' | 'check' | 'mais' | 'escudo' | 'info' | 'relogio' | 'chat' | 'lixo' | 'livro' | 'estrela' | 'fogo' | 'equipe' | 'play' | 'cronometro' | 'baixo' | 'lapis' | 'compartilhar' | 'presente';
+type NomeIcone = 'casa' | 'grafico' | 'pessoa' | 'seta' | 'cadeado' | 'check' | 'mais' | 'escudo' | 'info' | 'relogio' | 'chat' | 'lixo' | 'livro' | 'estrela' | 'fogo' | 'equipe' | 'play' | 'cronometro' | 'baixo' | 'lapis' | 'compartilhar' | 'presente' | 'escola' | 'terapia' | 'sol' | 'nuvem' | 'chuva' | 'ouvido' | 'musica' | 'boca' | 'colher' | 'espelho' | 'mao' | 'blocos' | 'letras';
 
 const TRACOS: Record<NomeIcone, ReactNode> = {
   casa: <Path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z" />,
@@ -71,9 +71,72 @@ const TRACOS: Record<NomeIcone, ReactNode> = {
       <Path d="M12 7c-1.5-3-5-3.5-5-1.2C7 7 9 7 12 7zM12 7c1.5-3 5-3.5 5-1.2C17 7 15 7 12 7z" />
     </>
   ),
+  escola: (
+    <>
+      <Path d="M2.5 9.5L12 5l9.5 4.5L12 14z" />
+      <Path d="M6.5 11.8V16c0 1.4 2.5 3 5.5 3s5.5-1.6 5.5-3v-4.2M21.5 9.5v5" />
+    </>
+  ),
+  terapia: (
+    <>
+      <Path d="M5 3.5v5a4 4 0 0 0 8 0v-5" />
+      <Path d="M9 12.5v2.5a5 5 0 0 0 10 0v-2" />
+      <Circle cx={19} cy={11} r={2} />
+    </>
+  ),
+  sol: (
+    <>
+      <Circle cx={12} cy={12} r={4} />
+      <Path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4" />
+    </>
+  ),
+  nuvem: <Path d="M7.5 18.5h9.5a4 4 0 0 0 .4-8 6 6 0 0 0-11.6 1.6 3.3 3.3 0 0 0 1.7 6.4z" />,
+  chuva: (
+    <>
+      <Path d="M7.5 14.5h9.5a3.5 3.5 0 0 0 .3-7 5.5 5.5 0 0 0-10.6 1.4 3 3 0 0 0 .8 5.6z" />
+      <Path d="M8.5 17.5l-1 2.5M12.5 17.5l-1 2.5M16.5 17.5l-1 2.5" />
+    </>
+  ),
+  ouvido: <Path d="M7.5 9a4.5 4.5 0 0 1 9 0c0 3.5-3.5 4-3.5 7.5a2.5 2.5 0 0 1-5 0M10.5 9.5a1.5 1.5 0 0 1 3 0" />,
+  musica: (
+    <>
+      <Path d="M9 17.5V5.5l10-2v12" />
+      <Circle cx={6.5} cy={17.5} r={2.5} />
+      <Circle cx={16.5} cy={15.5} r={2.5} />
+    </>
+  ),
+  boca: <Path d="M3.5 11c3-2.5 14-2.5 17 0-2.5 4.5-14.5 4.5-17 0zM3.5 11h17" />,
+  colher: <Path d="M12 3c2.4 0 4 2 4 4.6 0 2.5-1.7 4.4-4 4.4s-4-1.9-4-4.4C8 5 9.6 3 12 3zM12 12v9" />,
+  espelho: (
+    <>
+      <Circle cx={12} cy={9} r={6} />
+      <Path d="M12 15v6M9 21h6M10 6.5a3 3 0 0 1 3.5-.5" />
+    </>
+  ),
+  mao: <Path d="M8 12.5V5a1.5 1.5 0 0 1 3 0v6M11 10a1.5 1.5 0 0 1 3 0v1.5M14 11a1.5 1.5 0 0 1 3 0v4a6 6 0 0 1-6 6h-.5a5 5 0 0 1-4-2L4 15.5a1.5 1.5 0 0 1 2.4-1.8L8 15.5" />,
+  blocos: <Path d="M3.5 13h7.5v7.5H3.5zM13 13h7.5v7.5H13zM8.25 3.5h7.5V11h-7.5z" />,
+  letras: <Path d="M3 18L7 6l4 12M4.5 14h5M14 6h3.5a2.75 2.75 0 0 1 0 5.5H14zM14 11.5h4a3.25 3.25 0 0 1 0 6.5h-4z" />,
 };
 
 export type { NomeIcone };
+
+/** Ícone de linha por habilidade (substitui os emojis: mesmo traço do resto do app). */
+export const ICONE_AREA: Record<string, NomeIcone> = {
+  fala: 'chat',
+  compreensao: 'ouvido',
+  interacao: 'equipe',
+  audicao: 'musica',
+  motricidade_oral: 'boca',
+  alimentacao: 'colher',
+  imitacao: 'espelho',
+  gestos: 'mao',
+  brincar: 'blocos',
+  narrativa: 'livro',
+  inteligibilidade: 'chat',
+  consciencia_fonologica: 'letras',
+};
+export const ICONE_CONTEXTO: Record<'casa' | 'escola' | 'terapia', NomeIcone> = { casa: 'casa', escola: 'escola', terapia: 'terapia' };
+export const ICONE_HUMOR: Record<'bom' | 'normal' | 'dificil', NomeIcone> = { bom: 'sol', normal: 'nuvem', dificil: 'chuva' };
 
 export function Icone({ nome, cor = cores.texto, tamanho = 20, espessura = 2, cheio }: { nome: NomeIcone; cor?: string; tamanho?: number; espessura?: number; cheio?: boolean }) {
   return (

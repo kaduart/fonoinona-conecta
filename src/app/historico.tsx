@@ -2,7 +2,7 @@ import { Redirect, useRouter } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import Svg, { Circle, G, Line, Path, Text as SvgText } from 'react-native-svg';
 
-import { BarraInferior, Icone } from '@/components/navegacao';
+import { BarraInferior, ICONE_HUMOR, Icone } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
 import { Botao, Card, Chip } from '@/components/ui';
@@ -10,7 +10,7 @@ import { MISSOES, ROTULO_COMO_FOI } from '@/content/missoes';
 import { FAIXAS, ROTULO_AREA } from '@/content/perguntas';
 import { TEXTOS_RESULTADO } from '@/content/resultados';
 import { formatarDataCurta, proximaTriagem } from '@/domain/acompanhamento';
-import { EMOJI_HUMOR, marcasDeAtividade, resumir, rotuloAreaDiario } from '@/domain/diario';
+import { marcasDeAtividade, resumir, rotuloAreaDiario } from '@/domain/diario';
 import { idadeDe } from '@/domain/idade';
 import { diasSeguidos, fasesDaTrilha, missoesParaIdade, montarTrilha } from '@/domain/missoes';
 import type { NivelResultado } from '@/domain/triagem';
@@ -91,9 +91,12 @@ function HumorDoMes({ humor }: { humor: { bom: number; normal: number; dificil: 
       </View>
       <View style={{ flexDirection: 'row', gap: 14 }}>
         {partes.map((p) => (
-          <Texto key={p.chave} variante="legenda">
-            {EMOJI_HUMOR[p.chave]} {p.n} {p.rotulo}
-          </Texto>
+          <View key={p.chave} style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+            <Icone nome={ICONE_HUMOR[p.chave]} cor={cores.texto2} tamanho={15} />
+            <Texto variante="legenda">
+              {p.n} {p.rotulo}
+            </Texto>
+          </View>
         ))}
       </View>
     </View>
