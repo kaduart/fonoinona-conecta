@@ -6,7 +6,7 @@ import { BarraInferior, ICONE_HUMOR, Icone } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
 import { Numero } from '@/components/numero';
 import { Texto } from '@/components/texto';
-import { Botao, Card, Chip } from '@/components/ui';
+import { Botao, Card, Chip, Vazio } from '@/components/ui';
 import { MISSOES, ROTULO_COMO_FOI } from '@/content/missoes';
 import { FAIXAS, ROTULO_AREA } from '@/content/perguntas';
 import { TEXTOS_RESULTADO } from '@/content/resultados';
@@ -139,10 +139,7 @@ export default function Historico() {
           <Grafico triagens={triagens} />
         </Card>
       ) : (
-        <Card style={{ padding: 18, gap: 8 }}>
-          <Texto variante="rotulo">Nenhuma triagem ainda</Texto>
-          <Texto>Faça a primeira para acompanhar a evolução de {nome}.</Texto>
-        </Card>
+        <Vazio icone={<Icone nome="grafico" cor={cores.marca} tamanho={22} />} titulo="Nenhuma triagem ainda" texto={`Faça a primeira para acompanhar a evolução de ${nome}.`} />
       )}
 
       {areas.length ? (

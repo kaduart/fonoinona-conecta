@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Icone } from '@/components/navegacao';
 import { Texto } from '@/components/texto';
 import { Botao } from '@/components/ui';
-import { cores, fonte, raio } from '@/theme/tokens';
+import { cores, fonte, raio, toque } from '@/theme/tokens';
 
 /**
  * Folha que sobe de baixo (estilo Vaul), feita com Modal + Reanimated: fecha tocando fora ou no voltar do Android.
@@ -75,7 +75,7 @@ export function Confirmacao({
             accessibilityState={{ disabled: !!carregando }}
             disabled={carregando}
             onPress={onConfirmar}
-            style={({ pressed }) => [s.perigo, pressed && { opacity: 0.85 }]}
+            style={({ pressed }) => [s.perigo, pressed && toque]}
           >
             <Texto style={{ fontFamily: fonte.negrito, color: '#fff', fontSize: 16 }}>{carregando ? 'Apagando…' : acao}</Texto>
           </Pressable>

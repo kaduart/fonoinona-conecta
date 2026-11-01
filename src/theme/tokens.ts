@@ -38,7 +38,7 @@ export const raio = { sm: 12, md: 16, lg: 20, xl: 24, xxl: 28, pill: 999 } as co
 export const espaco = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 } as const;
 
 export const sombra = {
-  card: '0px 12px 30px rgba(44, 62, 63, 0.04)',
+  card: '0px 1px 2px rgba(44, 62, 63, 0.04), 0px 10px 28px rgba(44, 62, 63, 0.06)',
   elevada: '0px 18px 40px rgba(44, 62, 63, 0.08)',
   botao: '0px 12px 24px rgba(31, 122, 107, 0.28)',
 } as const;
@@ -50,3 +50,6 @@ export const fonte = {
   negrito: 'Figtree_700Bold',
   extra: 'Figtree_800ExtraBold',
 } as const;
+
+/** Resposta ao toque igual em todo o app: leve afundada, sem sumir. */
+export const toque = { opacity: 0.88, transform: [{ scale: 0.98 }] } as const;

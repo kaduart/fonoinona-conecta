@@ -6,7 +6,7 @@ import { registrarEvento } from '@/api/cliente';
 import { Icone } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
-import { Botao, BotaoVoltar } from '@/components/ui';
+import { Botao, BotaoVoltar, Vazio } from '@/components/ui';
 import { codigoContato, linkWhatsAppTexto } from '@/domain/contato';
 import { dataLocal, resumir, textoResumo } from '@/domain/diario';
 import { useApp } from '@/state/app';
@@ -76,7 +76,7 @@ export default function DiarioResumo() {
             <Texto style={{ fontSize: 14, lineHeight: 21, color: '#1D2B22' }}>{texto}</Texto>
           </View>
         ) : (
-          <Texto>Nenhum dia anotado nesse período. Escolha um período maior ou anote o dia primeiro.</Texto>
+          <Vazio icone={<Icone nome="lapis" cor={cores.marca} tamanho={22} />} titulo="Nada anotado nesse período" texto="Nenhum dia anotado nesse período. Escolha um período maior ou anote o dia primeiro." />
         )}
       </View>
 

@@ -16,7 +16,7 @@ import { fasesDaTrilha, MISSOES_POR_FASE, missoesParaIdade, montarTrilha, type I
 import { useSomAoAbrir } from '@/servicos/sons';
 import { useApp } from '@/state/app';
 import { useDadosCrianca } from '@/state/dados';
-import { cores, fonte, raio, sombra } from '@/theme/tokens';
+import { cores, fonte, raio, sombra, toque } from '@/theme/tokens';
 
 export default function Trilha() {
   const router = useRouter();
@@ -74,7 +74,7 @@ export default function Trilha() {
                 accessibilityRole="button"
                 accessibilityLabel={`Fase ${fase.numero}, ${tema.titulo}. Ver o objetivo e os recursos`}
                 onPress={() => router.push({ pathname: '/fase/[numero]', params: { numero: String(fase.numero) } })}
-                style={({ pressed }) => [s.fase, !aberta && { opacity: 0.6 }, pressed && { opacity: 0.75 }]}
+                style={({ pressed }) => [s.fase, !aberta && { opacity: 0.6 }, pressed && toque]}
               >
                 <Medalha tom={fase.medalha.tom} trancada={!fase.completa} tamanho={38} />
                 <View style={{ flex: 1 }}>
@@ -169,7 +169,7 @@ function CartaoMissao({ item, numero, recemAberta, onPress }: { item: ItemTrilha
         accessibilityLabel={`${missao.titulo}${liberada ? '' : ', bloqueada'}${vezes ? ', concluída' : ''}${ativo ? ', acabou de abrir' : ''}`}
         disabled={!liberada}
         onPress={onPress}
-        style={({ pressed }) => [s.missao, !liberada && s.missaoTrancada, pressed && { opacity: 0.8 }]}
+        style={({ pressed }) => [s.missao, !liberada && s.missaoTrancada, pressed && toque]}
       >
         <View style={[s.numero, vezes > 0 && { backgroundColor: cores.marca }, !liberada && { backgroundColor: cores.fundo2 }, ativo && { backgroundColor: cores.solFundo }]}>
           {vezes > 0 ? (

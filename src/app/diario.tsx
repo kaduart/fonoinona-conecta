@@ -25,7 +25,7 @@ import { diasSeguidos, semana } from '@/domain/missoes';
 import { useSomAoAbrir } from '@/servicos/sons';
 import { useApp } from '@/state/app';
 import { useDadosCrianca } from '@/state/dados';
-import { cores, fonte, raio, sombra } from '@/theme/tokens';
+import { cores, fonte, raio, sombra, toque } from '@/theme/tokens';
 
 const LETRA_DIA = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 const FILTROS: { id: FiltroDiario; rotulo: string }[] = [
@@ -80,12 +80,12 @@ export default function Diario() {
       }
     >
       <View style={s.topo} onLayout={(e) => setLargura(e.nativeEvent.layout.width)}>
-        <View style={{ flex: 1, gap: 2 }}>
+        <View style={{ gap: 2 }}>
           <Texto variante="titulo">Diário de {nome}</Texto>
           <Texto>Casa, escola e terapia num só lugar.</Texto>
         </View>
         {registros.length ? (
-          <Pressable accessibilityRole="button" onPress={() => router.push('/diario-resumo')} style={({ pressed }) => [s.resumo, pressed && { opacity: 0.8 }]}>
+          <Pressable accessibilityRole="button" onPress={() => router.push('/diario-resumo')} style={({ pressed }) => [s.resumo, pressed && toque]}>
             <Icone nome="chat" cor={cores.marca} tamanho={15} />
             <Texto style={{ fontFamily: fonte.negrito, fontSize: 12.5, color: cores.marca }}>Enviar resumo</Texto>
           </Pressable>
@@ -184,7 +184,7 @@ export default function Diario() {
       ))}
 
       {dados ? (
-        <Pressable accessibilityRole="button" onPress={() => router.push('/lembrete')} style={({ pressed }) => [s.lembrete, pressed && { opacity: 0.8 }]}>
+        <Pressable accessibilityRole="button" onPress={() => router.push('/lembrete')} style={({ pressed }) => [s.lembrete, pressed && toque]}>
           <Icone nome="relogio" cor={cores.marca} tamanho={18} />
           <Texto style={{ flex: 1, fontSize: 14 }}>Quer um lembrete para anotar todo dia?</Texto>
           <Icone nome="seta" cor={cores.texto3} tamanho={16} />
@@ -217,7 +217,7 @@ function CartaoRegistro({ registro: r, destaque, onPress }: { registro: Registro
       accessibilityRole="button"
       accessibilityLabel={`${r.conquista ? 'Conquista. ' : ''}${ROTULO_CONTEXTO[r.contexto]}${r.humor ? `, ${ROTULO_HUMOR[r.humor]}` : ''}. ${r.nota}. Toque para editar`}
       onPress={onPress}
-      style={({ pressed }) => [s.registro, r.conquista && s.registroConquista, destaque && s.registroDestaque, pressed && { opacity: 0.9 }]}
+      style={({ pressed }) => [s.registro, r.conquista && s.registroConquista, destaque && s.registroDestaque, pressed && toque]}
     >
       <View style={[s.icone, r.conquista && { backgroundColor: cores.solFundo }]}>
         {r.conquista ? <Icone nome="estrela" cor={cores.sol} tamanho={21} cheio /> : <Icone nome={ICONE_CONTEXTO[r.contexto]} cor={cores.marca} tamanho={21} />}
@@ -267,8 +267,8 @@ function CartaoRegistro({ registro: r, destaque, onPress }: { registro: Registro
 const s = StyleSheet.create({
   ilustracao: { alignSelf: 'stretch', alignItems: 'center', borderRadius: raio.lg, backgroundColor: cores.ilustracao, paddingVertical: 6 },
   lembrete: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 14, borderRadius: raio.lg, backgroundColor: cores.marcaSuave, marginTop: 6 },
-  topo: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginTop: 4 },
-  resumo: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 11, paddingVertical: 8, borderRadius: raio.sm, backgroundColor: cores.marcaSuave, marginTop: 6 },
+  topo: { gap: 10, marginTop: 4 },
+  resumo: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 11, paddingVertical: 8, borderRadius: raio.pill, backgroundColor: cores.marcaSuave, alignSelf: 'flex-start' },
   dia: { width: 34, height: 34, borderRadius: 17, backgroundColor: cores.fundo2, alignItems: 'center', justifyContent: 'center' },
   diaHoje: { backgroundColor: cores.superficie, borderWidth: 2, borderColor: cores.marca },
   filtro: { paddingHorizontal: 13, height: 36, borderRadius: raio.pill, backgroundColor: cores.superficie, borderWidth: 1, borderColor: cores.linha, justifyContent: 'center' },

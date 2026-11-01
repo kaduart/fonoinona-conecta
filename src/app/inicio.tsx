@@ -19,7 +19,7 @@ import { marcasDeAtividade } from '@/domain/diario';
 import { areasComDificuldade, diasSeguidos, META_SEMANAL, missaoDoDia, missoesParaIdade, montarTrilha, semana } from '@/domain/missoes';
 import { useApp } from '@/state/app';
 import { useDadosCrianca } from '@/state/dados';
-import { cores, fonte, raio, sombra } from '@/theme/tokens';
+import { cores, fonte, raio, sombra, toque } from '@/theme/tokens';
 
 const LETRA_DIA = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 
@@ -95,7 +95,7 @@ export default function Inicio() {
             accessibilityRole="button"
             accessibilityLabel={`Começar missão ${doDia.titulo}`}
             onPress={() => router.push({ pathname: '/missao/[id]', params: { id: doDia.id } })}
-            style={({ pressed }) => [s.heroiCartao, pressed && { opacity: 0.92 }]}
+            style={({ pressed }) => [s.heroiCartao, pressed && toque]}
           >
             <View style={{ flex: 1 }}>
               <Texto style={{ fontFamily: fonte.extra, fontSize: 18, letterSpacing: -0.3, color: cores.texto }}>{doDia.titulo}</Texto>
@@ -115,7 +115,7 @@ export default function Inicio() {
           accessibilityRole="button"
           accessibilityLabel="Ver resultado completo da última triagem"
           onPress={() => router.push({ pathname: '/resultado', params: { id: ultima.id } })}
-          style={({ pressed }) => [s.resultado, pressed && { opacity: 0.9 }]}
+          style={({ pressed }) => [s.resultado, pressed && toque]}
         >
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
             <Texto variante="legenda" numberOfLines={1} style={{ flexShrink: 1 }}>
@@ -233,7 +233,7 @@ export default function Inicio() {
       <Pressable
         accessibilityRole="button"
         onPress={() => (proxima.disponivel ? router.push('/triagem') : irPara(router, '/historico'))}
-        style={({ pressed }) => [s.triagem, pressed && { opacity: 0.85 }]}
+        style={({ pressed }) => [s.triagem, pressed && toque]}
       >
         <View style={s.triagemIcone}>
           <Icone nome="relogio" cor="#C98A12" tamanho={20} />

@@ -4,7 +4,7 @@ import { Image, Pressable, StyleSheet, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 
 import { Texto } from '@/components/texto';
-import { cores, fonte, raio, sombra } from '@/theme/tokens';
+import { cores, fonte, raio, sombra, toque } from '@/theme/tokens';
 
 type NomeIcone = 'casa' | 'grafico' | 'pessoa' | 'seta' | 'cadeado' | 'check' | 'mais' | 'escudo' | 'info' | 'relogio' | 'chat' | 'lixo' | 'livro' | 'estrela' | 'fogo' | 'equipe' | 'play' | 'cronometro' | 'baixo' | 'lapis' | 'compartilhar' | 'presente' | 'escola' | 'terapia' | 'sol' | 'nuvem' | 'chuva' | 'ouvido' | 'musica' | 'boca' | 'colher' | 'espelho' | 'mao' | 'blocos' | 'letras';
 
@@ -165,7 +165,7 @@ export function Avatar({ nome, indice = 0, tamanho = 44 }: { nome: string; indic
 /** Linha de lista com ícone, título, descrição e seta. */
 export function ItemLista({ icone, titulo, descricao, onPress, cor = cores.marca, fundo = cores.marcaSuave }: { icone: NomeIcone; titulo: string; descricao?: string; onPress: () => void; cor?: string; fundo?: string }) {
   return (
-    <Pressable accessibilityRole="button" onPress={onPress} style={({ pressed }) => [s.item, pressed && { opacity: 0.7 }]}>
+    <Pressable accessibilityRole="button" onPress={onPress} style={({ pressed }) => [s.item, pressed && toque]}>
       <View style={[s.itemIcone, { backgroundColor: fundo }]}>
         <Icone nome={icone} cor={cor} tamanho={18} />
       </View>
@@ -205,7 +205,7 @@ export function Marca() {
 export function SeletorCrianca({ nome, idade, indice = 0 }: { nome: string; idade: string; indice?: number }) {
   const router = useRouter();
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={`${nome}, ${idade}. Trocar criança`} onPress={() => router.push('/perfil')} style={({ pressed }) => [s.seletor, pressed && { opacity: 0.8 }]}>
+    <Pressable accessibilityRole="button" accessibilityLabel={`${nome}, ${idade}. Trocar criança`} onPress={() => router.push('/perfil')} style={({ pressed }) => [s.seletor, pressed && toque]}>
       <Avatar nome={nome} indice={indice} tamanho={30} />
       <Texto style={{ fontFamily: fonte.semi, fontSize: 13, color: cores.texto }} numberOfLines={1}>
         {nome} · {idade}
