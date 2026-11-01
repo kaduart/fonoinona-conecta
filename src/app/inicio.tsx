@@ -1,9 +1,11 @@
 import { Redirect, useRouter } from 'expo-router';
+import { useEffect } from 'react';
 import { Linking, Pressable, StyleSheet, View } from 'react-native';
 
 import { registrarEvento } from '@/api/cliente';
 import { BarraInferior, Icone, irPara, Marca, SeletorCrianca } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
+import { Numero } from '@/components/numero';
 import { Texto } from '@/components/texto';
 import { Botao, Card, Chip } from '@/components/ui';
 import { TEXTOS_RESULTADO } from '@/content/resultados';
@@ -16,9 +18,10 @@ import { codigoContato, linkWhatsApp, linkWhatsAppGeral } from '@/domain/contato
 import { formatarIdade, idadeDe } from '@/domain/idade';
 import { marcasDeAtividade } from '@/domain/diario';
 import { areasComDificuldade, diasSeguidos, META_SEMANAL, missaoDoDia, missoesParaIdade, montarTrilha, semana } from '@/domain/missoes';
+import { agendarAvisoTriagem } from '@/servicos/lembrete';
 import { useApp } from '@/state/app';
 import { useDadosCrianca } from '@/state/dados';
-import { cores, fonte, raio, sombra } from '@/theme/tokens';
+import { cores, fonte, raio, sombra, toque, vidro, tema } from '@/theme/tokens';
 
 const LETRA_DIA = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 
@@ -36,6 +39,15 @@ export default function Inicio() {
   const router = useRouter();
   const { criancaAtual, criancas } = useApp();
   const dados = useDadosCrianca(criancaAtual?.id);
+
+  // agenda (ou cancela) o aviso do dia em que a próxima triagem libera; só se a família já liberou notificações
+  const ultimaId = dados?.triagens[0]?.id;
+  useEffect(() => {
+    if (!criancaAtual || !dados) return;
+    const p = proximaTriagem(criancaAtual, dados.triagens[0] ?? null);
+    void agendarAvisoTriagem(criancaAtual.id, p.data, p.disponivel);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [criancaAtual?.id, ultimaId, !!dados]);
 
   if (!criancaAtual) return <Redirect href="/" />;
 
@@ -86,7 +98,7 @@ export default function Inicio() {
             <Texto style={{ fontFamily: fonte.semi, fontSize: 12, color: cores.marca }}>Missão do dia</Texto>
           </View>
           {seguidos > 0 ? (
-            <View style={[s.selo, { right: 14, backgroundColor: 'rgba(255,255,255,0.9)' }]}>
+            <View style={[s.selo, { right: 14, backgroundColor: vidro(0.9) }]}>
               <Texto style={{ fontFamily: fonte.negrito, fontSize: 12, color: cores.terraTexto }}>🔥 {seguidos === 1 ? '1 dia' : `${seguidos} dias`}</Texto>
             </View>
           ) : null}
@@ -94,7 +106,7 @@ export default function Inicio() {
             accessibilityRole="button"
             accessibilityLabel={`Começar missão ${doDia.titulo}`}
             onPress={() => router.push({ pathname: '/missao/[id]', params: { id: doDia.id } })}
-            style={({ pressed }) => [s.heroiCartao, pressed && { opacity: 0.92 }]}
+            style={({ pressed }) => [s.heroiCartao, pressed && toque]}
           >
             <View style={{ flex: 1 }}>
               <Texto style={{ fontFamily: fonte.extra, fontSize: 18, letterSpacing: -0.3, color: cores.texto }}>{doDia.titulo}</Texto>
@@ -114,7 +126,7 @@ export default function Inicio() {
           accessibilityRole="button"
           accessibilityLabel="Ver resultado completo da última triagem"
           onPress={() => router.push({ pathname: '/resultado', params: { id: ultima.id } })}
-          style={({ pressed }) => [s.resultado, pressed && { opacity: 0.9 }]}
+          style={({ pressed }) => [s.resultado, pressed && toque]}
         >
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
             <Texto variante="legenda" numberOfLines={1} style={{ flexShrink: 1 }}>
@@ -192,9 +204,12 @@ export default function Inicio() {
             <Texto style={{ fontFamily: fonte.semi, fontSize: 13, color: cores.texto }}>
               {metaBatida ? 'Meta da semana batida! 🎉' : `Meta: ${META_SEMANAL} dias na semana`}
             </Texto>
-            <Texto variante="legenda" style={{ fontFamily: fonte.negrito, color: metaBatida ? cores.marca : cores.texto2 }}>
-              {Math.min(feitosNaSemana, META_SEMANAL)}/{META_SEMANAL}
-            </Texto>
+            <View style={{ flexDirection: 'row' }} accessible accessibilityLabel={`${Math.min(feitosNaSemana, META_SEMANAL)} de ${META_SEMANAL}`}>
+              <Numero valor={Math.min(feitosNaSemana, META_SEMANAL)} style={{ fontFamily: fonte.negrito, fontSize: 12.5, lineHeight: 18, color: metaBatida ? cores.marca : cores.texto2 }} />
+              <Texto variante="legenda" style={{ fontFamily: fonte.negrito, color: metaBatida ? cores.marca : cores.texto2 }}>
+                /{META_SEMANAL}
+              </Texto>
+            </View>
           </View>
           <View style={{ flexDirection: 'row', gap: 6 }}>
             {Array.from({ length: META_SEMANAL }, (_, i) => (
@@ -229,7 +244,7 @@ export default function Inicio() {
       <Pressable
         accessibilityRole="button"
         onPress={() => (proxima.disponivel ? router.push('/triagem') : irPara(router, '/historico'))}
-        style={({ pressed }) => [s.triagem, pressed && { opacity: 0.85 }]}
+        style={({ pressed }) => [s.triagem, pressed && toque]}
       >
         <View style={s.triagemIcone}>
           <Icone nome="relogio" cor="#C98A12" tamanho={20} />
@@ -276,7 +291,7 @@ const s = StyleSheet.create({
     boxShadow: '0px 10px 24px rgba(44, 62, 63, 0.08)',
   },
   play: { width: 52, height: 52, borderRadius: 18, backgroundColor: cores.marca, alignItems: 'center', justifyContent: 'center', boxShadow: sombra.botao },
-  chama: { flexDirection: 'row', alignItems: 'center', gap: 5, height: 26, paddingHorizontal: 10, borderRadius: raio.pill, backgroundColor: '#FCE9E3' },
+  chama: { flexDirection: 'row', alignItems: 'center', gap: 5, height: 26, paddingHorizontal: 10, borderRadius: raio.pill, backgroundColor: tema('#FCE9E3', '#3A231C') },
   meta: { gap: 8, paddingTop: 12, borderTopWidth: 1, borderTopColor: cores.linha },
   metaPasso: { flex: 1, height: 8, borderRadius: 4, backgroundColor: cores.fundo2 },
   dia: { width: 36, height: 36, borderRadius: 12, backgroundColor: cores.fundo2, alignItems: 'center', justifyContent: 'center' },

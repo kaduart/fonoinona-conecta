@@ -4,7 +4,21 @@ import Svg, { Path } from 'react-native-svg';
 
 import { Texto } from '@/components/texto';
 import type { NivelResultado } from '@/domain/triagem';
-import { cores, fonte, raio, sombra } from '@/theme/tokens';
+import { cores, fonte, raio, sombra, toque, tema, contorno, vidro } from '@/theme/tokens';
+
+/** Estado vazio do app: ícone num selo, título, texto e (opcional) uma ação. Mesmo desenho em todas as telas. */
+export function Vazio({ icone, titulo, texto, children }: { icone: ReactNode; titulo: string; texto: string; children?: ReactNode }) {
+  return (
+    <View style={[s.card, s.vazio]}>
+      <View style={s.vazioSelo}>{icone}</View>
+      <Texto variante="rotulo" style={{ textAlign: 'center' }}>
+        {titulo}
+      </Texto>
+      <Texto style={{ textAlign: 'center' }}>{texto}</Texto>
+      {children}
+    </View>
+  );
+}
 
 export function Card({ children, style, elevado }: { children: ReactNode; style?: StyleProp<ViewStyle>; elevado?: boolean }) {
   return <View style={[s.card, elevado && { boxShadow: sombra.elevada }, style]}>{children}</View>;
@@ -39,7 +53,7 @@ export function Botao({
       accessibilityState={{ disabled: !!inativo }}
       disabled={inativo}
       onPress={onPress}
-      style={({ pressed }) => [s.botao, inativo && s.botaoInativo, pressed && { opacity: 0.9, transform: [{ scale: 0.99 }] }]}
+      style={({ pressed }) => [s.botao, inativo && s.botaoInativo, pressed && toque]}
     >
       {carregando ? (
         <ActivityIndicator color="#fff" />
@@ -164,11 +178,13 @@ export function Segmentos({ total, atual }: { total: number; atual: number }) {
 }
 
 const s = StyleSheet.create({
-  caixa: { width: 24, height: 24, borderRadius: 7, borderWidth: 2, borderColor: '#B8C6C5', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff' },
+  caixa: { width: 24, height: 24, borderRadius: 7, borderWidth: 2, borderColor: tema('#B8C6C5', '#4A5B5C'), alignItems: 'center', justifyContent: 'center', backgroundColor: cores.superficie },
   caixaAtiva: { backgroundColor: cores.marca, borderColor: cores.marca },
-  trilhoChave: { width: 48, height: 28, borderRadius: 14, backgroundColor: '#C9D6D5', padding: 3, justifyContent: 'center' },
+  trilhoChave: { width: 48, height: 28, borderRadius: 14, backgroundColor: tema('#C9D6D5', '#3A4849'), padding: 3, justifyContent: 'center' },
   bolinhaChave: { width: 22, height: 22, borderRadius: 11, backgroundColor: '#fff', boxShadow: '0px 1px 3px rgba(0,0,0,0.18)' },
-  card: { backgroundColor: cores.superficie, borderRadius: 24, boxShadow: sombra.card },
+  vazio: { padding: 22, gap: 8, alignItems: 'center' },
+  vazioSelo: { width: 52, height: 52, borderRadius: 26, backgroundColor: cores.marcaSuave, alignItems: 'center', justifyContent: 'center', marginBottom: 4 },
+  card: { backgroundColor: cores.superficie, borderRadius: 24, boxShadow: sombra.card, borderWidth: 1, borderColor: contorno },
   botao: {
     height: 58,
     borderRadius: raio.lg,
@@ -186,7 +202,7 @@ const s = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: raio.md,
-    backgroundColor: 'rgba(255,255,255,0.85)',
+    backgroundColor: vidro(0.85),
     alignItems: 'center',
     justifyContent: 'center',
     boxShadow: sombra.card,

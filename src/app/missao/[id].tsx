@@ -15,7 +15,7 @@ import { RESPONSAVEL_TECNICA } from '@/content/resultados';
 const DICAS_REVISADAS = false;
 import { formatarIdade, idadeDe } from '@/domain/idade';
 import { useApp } from '@/state/app';
-import { cores, fonte, raio, sombra } from '@/theme/tokens';
+import { cores, fonte, raio, sombra, vidro, tema } from '@/theme/tokens';
 
 /** "10 min" → 600 segundos; sem número, 10 minutos. */
 function segundosDe(duracao: string) {
@@ -200,14 +200,14 @@ export default function MissaoTela() {
 const s = StyleSheet.create({
   capa: { marginHorizontal: -20, marginTop: -8, borderBottomLeftRadius: raio.xxl, borderBottomRightRadius: raio.xxl, overflow: 'hidden', backgroundColor: cores.ilustracao },
   capaTopo: { position: 'absolute', top: 10, left: 18, right: 18, flexDirection: 'row', justifyContent: 'space-between' },
-  flutuante: { height: 44, borderRadius: raio.md, backgroundColor: 'rgba(255,255,255,0.9)', flexDirection: 'row', alignItems: 'center', boxShadow: sombra.card },
+  flutuante: { height: 44, borderRadius: raio.md, backgroundColor: vidro(0.9), flexDirection: 'row', alignItems: 'center', boxShadow: sombra.card },
   material: { padding: 20, flexDirection: 'row', gap: 12, alignItems: 'center', borderRadius: raio.lg },
-  materialIcone: { width: 42, height: 42, borderRadius: 14, backgroundColor: '#FBE9E2', alignItems: 'center', justifyContent: 'center' },
+  materialIcone: { width: 42, height: 42, borderRadius: 14, backgroundColor: tema('#FBE9E2', '#3A221B'), alignItems: 'center', justifyContent: 'center' },
   passo: { flexDirection: 'row', gap: 14, alignItems: 'flex-start', paddingVertical: 15 },
   passoLinha: { borderBottomWidth: 1, borderBottomColor: cores.linha },
-  caixa: { width: 26, height: 26, borderRadius: 9, borderWidth: 2, borderColor: '#D3DEDD', alignItems: 'center', justifyContent: 'center', marginTop: -1 },
+  caixa: { width: 26, height: 26, borderRadius: 9, borderWidth: 2, borderColor: tema('#D3DEDD', '#3A4849'), alignItems: 'center', justifyContent: 'center', marginTop: -1 },
   aviso: { padding: 18, borderRadius: raio.lg },
   dica: { padding: 16, borderRadius: raio.lg, backgroundColor: cores.solFundo, borderWidth: 1, borderColor: 'rgba(242,184,75,0.25)' },
-  dicaIcone: { width: 36, height: 36, borderRadius: 12, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' },
-  observar: { gap: 4, padding: 12, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.7)' },
+  dicaIcone: { width: 36, height: 36, borderRadius: 12, backgroundColor: cores.superficie, alignItems: 'center', justifyContent: 'center' },
+  observar: { gap: 4, padding: 12, borderRadius: 12, backgroundColor: vidro(0.7) },
 });

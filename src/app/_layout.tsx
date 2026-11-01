@@ -1,18 +1,20 @@
 import {
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-  Inter_800ExtraBold,
+  Figtree_400Regular,
+  Figtree_500Medium,
+  Figtree_600SemiBold,
+  Figtree_700Bold,
+  Figtree_800ExtraBold,
   useFonts,
-} from '@expo-google-fonts/inter';
+} from '@expo-google-fonts/figtree';
 import { useRouter } from 'expo-router';
 import { Stack } from 'expo-router/stack';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
+import { Appearance, Platform } from 'react-native';
 
 import { atualizarConteudo, registrarEvento } from '@/api/cliente';
+import { AvisoProvider } from '@/components/aviso';
 import { prepararNotificacoes } from '@/servicos/lembrete';
 import { AppProvider, useApp } from '@/state/app';
 import { cores } from '@/theme/tokens';
@@ -21,7 +23,7 @@ SplashScreen.preventAutoHideAsync();
 
 function Navegacao() {
   const { carregando } = useApp();
-  const [fontesProntas] = useFonts({ Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold, Inter_800ExtraBold });
+  const [fontesProntas] = useFonts({ Figtree_400Regular, Figtree_500Medium, Figtree_600SemiBold, Figtree_700Bold, Figtree_800ExtraBold });
   const pronto = fontesProntas && !carregando;
   const router = useRouter();
 
@@ -34,6 +36,13 @@ function Navegacao() {
     return () => desfazer?.();
   }, [pronto, router]);
 
+  // os estilos usam o tema lido ao abrir; no navegador, trocar o tema do sistema recarrega a página
+  useEffect(() => {
+    if (Platform.OS !== 'web') return;
+    const sub = Appearance.addChangeListener(() => window.location.reload());
+    return () => sub.remove();
+  }, []);
+
   useEffect(() => {
     if (!pronto) return;
     SplashScreen.hideAsync();
@@ -45,7 +54,7 @@ function Navegacao() {
   if (!pronto) return null;
   return (
     <>
-      <StatusBar style="dark" />
+      <StatusBar style="auto" />
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: cores.fundo } }} />
     </>
   );
@@ -54,7 +63,9 @@ function Navegacao() {
 export default function RootLayout() {
   return (
     <AppProvider>
-      <Navegacao />
+      <AvisoProvider>
+        <Navegacao />
+      </AvisoProvider>
     </AppProvider>
   );
 }

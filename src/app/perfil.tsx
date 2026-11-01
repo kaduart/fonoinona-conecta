@@ -2,6 +2,8 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { useAviso } from '@/components/aviso';
+import { Confirmacao as FolhaConfirmacao } from '@/components/folha';
 import { Avatar, Icone, ItemLista, irPara } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
@@ -11,7 +13,7 @@ import { formatarIdade, idadeDe } from '@/domain/idade';
 import { definirSons, sonsLigados, tocar } from '@/servicos/sons';
 import { useApp } from '@/state/app';
 import { repositorio, type TriagemSalva } from '@/storage/repositorio';
-import { cores, fonte, raio, sombra } from '@/theme/tokens';
+import { cores, fonte, raio, sombra, tema, fixas } from '@/theme/tokens';
 
 type Confirmacao = 'crianca' | 'tudo' | null;
 
@@ -31,6 +33,7 @@ export default function Perfil() {
   const [confirmar, setConfirmar] = useState<Confirmacao>(null);
   const [apagando, setApagando] = useState(false);
   const [sons, setSons] = useState(true);
+  const { mostrar } = useAviso();
   useFocusEffect(
     useCallback(() => {
       sonsLigados().then(setSons).catch(() => undefined);
@@ -58,9 +61,11 @@ export default function Perfil() {
       if (confirmar === 'tudo') await repositorio.apagarTudo();
       else if (criancaAtual) await repositorio.removerCrianca(criancaAtual.id);
       await recarregar();
+      mostrar(confirmar === 'tudo' ? 'Tudo apagado deste celular.' : 'Dados apagados.');
       irPara(router, '/');
     } catch (e) {
       console.error('[perfil] falha ao apagar', e);
+      mostrar('Não deu para apagar agora. Tente de novo.', 'erro');
     } finally {
       setApagando(false);
       setConfirmar(null);
@@ -126,19 +131,22 @@ export default function Perfil() {
         <View style={s.divisor} />
         <ItemLista icone="livro" titulo="Cópia dos dados" descricao="Para trocar de celular sem perder nada" onPress={() => router.push('/meus-dados')} />
         <View style={s.divisor} />
-        <ItemLista icone="escudo" titulo="Privacidade e dados" descricao="Tudo fica no seu celular" onPress={() => setConfirmar(confirmar ? null : 'crianca')} />
+        <ItemLista icone="escudo" titulo="Privacidade e dados" descricao="Tudo fica no seu celular" onPress={() => setConfirmar('crianca')} />
         <View style={s.divisor} />
         <ItemLista icone="info" titulo="Sobre o app" descricao="Responsável técnica e fontes" onPress={() => router.push('/sobre')} />
       </Card>
 
       <Interruptor valor={sons} onChange={alternarSons} titulo="Sons do app" descricao="Sons curtos e vibração nas conquistas. No iPhone, seguem a chave de silêncio." />
 
-      {confirmar ? (
-        <Card style={{ padding: 16, gap: 12 }}>
-          <Texto variante="rotulo">Seus dados</Texto>
-          <Texto>
-            As respostas e missões ficam só neste celular. Nada é enviado para a clínica sem o seu toque no WhatsApp. Você pode apagar quando quiser, e não dá para desfazer.
-          </Texto>
+      <FolhaConfirmacao
+        aberta={!!confirmar}
+        titulo="Seus dados"
+        texto="As respostas e missões ficam só neste celular. Nada é enviado para a clínica sem o seu toque no WhatsApp. Você pode apagar quando quiser, e não dá para desfazer."
+        acao="Apagar definitivamente"
+        onConfirmar={apagar}
+        onFechar={() => setConfirmar(null)}
+        carregando={apagando}
+      >
           <View style={{ flexDirection: 'row', gap: 8 }}>
             <Pressable accessibilityRole="radio" accessibilityState={{ checked: confirmar === 'crianca' }} onPress={() => setConfirmar('crianca')} style={[s.opcao, confirmar === 'crianca' && s.opcaoAtiva]}>
               <Texto style={[s.opcaoTexto, confirmar === 'crianca' && { color: '#fff' }]}>Só de {criancaAtual?.apelido}</Texto>
@@ -147,13 +155,7 @@ export default function Perfil() {
               <Texto style={[s.opcaoTexto, confirmar === 'tudo' && { color: '#fff' }]}>Tudo do app</Texto>
             </Pressable>
           </View>
-          <Pressable accessibilityRole="button" onPress={apagar} disabled={apagando} style={s.apagar}>
-            <Icone nome="lixo" cor={cores.avaliarTexto} tamanho={18} />
-            <Texto style={{ fontFamily: fonte.negrito, color: cores.avaliarTexto, fontSize: 15 }}>{apagando ? 'Apagando…' : 'Apagar definitivamente'}</Texto>
-          </Pressable>
-          <Botao variante="texto" titulo="Cancelar" onPress={() => setConfirmar(null)} />
-        </Card>
-      ) : null}
+      </FolhaConfirmacao>
     </Tela>
   );
 }
@@ -161,10 +163,9 @@ export default function Perfil() {
 const s = StyleSheet.create({
   crianca: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: raio.lg, backgroundColor: cores.superficie, boxShadow: sombra.card, borderWidth: 1.5, borderColor: 'transparent' },
   criancaAtiva: { borderColor: cores.marca },
-  adicionar: { height: 54, borderRadius: raio.lg, borderWidth: 1.5, borderStyle: 'dashed', borderColor: '#BFDCD5', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
+  adicionar: { height: 54, borderRadius: raio.lg, borderWidth: 1.5, borderStyle: 'dashed', borderColor: tema('#BFDCD5', '#2A4A44'), flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
   divisor: { height: 1, backgroundColor: cores.linha, marginLeft: 68 },
   opcao: { flex: 1, height: 42, borderRadius: raio.md, backgroundColor: cores.neutroFundo, alignItems: 'center', justifyContent: 'center' },
-  opcaoAtiva: { backgroundColor: cores.texto },
+  opcaoAtiva: { backgroundColor: fixas.grafite, borderWidth: tema(0, 1), borderColor: cores.marca },
   opcaoTexto: { fontFamily: fonte.semi, fontSize: 13.5, color: cores.texto2 },
-  apagar: { height: 50, borderRadius: raio.md, backgroundColor: cores.avaliarFundo, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
 });
