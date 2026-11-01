@@ -11,7 +11,7 @@ import { Botao, BotaoVoltar, Card, Chip, Segmentos, SetaDireita } from '@/compon
 import { ALERTAS, ROTULO_AREA, VERSAO_CONTEUDO } from '@/content/perguntas';
 import { formatarIdade, idadeParaTriagem } from '@/domain/idade';
 import { avaliar, faixaPara, personalizar, type Resposta } from '@/domain/triagem';
-import { toqueLeve } from '@/servicos/sons';
+import { marcar } from '@/servicos/sons';
 import { useApp } from '@/state/app';
 import { novoId, repositorio } from '@/storage/repositorio';
 import { cores, fonte, raio, sombra, toque, vidro, tema } from '@/theme/tokens';
@@ -125,7 +125,7 @@ export default function Triagem() {
     : (respostas[pergunta.id] ?? null);
 
   function escolher(valor: string) {
-    toqueLeve();
+    marcar();
     if (ehAlerta) setAlertas((a) => ({ ...a, [pergunta.id]: valor === 'sim' }));
     else setRespostas((r) => ({ ...r, [pergunta.id]: valor as Resposta }));
     // avança sozinho para a próxima (a última espera o "Ver resultado"); a pausa deixa ver a marcação

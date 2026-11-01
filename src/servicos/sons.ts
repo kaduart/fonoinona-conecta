@@ -8,7 +8,7 @@ import { repositorio } from '@/storage/repositorio';
 // Sons curtos de comemoração (criados para o app, sem direitos de terceiros) + vibração leve.
 // Respeitam a chave de silêncio do iPhone e a opção "Sons do app" no Perfil.
 
-export type Som = 'missao' | 'desbloqueio' | 'medalha' | 'conquista' | 'completo' | 'revelacao';
+export type Som = 'missao' | 'desbloqueio' | 'medalha' | 'conquista' | 'completo' | 'revelacao' | 'resposta';
 
 const ARQUIVOS: Record<Som, number> = {
   missao: require('../../assets/sons/missao.wav'),
@@ -17,6 +17,7 @@ const ARQUIVOS: Record<Som, number> = {
   conquista: require('../../assets/sons/conquista.wav'),
   completo: require('../../assets/sons/completo.wav'),
   revelacao: require('../../assets/sons/revelacao.wav'),
+  resposta: require('../../assets/sons/resposta.wav'),
 };
 
 const VIBRACAO: Partial<Record<Som, () => Promise<void>>> = {
@@ -55,6 +56,12 @@ export function toqueLeve(): void {
     .catch(() => undefined);
 }
 
+/** Marcar uma resposta (triagem, Diário): clique suave + vibração leve. Funciona também no navegador. */
+export function marcar(): void {
+  toqueLeve();
+  void tocar('resposta');
+}
+
 /** Toca um som de comemoração (e vibra). Nunca lança erro: som é enfeite. */
 export async function tocar(som: Som): Promise<void> {
   try {
@@ -64,7 +71,7 @@ export async function tocar(som: Som): Promise<void> {
     let p = players.get(som);
     if (!p) {
       p = createAudioPlayer(ARQUIVOS[som]);
-      p.volume = 0.6;
+      p.volume = som === 'resposta' ? 0.35 : 0.6;
       players.set(som, p);
     } else await p.seekTo(0);
     p.play();
