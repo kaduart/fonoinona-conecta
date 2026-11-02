@@ -1,10 +1,8 @@
-import { Appearance } from 'react-native';
-
 /**
- * Tema claro/escuro: segue o aparelho e é lido quando o app abre (os estilos são montados uma vez).
- * No navegador, trocar o tema do sistema recarrega a página (ver _layout).
+ * Tema: o app é sempre claro (regra da clínica: nenhuma tela com fundo escuro),
+ * mesmo com o aparelho em modo escuro. A paleta escura fica guardada, desligada.
  */
-export const escuro = Appearance.getColorScheme() === 'dark';
+export const escuro = false as boolean;
 /** Escolhe o valor do tema atual: tema(claro, escuro). */
 export const tema = <T,>(claro: T, noEscuro: T): T => (escuro ? noEscuro : claro);
 

@@ -19,9 +19,8 @@ type Props = {
 };
 
 /**
- * Ilustração flat 2D com microanimação de fundo.
- * O traço dos personagens é um PNG parado; por cima, a camada Lottie transparente mexe só
- * folhas, balões, brilhos e a onda de som, em loop de 3 s. Com "reduzir movimento", fica parado.
+ * Ilustração flat 2D + line art. A arte é um PNG transparente; quando a cena tem camada
+ * Lottie, ela entra por cima (loop curto). Com "reduzir movimento", fica parado.
  */
 export function CenaAnimada({ cena, style, titulo, legenda, fundo = true }: Props) {
   const c = CENAS[cena];
@@ -35,9 +34,11 @@ export function CenaAnimada({ cena, style, titulo, legenda, fundo = true }: Prop
         accessibilityLabel={c.rotulo}
       >
         <Image source={c.imagem} style={s.arte} resizeMode="contain" accessibilityIgnoresInvertColors />
-        <View style={StyleSheet.absoluteFill} pointerEvents="none">
-          <Lottie dados={c.animacao} />
-        </View>
+        {c.animacao ? (
+          <View style={StyleSheet.absoluteFill} pointerEvents="none">
+            <Lottie dados={c.animacao} />
+          </View>
+        ) : null}
       </Animated.View>
       {titulo || legenda ? (
         <View style={s.textos}>
@@ -51,7 +52,7 @@ export function CenaAnimada({ cena, style, titulo, legenda, fundo = true }: Prop
 
 export const CenaLeitura = (p: Omit<Props, 'cena'>) => <CenaAnimada cena="leitura" {...p} />;
 export const CenaBrincar = (p: Omit<Props, 'cena'>) => <CenaAnimada cena="brincar" {...p} />;
-export const CenaEspelho = (p: Omit<Props, 'cena'>) => <CenaAnimada cena="espelho" {...p} />;
+export const CenaMovimento = (p: Omit<Props, 'cena'>) => <CenaAnimada cena="movimento" {...p} />;
 
 const s = StyleSheet.create({
   palco: { width: '100%', overflow: 'hidden' },

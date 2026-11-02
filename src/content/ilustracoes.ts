@@ -3,15 +3,18 @@ import type { Area } from '@/content/perguntas';
 
 /**
  * Qual cena flat 2D (src/components/animacoes) ilustra cada área da missão.
- * Fala, imitação e motricidade oral: espelho. Compreensão e narrativa: leitura. O resto: brincar.
+ * Linguagem e escuta: leitura (mãe e filho lendo). Gestos e imitação: movimento.
+ * O resto (brincar, interação, alimentação...): brincar (duas crianças com blocos).
  */
 const POR_AREA: Partial<Record<Area, NomeCena>> = {
-  fala: 'espelho',
-  imitacao: 'espelho',
-  motricidade_oral: 'espelho',
+  fala: 'leitura',
   compreensao: 'leitura',
   narrativa: 'leitura',
   consciencia_fonologica: 'leitura',
+  inteligibilidade: 'leitura',
+  audicao: 'leitura',
+  gestos: 'movimento',
+  imitacao: 'movimento',
 };
 
 export function cenaDaArea(area: Area | undefined): NomeCena {
