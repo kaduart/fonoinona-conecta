@@ -70,7 +70,7 @@ export default function Fase() {
       <View style={{ alignItems: 'center', gap: 8 }}>
         {fase ? <Medalha tom={fase.medalha.tom} trancada={!fase.completa} tamanho={86} /> : null}
         <View style={s.selo}>
-          <Texto style={{ fontFamily: fonte.negrito, fontSize: 12, color: cores.marca, letterSpacing: 0.6 }}>FASE {numero}</Texto>
+          <Texto style={{ fontFamily: fonte.negrito, fontSize: 12, color: cores.marca }}>Fase {numero}</Texto>
         </View>
         <Texto variante="titulo" style={{ textAlign: 'center' }}>
           {tema.titulo}
@@ -79,7 +79,7 @@ export default function Fase() {
       </View>
 
       <View style={{ gap: 10 }}>
-        <Texto variante="sobretitulo">FAÇA EM CASA</Texto>
+        <Texto variante="sobretitulo">Faça em casa</Texto>
         {tema.recursos.map((r) => (
           <Card key={r.titulo} style={{ padding: 16, gap: 6 }}>
             <Texto variante="rotulo">{r.titulo}</Texto>
@@ -106,7 +106,7 @@ export default function Fase() {
             <Icone nome="presente" cor={cores.solTexto} tamanho={20} />
           </View>
           <View style={{ flex: 1 }}>
-            <Texto style={{ fontFamily: fonte.negrito, fontSize: 11, letterSpacing: 0.6, color: cores.solTexto }}>EM BREVE</Texto>
+            <Texto style={{ fontFamily: fonte.negrito, fontSize: 12, color: cores.solTexto }}>Em breve</Texto>
             <Texto variante="rotulo">{tema.kit.nome}</Texto>
           </View>
         </View>

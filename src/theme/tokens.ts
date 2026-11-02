@@ -9,17 +9,17 @@ export const escuro = Appearance.getColorScheme() === 'dark';
 export const tema = <T,>(claro: T, noEscuro: T): T => (escuro ? noEscuro : claro);
 
 const claro = {
-  fundo: '#F8FBFB',
+  fundo: '#F7F5F0',
   /** trilhos de barras e casas vazias */
-  fundo2: '#EDF3F2',
-  /** fundo das ilustrações 3D (igual ao delas) */
+  fundo2: '#EDEAE2',
+  /** fundo das ilustrações flat (igual ao da página) */
   ilustracao: '#F7F5F0',
   superficie: '#FFFFFF',
   /** grafite clínico: títulos e textos fortes */
   texto: '#1F2C2D',
   texto2: '#4A5B5C',
   texto3: '#667677',
-  linha: '#E9EFEE',
+  linha: '#E6E2D8',
   marca: '#1F7A6B',
   marcaEscura: '#14564B',
   marcaMedia: '#2E9C87',
@@ -34,7 +34,7 @@ const claro = {
   avaliar: '#FF7A6B',
   avaliarFundo: '#FFECE8',
   avaliarTexto: '#C2412D',
-  neutroFundo: '#EDF3F2',
+  neutroFundo: '#EDEAE2',
   terra: '#E07A5F',
   /** terra para texto (contraste AA sobre branco) */
   terraTexto: '#B5513A',

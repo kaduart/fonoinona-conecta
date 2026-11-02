@@ -95,9 +95,12 @@ export default function Diario() {
 
       <Card style={{ padding: 16, gap: 12 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Texto variante="rotulo" style={{ fontSize: 14 }}>
-            Sequência desta semana 🔥
-          </Texto>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <Texto variante="rotulo" style={{ fontSize: 14 }}>
+              Sequência desta semana
+            </Texto>
+            <Icone nome="fogo" cor={cores.terraTexto} tamanho={15} espessura={2.2} />
+          </View>
           <Texto style={{ fontFamily: fonte.negrito, fontSize: 12.5, color: seguidos ? cores.terraTexto : cores.texto3 }}>
             {seguidos === 1 ? '1 dia seguido' : `${seguidos} dias seguidos`}
           </Texto>
@@ -132,7 +135,7 @@ export default function Diario() {
       {missaoSugerida ? (
         <Card style={{ padding: 16, gap: 10, borderWidth: 1.5, borderColor: cores.marcaSuave }}>
           <Texto variante="legenda">Anotado. Uma brincadeira que pode ajudar:</Texto>
-          <Texto variante="rotulo">🎯 {missaoSugerida.titulo}</Texto>
+          <Texto variante="rotulo">{missaoSugerida.titulo}</Texto>
           <Texto variante="legenda">
             {missaoSugerida.duracao} · {missaoSugerida.rotuloArea}
           </Texto>
@@ -185,7 +188,7 @@ export default function Diario() {
       {grupos.map((g) => (
         <Animated.View key={g.data} style={{ gap: 10 }} entering={FadeIn.duration(220)} layout={LinearTransition.duration(220)}>
           <Texto variante="legenda" style={s.data}>
-            {rotuloDia(g.data, hoje).toUpperCase()}
+            {rotuloDia(g.data, hoje)}
           </Texto>
           {g.registros.map((r) => (
             <CartaoRegistro key={r.id} registro={r} destaque={r.id === conquista} onPress={() => router.push({ pathname: '/diario-anotar', params: { id: r.id } })} />
@@ -284,7 +287,7 @@ const s = StyleSheet.create({
   diaHoje: { backgroundColor: cores.superficie, borderWidth: 2, borderColor: cores.marca },
   filtro: { paddingHorizontal: 13, height: 36, borderRadius: raio.pill, backgroundColor: cores.superficie, borderWidth: 1, borderColor: cores.linha, justifyContent: 'center' },
   filtroAtivo: { backgroundColor: cores.marca, borderColor: cores.marca },
-  data: { fontFamily: fonte.negrito, letterSpacing: 0.6, color: cores.texto3, marginTop: 4 },
+  data: { fontFamily: fonte.negrito, color: cores.texto3, marginTop: 4 },
   registro: { flexDirection: 'row', gap: 12, padding: 16, borderRadius: raio.xl, backgroundColor: cores.superficie, boxShadow: sombra.card },
   registroConquista: { borderWidth: 1.5, borderColor: tema('#F6DFA6', '#4A3A14') },
   registroDestaque: { boxShadow: '0px 0px 24px rgba(242,184,75,0.45)' },
