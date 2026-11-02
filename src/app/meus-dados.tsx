@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 
+import { useAviso } from '@/components/aviso';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
 import { Botao, BotaoVoltar, Card } from '@/components/ui';
@@ -26,6 +27,7 @@ export default function MeusDados() {
   const { recarregar } = useApp();
   const [msg, setMsg] = useState<{ tipo: 'ok' | 'erro'; texto: string } | null>(null);
   const [ocupado, setOcupado] = useState<'exportar' | 'importar' | null>(null);
+  const { mostrar } = useAviso();
   const noCelular = Platform.OS !== 'web';
 
   async function exportar() {
@@ -38,6 +40,7 @@ export default function MeusDados() {
       await arquivo.write(JSON.stringify(montarBackup(await repositorio.exportar(), agora)));
       if (!(await Sharing.isAvailableAsync())) throw new Error('compartilhamento indisponível');
       await Sharing.shareAsync(arquivo.uri, { mimeType: 'application/json', UTI: 'public.json', dialogTitle: 'Guardar cópia do Conecta' });
+      mostrar('Cópia pronta');
       setMsg({ tipo: 'ok', texto: 'Cópia pronta. Guarde em um lugar seguro, como o seu Drive ou iCloud.' });
     } catch (e) {
       console.error('[meus-dados] exportar', e);
@@ -58,6 +61,7 @@ export default function MeusDados() {
       await repositorio.importar(lido.backup);
       await recarregar();
       const n = contarBackup(lido.backup);
+      mostrar('Cópia restaurada');
       setMsg({ tipo: 'ok', texto: `Cópia restaurada: ${n.criancas} ${n.criancas === 1 ? 'criança' : 'crianças'}, ${n.triagens} triagens, ${n.missoes} missões e ${n.diario} anotações. O que já estava no celular foi mantido.` });
     } catch (e) {
       console.error('[meus-dados] importar', e);

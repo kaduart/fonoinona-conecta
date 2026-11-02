@@ -2,10 +2,12 @@ import { Redirect, useRouter } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import Svg, { Circle, G, Line, Path, Text as SvgText } from 'react-native-svg';
 
-import { BarraInferior, ICONE_HUMOR, Icone } from '@/components/navegacao';
+import { BarraInferior, ICONE_HUMOR, Icone, ItemLista } from '@/components/navegacao';
+import { comprimento, LinhaDesenhada, Preenchimento } from '@/components/grafico';
 import { Tela } from '@/components/tela';
+import { Numero } from '@/components/numero';
 import { Texto } from '@/components/texto';
-import { Botao, Card, Chip } from '@/components/ui';
+import { Botao, Card, Chip, Vazio } from '@/components/ui';
 import { MISSOES, ROTULO_COMO_FOI } from '@/content/missoes';
 import { FAIXAS, ROTULO_AREA } from '@/content/perguntas';
 import { TEXTOS_RESULTADO } from '@/content/resultados';
@@ -17,7 +19,7 @@ import type { NivelResultado } from '@/domain/triagem';
 import { useApp } from '@/state/app';
 import { useDadosCrianca } from '@/state/dados';
 import type { TriagemSalva } from '@/storage/repositorio';
-import { cores, fonte, raio } from '@/theme/tokens';
+import { cores, fonte, raio, tema } from '@/theme/tokens';
 
 const ALTURA: Record<NivelResultado, number> = { avaliar: 0, observar: 1, esperado: 2 };
 const COR: Record<NivelResultado, string> = { avaliar: cores.terra, observar: cores.sol, esperado: cores.esperado };
@@ -48,12 +50,12 @@ function Grafico({ triagens }: { triagens: TriagemSalva[] }) {
         </G>
       ))}
       {pontos.length > 1 ? <Path d={`${d} L${x(pontos.length - 1)} 112 L${x(0)} 112 Z`} fill={cores.marca} fillOpacity={0.08} /> : null}
-      <Path d={d} stroke={cores.marca} strokeWidth={3} fill="none" strokeLinejoin="round" strokeLinecap="round" />
+      <LinhaDesenhada d={d} tamanho={comprimento(pontos.map((p, i) => ({ x: x(i), y: y(p.resultado.nivel) })))} stroke={cores.marca} strokeWidth={3} fill="none" strokeLinejoin="round" strokeLinecap="round" />
       {pontos.map((p, i) => {
         const data = new Date(p.criadaEm);
         return (
           <G key={p.id}>
-            <Circle cx={x(i)} cy={y(p.resultado.nivel)} r={6} fill="#fff" stroke={COR[p.resultado.nivel]} strokeWidth={3} />
+            <Circle cx={x(i)} cy={y(p.resultado.nivel)} r={6} fill={cores.superficie} stroke={COR[p.resultado.nivel]} strokeWidth={3} />
             <SvgText x={x(i)} y={126} fontSize={10} fontFamily={fonte.media} fill={cores.texto3} textAnchor="middle">
               {MESES[data.getMonth()]}
             </SvgText>
@@ -64,10 +66,10 @@ function Grafico({ triagens }: { triagens: TriagemSalva[] }) {
   );
 }
 
-function Numero({ valor, rotulo, cor }: { valor: number; rotulo: string; cor: string }) {
+function Indicador({ valor, rotulo, cor }: { valor: number; rotulo: string; cor: string }) {
   return (
     <Card style={{ flex: 1, padding: 14, gap: 2, borderRadius: raio.lg }}>
-      <Texto style={{ fontFamily: fonte.extra, fontSize: 24, color: cor }}>{valor}</Texto>
+      <Numero valor={valor} style={{ fontFamily: fonte.extra, fontSize: 24, color: cor }} />
       <Texto variante="legenda">{rotulo}</Texto>
     </Card>
   );
@@ -79,7 +81,7 @@ function HumorDoMes({ humor }: { humor: { bom: number; normal: number; dificil: 
   if (!total) return null;
   const partes = [
     { chave: 'bom' as const, n: humor.bom, cor: cores.esperado, rotulo: humor.bom === 1 ? 'bom' : 'bons' },
-    { chave: 'normal' as const, n: humor.normal, cor: '#C9D3D6', rotulo: humor.normal === 1 ? 'normal' : 'normais' },
+    { chave: 'normal' as const, n: humor.normal, cor: tema('#C9D3D6', '#4A5B5C'), rotulo: humor.normal === 1 ? 'normal' : 'normais' },
     { chave: 'dificil' as const, n: humor.dificil, cor: cores.sol, rotulo: humor.dificil === 1 ? 'difícil' : 'difíceis' },
   ];
   return (
@@ -138,10 +140,7 @@ export default function Historico() {
           <Grafico triagens={triagens} />
         </Card>
       ) : (
-        <Card style={{ padding: 18, gap: 8 }}>
-          <Texto variante="rotulo">Nenhuma triagem ainda</Texto>
-          <Texto>Faça a primeira para acompanhar a evolução de {nome}.</Texto>
-        </Card>
+        <Vazio icone={<Icone nome="grafico" cor={cores.marca} tamanho={22} />} titulo="Nenhuma triagem ainda" texto={`Faça a primeira para acompanhar a evolução de ${nome}.`} />
       )}
 
       {areas.length ? (
@@ -149,14 +148,14 @@ export default function Historico() {
           <Texto variante="rotulo" style={{ fontSize: 14 }}>
             Por habilidade
           </Texto>
-          {areas.map((a) => (
+          {areas.map((a, i) => (
             <View key={a.area} style={{ gap: 6 }}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                 <Texto style={{ fontFamily: fonte.semi, fontSize: 13, color: cores.texto }}>{a.rotulo}</Texto>
                 <Texto style={{ fontFamily: fonte.semi, fontSize: 13, color: TOM_AREA[a.nivel].texto }}>{TOM_AREA[a.nivel].rotulo}</Texto>
               </View>
               <View style={s.barra}>
-                <View style={[s.barraCheia, { width: `${Math.max(8, a.pontuacao)}%`, backgroundColor: TOM_AREA[a.nivel].cor }]} />
+                <Preenchimento pct={Math.max(8, a.pontuacao)} cor={TOM_AREA[a.nivel].cor} atraso={i * 70} />
               </View>
             </View>
           ))}
@@ -164,10 +163,14 @@ export default function Historico() {
       ) : null}
 
       <View style={{ flexDirection: 'row', gap: 10 }}>
-        <Numero valor={conclusoes.length} rotulo={conclusoes.length === 1 ? 'missão feita' : 'missões feitas'} cor={cores.marca} />
-        <Numero valor={seguidos} rotulo={seguidos === 1 ? 'dia seguido' : 'dias seguidos'} cor={cores.terraTexto} />
-        <Numero valor={medalhas} rotulo={medalhas === 1 ? 'medalha' : 'medalhas'} cor="#B07A10" />
+        <Indicador valor={conclusoes.length} rotulo={conclusoes.length === 1 ? 'missão feita' : 'missões feitas'} cor={cores.marca} />
+        <Indicador valor={seguidos} rotulo={seguidos === 1 ? 'dia seguido' : 'dias seguidos'} cor={cores.terraTexto} />
+        <Indicador valor={medalhas} rotulo={medalhas === 1 ? 'medalha' : 'medalhas'} cor="#B07A10" />
       </View>
+
+      <Card style={{ paddingVertical: 4 }}>
+        <ItemLista icone="estrela" cor={cores.solTexto} fundo={cores.solFundo} titulo="Linha do tempo de conquistas" descricao="Tudo o que vocês celebraram, pronto para mandar à família" onPress={() => router.push('/conquistas')} />
+      </Card>
 
       <Card style={{ padding: 16, gap: 12 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
@@ -183,7 +186,7 @@ export default function Historico() {
               {mes.conquistas ? (
                 <>
                   {' · '}
-                  <Texto style={{ fontFamily: fonte.negrito, color: '#C98A12', fontSize: 14 }}>⭐ {mes.conquistas}</Texto> {mes.conquistas === 1 ? 'conquista' : 'conquistas'}
+                  <Texto style={{ fontFamily: fonte.negrito, color: cores.solTexto, fontSize: 14 }}>⭐ {mes.conquistas}</Texto> {mes.conquistas === 1 ? 'conquista' : 'conquistas'}
                 </>
               ) : null}
             </Texto>
@@ -271,10 +274,9 @@ export default function Historico() {
 }
 
 const s = StyleSheet.create({
-  marco: { width: 16, height: 16, borderRadius: 8, borderWidth: 2, borderColor: '#D3DEDD', backgroundColor: '#fff', marginTop: 16 },
+  marco: { width: 16, height: 16, borderRadius: 8, borderWidth: 2, borderColor: tema('#D3DEDD', '#3A4849'), backgroundColor: cores.superficie, marginTop: 16 },
   trilho: { flex: 1, width: 2, backgroundColor: cores.fundo2, marginTop: 4, marginBottom: -14 },
   proxima: { padding: 14, flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: raio.lg, backgroundColor: cores.marcaSuave, boxShadow: 'none' },
   barra: { height: 9, borderRadius: 5, backgroundColor: cores.fundo2, overflow: 'hidden' },
-  barraCheia: { height: '100%', borderRadius: 5 },
   conclusao: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 6 },
 });

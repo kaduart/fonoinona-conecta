@@ -11,6 +11,7 @@ import { Medidor } from '@/components/medidor';
 import { useProgresso } from '@/components/progresso';
 import { ICONE_AREA, Icone, irPara } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
+import { Lottie } from '@/components/lottie';
 import { Texto } from '@/components/texto';
 import { Botao } from '@/components/ui';
 import { FAIXAS } from '@/content/perguntas';
@@ -32,7 +33,7 @@ import { contarHabilidades, personalizar, type NivelResultado, type ResultadoAre
 import { useSomAoAbrir } from '@/servicos/sons';
 import { useApp } from '@/state/app';
 import { repositorio, type TriagemSalva } from '@/storage/repositorio';
-import { cores, fonte, raio } from '@/theme/tokens';
+import { cores, fonte, raio, tema, sombra } from '@/theme/tokens';
 
 const MARCA = require('../../assets/images/marca.png');
 
@@ -43,7 +44,7 @@ const BADGE: Record<NivelResultado, { fundo: string; borda: string; texto: strin
 };
 const BADGE_CLARO: Record<NivelResultado, { fundo: string; borda: string; texto: string; ponto: string }> = {
   esperado: { fundo: 'rgba(43,181,154,0.12)', borda: 'rgba(43,181,154,0.25)', texto: cores.esperadoTexto, ponto: cores.esperado },
-  observar: { fundo: 'rgba(242,184,75,0.14)', borda: 'rgba(242,184,75,0.32)', texto: '#9A6A0B', ponto: '#F2B84B' },
+  observar: { fundo: 'rgba(242,184,75,0.14)', borda: 'rgba(242,184,75,0.32)', texto: cores.observarTexto, ponto: '#F2B84B' },
   avaliar: { fundo: 'rgba(255,122,107,0.12)', borda: 'rgba(255,122,107,0.28)', texto: cores.avaliarTexto, ponto: cores.avaliar },
 };
 
@@ -167,6 +168,9 @@ export default function ResultadoTela() {
     return (
       <Pressable style={s.intro} onPress={() => setIntro(false)} accessibilityRole="button" accessibilityLabel="Ver resultado">
         <Animated.View style={estiloVoo}>
+          <View pointerEvents="none" style={s.ondas}>
+            <Lottie nome="ondas" tamanho={380} />
+          </View>
           <CelebracaoConquista tamanho={280} />
         </Animated.View>
         <Animated.View style={[{ alignItems: 'center', gap: 10 }, estiloTextoVoo]}>
@@ -367,35 +371,36 @@ export default function ResultadoTela() {
 }
 
 const s = StyleSheet.create({
-  escuro: { backgroundColor: '#fff', borderRadius: 28, padding: 22, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(31,122,107,0.10)', boxShadow: '0px 14px 34px rgba(44, 62, 63, 0.07)' },
+  escuro: { backgroundColor: cores.superficie, borderRadius: 28, padding: 22, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(31,122,107,0.10)', boxShadow: sombra.card },
   avatarAnel: { width: 54, height: 54, borderRadius: 27, padding: 2, backgroundColor: 'rgba(95,195,168,0.55)' },
-  avatar: { flex: 1, borderRadius: 25, backgroundColor: '#1F7A6B', alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#fff' },
+  avatar: { flex: 1, borderRadius: 25, backgroundColor: '#1F7A6B', alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: cores.superficie },
   logo: { width: 40, height: 40, borderRadius: 14, backgroundColor: cores.marcaSuave, alignItems: 'center', justifyContent: 'center' },
   escuroDivisor: { height: 1, backgroundColor: cores.linha, marginTop: 20, marginBottom: 16 },
   badge: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 28, paddingHorizontal: 12, borderRadius: raio.pill, borderWidth: 1 },
   secao: { fontFamily: fonte.extra, fontSize: 17, letterSpacing: -0.3, color: cores.texto },
-  selo: { flexDirection: 'row', alignItems: 'center', gap: 7, height: 34, paddingLeft: 7, paddingRight: 13, borderRadius: raio.pill, backgroundColor: '#fff', borderWidth: 1, borderColor: 'rgba(31,122,107,0.16)', boxShadow: '0px 6px 14px rgba(31, 122, 107, 0.08)' },
+  selo: { flexDirection: 'row', alignItems: 'center', gap: 7, height: 34, paddingLeft: 7, paddingRight: 13, borderRadius: raio.pill, backgroundColor: cores.superficie, borderWidth: 1, borderColor: 'rgba(31,122,107,0.16)', boxShadow: '0px 6px 14px rgba(31, 122, 107, 0.08)' },
   seloCheck: { width: 20, height: 20, borderRadius: 10, backgroundColor: '#2BB59A', alignItems: 'center', justifyContent: 'center' },
-  foco: { backgroundColor: '#fff', borderRadius: 20, padding: 18, gap: 14, boxShadow: '0px 14px 34px rgba(44, 62, 63, 0.07)' },
-  focoIcone: { width: 44, height: 44, borderRadius: 15, backgroundColor: '#FDF3DC', alignItems: 'center', justifyContent: 'center' },
-  trilho: { height: 8, borderRadius: 4, backgroundColor: '#EDF3F2', overflow: 'hidden' },
-  dica: { backgroundColor: '#FFF9EC', borderRadius: 14, paddingVertical: 12, paddingHorizontal: 14, borderWidth: 1, borderColor: 'rgba(242,184,75,0.22)' },
-  ponte: { backgroundColor: '#fff', borderRadius: 24, padding: 20, gap: 14, borderWidth: 1, borderColor: 'rgba(31,122,107,0.12)', boxShadow: '0px 14px 34px rgba(44, 62, 63, 0.07)' },
+  foco: { backgroundColor: cores.superficie, borderRadius: 20, padding: 18, gap: 14, boxShadow: sombra.card },
+  focoIcone: { width: 44, height: 44, borderRadius: 15, backgroundColor: cores.solFundo, alignItems: 'center', justifyContent: 'center' },
+  trilho: { height: 8, borderRadius: 4, backgroundColor: cores.fundo2, overflow: 'hidden' },
+  dica: { backgroundColor: tema('#FFF9EC', '#2A2414'), borderRadius: 14, paddingVertical: 12, paddingHorizontal: 14, borderWidth: 1, borderColor: 'rgba(242,184,75,0.22)' },
+  ponte: { backgroundColor: cores.superficie, borderRadius: 24, padding: 20, gap: 14, borderWidth: 1, borderColor: 'rgba(31,122,107,0.12)', boxShadow: sombra.card },
   ponteRotulo: { fontFamily: fonte.extra, fontSize: 11, letterSpacing: 1.2, color: cores.marca },
   pediatra: { flexDirection: 'row', gap: 10, alignItems: 'flex-start', padding: 12, borderRadius: raio.md, backgroundColor: cores.fundo2 },
-  ponteDivisor: { height: 1, backgroundColor: '#EDF3F2' },
-  luzAvatar: { position: 'absolute', right: -2, bottom: -2, width: 14, height: 14, borderRadius: 7, borderWidth: 2.5, borderColor: '#fff' },
+  ponteDivisor: { height: 1, backgroundColor: cores.fundo2 },
+  luzAvatar: { position: 'absolute', right: -2, bottom: -2, width: 14, height: 14, borderRadius: 7, borderWidth: 2.5, borderColor: cores.superficie },
   passoNum: { width: 24, height: 24, borderRadius: 12, backgroundColor: cores.marca, alignItems: 'center', justifyContent: 'center' },
   passoLinha: { flex: 1, width: 2, backgroundColor: 'rgba(31,122,107,0.18)', marginVertical: 3 },
   codigo: { alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, backgroundColor: cores.marcaSuave, borderWidth: 1, borderStyle: 'dashed', borderColor: 'rgba(31,122,107,0.35)' },
-  opcao: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 16, borderWidth: 1.5, borderColor: '#E3ECEA', backgroundColor: '#fff' },
-  opcaoAtiva: { borderColor: cores.marca, backgroundColor: '#F2FAF7' },
-  caixa: { width: 22, height: 22, borderRadius: 7, borderWidth: 2, borderColor: '#B9C8C6', alignItems: 'center', justifyContent: 'center' },
+  opcao: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 16, borderWidth: 1.5, borderColor: cores.linha, backgroundColor: cores.superficie },
+  opcaoAtiva: { borderColor: cores.marca, backgroundColor: tema('#F2FAF7', '#17302B') },
+  caixa: { width: 22, height: 22, borderRadius: 7, borderWidth: 2, borderColor: tema('#B9C8C6', '#4A5B5C'), alignItems: 'center', justifyContent: 'center' },
   caixaAtiva: { backgroundColor: cores.marca, borderColor: cores.marca },
-  previa: { gap: 4, padding: 14, borderRadius: 14, backgroundColor: '#F2FAF7', borderLeftWidth: 3, borderLeftColor: cores.marca },
-  privacidade: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#F4F8F7', borderRadius: 12, paddingVertical: 10, paddingHorizontal: 12 },
+  previa: { gap: 4, padding: 14, borderRadius: 14, backgroundColor: tema('#F2FAF7', '#17302B'), borderLeftWidth: 3, borderLeftColor: cores.marca },
+  privacidade: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: cores.fundo2, borderRadius: 12, paddingVertical: 10, paddingHorizontal: 12 },
+  ondas: { position: 'absolute', top: -50, left: -50, right: -50, bottom: -50, alignItems: 'center', justifyContent: 'center', opacity: 0.55 },
   intro: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10, padding: 24, backgroundColor: cores.fundo },
-  rt: { flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: '#fff', borderRadius: 20, padding: 16, boxShadow: '0px 12px 30px rgba(44, 62, 63, 0.05)' },
+  rt: { flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: cores.superficie, borderRadius: 20, padding: 16, boxShadow: sombra.card },
   rtAvatar: { width: 50, height: 50, borderRadius: 17, backgroundColor: cores.marcaSuave, alignItems: 'center', justifyContent: 'center' },
   luz: { width: 8, height: 8, borderRadius: 4 },
   cta: { width: '100%', minHeight: 72, borderRadius: 24, overflow: 'hidden', backgroundColor: cores.marca, paddingVertical: 14, paddingLeft: 14, paddingRight: 18, flexDirection: 'row', alignItems: 'center', gap: 14, boxShadow: '0px 16px 32px rgba(31, 122, 107, 0.30)' },

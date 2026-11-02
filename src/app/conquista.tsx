@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import Animated, { FadeInUp, useAnimatedStyle, useReducedMotion, useSharedValue, withDelay, withRepeat, withSequence, withSpring, withTiming } from 'react-native-reanimated';
 
 import { ConfeteAoRedor } from '@/components/animacao';
+import { Lottie } from '@/components/lottie';
 import { Medalha } from '@/components/medalha';
 import { irPara } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
@@ -75,6 +76,9 @@ export default function Conquista() {
       }
     >
       <View style={s.palco} onLayout={(e) => setLargura(e.nativeEvent.layout.width)}>
+        <View pointerEvents="none" style={s.raios}>
+          <Lottie nome="raios" tamanho={PALCO + 40} />
+        </View>
         <Animated.View style={[s.halo, estiloBrilho]} />
         <Animated.View style={estiloMedalha} accessibilityRole="image" accessibilityLabel={`Medalha ${fase.medalha.nome}`}>
           <Medalha tom={fase.medalha.tom} tamanho={170} />
@@ -118,6 +122,7 @@ export default function Conquista() {
 
 const s = StyleSheet.create({
   palco: { height: PALCO, alignItems: 'center', justifyContent: 'center' },
+  raios: { position: 'absolute', alignItems: 'center', justifyContent: 'center' },
   halo: { position: 'absolute', width: 230, height: 230, borderRadius: 115, backgroundColor: 'rgba(242,184,75,0.28)', boxShadow: '0px 0px 60px rgba(242,184,75,0.55)' },
   selo: { paddingHorizontal: 12, height: 26, borderRadius: raio.pill, backgroundColor: cores.marcaSuave, justifyContent: 'center' },
   colecao: { gap: 12, padding: 16, borderRadius: raio.xl, backgroundColor: cores.superficie, marginTop: 4 },

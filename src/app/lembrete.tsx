@@ -2,6 +2,7 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { useAviso } from '@/components/aviso';
 import { Icone } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
@@ -16,6 +17,7 @@ export default function TelaLembrete() {
   const [lembrete, setLembrete] = useState<Lembrete | null>(null);
   const [aviso, setAviso] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
+  const { mostrar } = useAviso();
 
   useFocusEffect(
     useCallback(() => {
@@ -33,7 +35,11 @@ export default function TelaLembrete() {
       if (ativo) {
         const ok = await ligarLembrete(hora);
         if (!ok) setAviso('O celular não permitiu notificações. Você pode liberar nos Ajustes do aparelho.');
-      } else await desligarLembrete();
+        else mostrar(`Lembrete ligado: ${rotuloHorario({ hora, minuto: 0 })}`);
+      } else {
+        await desligarLembrete();
+        mostrar('Lembrete desligado', 'info');
+      }
       setLembrete(await repositorio.lerLembrete());
     } catch (e) {
       console.error('[lembrete] falha', e);

@@ -14,7 +14,7 @@ import { fasesDaTrilha, missoesParaIdade, montarTrilha } from '@/domain/missoes'
 import { useApp } from '@/state/app';
 import { useDadosCrianca } from '@/state/dados';
 import { repositorio } from '@/storage/repositorio';
-import { cores, fonte, raio } from '@/theme/tokens';
+import { cores, fonte, raio, tema } from '@/theme/tokens';
 
 /** Abertura de uma fase: o que ela trabalha, como montar os recursos em casa e o kit (em breve) como conveniência. */
 export default function Fase() {
@@ -127,6 +127,6 @@ export default function Fase() {
 const s = StyleSheet.create({
   selo: { paddingHorizontal: 12, height: 26, borderRadius: raio.pill, backgroundColor: cores.marcaSuave, justifyContent: 'center' },
   aviso: { flexDirection: 'row', gap: 8, padding: 12, borderRadius: raio.md, backgroundColor: cores.observarFundo },
-  kit: { gap: 10, padding: 16, borderRadius: raio.xl, backgroundColor: cores.solFundo, borderWidth: 1.5, borderColor: '#F6DFA6' },
-  kitIcone: { width: 40, height: 40, borderRadius: 14, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' },
+  kit: { gap: 10, padding: 16, borderRadius: raio.xl, backgroundColor: cores.solFundo, borderWidth: 1.5, borderColor: tema('#F6DFA6', '#4A3A14') },
+  kitIcone: { width: 40, height: 40, borderRadius: 14, backgroundColor: cores.superficie, alignItems: 'center', justifyContent: 'center' },
 });

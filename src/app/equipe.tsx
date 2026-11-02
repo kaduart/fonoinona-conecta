@@ -15,7 +15,7 @@ import { formatarIdade, idadeDe } from '@/domain/idade';
 import { faixaPara } from '@/domain/triagem';
 import { useApp } from '@/state/app';
 import { useDadosCrianca } from '@/state/dados';
-import { cores, fonte, raio, sombra } from '@/theme/tokens';
+import { cores, fonte, raio, sombra, toque } from '@/theme/tokens';
 
 const INICIAIS = RESPONSAVEL_TECNICA.nome
   .split(' ')
@@ -64,7 +64,7 @@ export default function Equipe() {
           registrarEvento({ tipo: 'whatsapp_aberto', origem: 'geral' });
           Linking.openURL(linkWhatsAppGeral('geral', formatarIdade(meses))).catch((e) => console.error('[equipe] WhatsApp', e));
         }}
-        style={({ pressed }) => [s.whats, pressed && { opacity: 0.92 }]}
+        style={({ pressed }) => [s.whats, pressed && toque]}
       >
         <View style={s.whatsIcone}>
           <Icone nome="chat" cor="#fff" tamanho={20} />

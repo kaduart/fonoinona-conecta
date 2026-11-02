@@ -4,7 +4,9 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withDelay, withRepeat, withSequence, withSpring, withTiming } from 'react-native-reanimated';
 
 import { BarraInferior, Icone } from '@/components/navegacao';
+import { Preenchimento } from '@/components/grafico';
 import { Tela } from '@/components/tela';
+import { Numero } from '@/components/numero';
 import { Texto } from '@/components/texto';
 import { Medalha } from '@/components/medalha';
 import { Chip } from '@/components/ui';
@@ -15,7 +17,7 @@ import { fasesDaTrilha, MISSOES_POR_FASE, missoesParaIdade, montarTrilha, type I
 import { useSomAoAbrir } from '@/servicos/sons';
 import { useApp } from '@/state/app';
 import { useDadosCrianca } from '@/state/dados';
-import { cores, fonte, raio, sombra } from '@/theme/tokens';
+import { cores, fonte, raio, sombra, toque, vidro } from '@/theme/tokens';
 
 export default function Trilha() {
   const router = useRouter();
@@ -47,15 +49,18 @@ export default function Trilha() {
 
       <View style={s.progresso}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
-          <Texto variante="rotulo" style={{ fontSize: 14 }}>
-            {feitas} de {trilha.length} missões
-          </Texto>
+          <View style={{ flexDirection: 'row', alignItems: 'baseline' }} accessible accessibilityLabel={`${feitas} de ${trilha.length} missões`}>
+            <Numero valor={feitas} style={{ fontFamily: fonte.semi, fontSize: 14, lineHeight: 20, color: cores.texto }} />
+            <Texto variante="rotulo" style={{ fontSize: 14 }}>
+              {' '}de {trilha.length} missões
+            </Texto>
+          </View>
           <Texto variante="legenda">
             {medalhas} {medalhas === 1 ? 'medalha' : 'medalhas'}
           </Texto>
         </View>
         <View style={s.barra}>
-          <View style={[s.barraCheia, { width: `${Math.round(progresso * 100)}%` }]} />
+          <Preenchimento pct={Math.round(progresso * 100)} cor={cores.marca} />
         </View>
         {ultima?.resultado.areaFoco ? <Chip texto={`Foco: ${ROTULO_AREA[ultima.resultado.areaFoco].toLowerCase()}`} /> : null}
       </View>
@@ -70,7 +75,7 @@ export default function Trilha() {
                 accessibilityRole="button"
                 accessibilityLabel={`Fase ${fase.numero}, ${tema.titulo}. Ver o objetivo e os recursos`}
                 onPress={() => router.push({ pathname: '/fase/[numero]', params: { numero: String(fase.numero) } })}
-                style={({ pressed }) => [s.fase, !aberta && { opacity: 0.6 }, pressed && { opacity: 0.75 }]}
+                style={({ pressed }) => [s.fase, !aberta && { opacity: 0.6 }, pressed && toque]}
               >
                 <Medalha tom={fase.medalha.tom} trancada={!fase.completa} tamanho={38} />
                 <View style={{ flex: 1 }}>
@@ -165,7 +170,7 @@ function CartaoMissao({ item, numero, recemAberta, onPress }: { item: ItemTrilha
         accessibilityLabel={`${missao.titulo}${liberada ? '' : ', bloqueada'}${vezes ? ', concluída' : ''}${ativo ? ', acabou de abrir' : ''}`}
         disabled={!liberada}
         onPress={onPress}
-        style={({ pressed }) => [s.missao, !liberada && s.missaoTrancada, pressed && { opacity: 0.8 }]}
+        style={({ pressed }) => [s.missao, !liberada && s.missaoTrancada, pressed && toque]}
       >
         <View style={[s.numero, vezes > 0 && { backgroundColor: cores.marca }, !liberada && { backgroundColor: cores.fundo2 }, ativo && { backgroundColor: cores.solFundo }]}>
           {vezes > 0 ? (
@@ -180,7 +185,7 @@ function CartaoMissao({ item, numero, recemAberta, onPress }: { item: ItemTrilha
         </View>
         <View style={{ flex: 1 }}>
           {ativo ? (
-            <Texto style={{ fontFamily: fonte.negrito, fontSize: 11, letterSpacing: 0.5, color: '#C98A12' }}>NOVA MISSÃO LIBERADA</Texto>
+            <Texto style={{ fontFamily: fonte.negrito, fontSize: 11, letterSpacing: 0.5, color: cores.solTexto }}>NOVA MISSÃO LIBERADA</Texto>
           ) : null}
           <Texto variante="rotulo" style={!liberada && { color: cores.texto3 }}>
             {missao.titulo}
@@ -200,8 +205,7 @@ const s = StyleSheet.create({
   fase: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 4 },
   progresso: { gap: 10, padding: 16, borderRadius: raio.xl, backgroundColor: cores.superficie, boxShadow: sombra.card },
   barra: { height: 9, borderRadius: 5, backgroundColor: cores.fundo2, overflow: 'hidden' },
-  barraCheia: { height: '100%', borderRadius: 5, backgroundColor: cores.marca },
   missao: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 14, borderRadius: raio.lg, backgroundColor: cores.superficie, boxShadow: sombra.card },
-  missaoTrancada: { backgroundColor: 'rgba(255,255,255,0.5)', boxShadow: 'none', borderWidth: 1, borderColor: cores.linha },
+  missaoTrancada: { backgroundColor: vidro(0.5), boxShadow: 'none', borderWidth: 1, borderColor: cores.linha },
   numero: { width: 42, height: 42, borderRadius: 14, backgroundColor: cores.marcaSuave, alignItems: 'center', justifyContent: 'center' },
 });
