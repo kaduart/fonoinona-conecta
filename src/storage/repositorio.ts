@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { FILA_VAZIA, type Fila } from '@/api/fila';
 import { mesclar, type ConteudoBackup } from '@/domain/backup';
+import type { AtividadeCasa, Ciclo } from '@/domain/casa';
 import type { RegistroDiario } from '@/domain/diario';
 import type { Conclusao } from '@/domain/missoes';
 import { chaveDoAparelho, descartarChave, novoNonce } from '@/storage/chave';
@@ -48,6 +49,8 @@ const CHAVES = {
   kitInteresse: 'conecta:kit-interesse:v1',
   lembrete: 'conecta:lembrete:v1',
   sons: 'conecta:sons:v1',
+  ciclos: 'conecta:ciclos:v1',
+  atividades: 'conecta:atividades-casa:v1',
 } as const;
 
 export type Lembrete = { ativo: boolean; hora: number; minuto: number; notificacaoId: string | null };
@@ -136,6 +139,34 @@ export const repositorio = {
     await gravar(CHAVES.diario, todos.filter((x) => x.id !== id));
   },
 
+  /** Ciclos de sessões da criança, do mais recente para o mais antigo. O atual é o primeiro. */
+  listarCiclos: async (criancaId: string) => {
+    const todos = await ler<Ciclo[]>(CHAVES.ciclos, []);
+    return todos.filter((c) => c.criancaId === criancaId).sort((a, b) => b.iniciadoEm.localeCompare(a.iniciadoEm));
+  },
+
+  /** Cria ou atualiza (idempotente pelo id). */
+  async salvarCiclo(c: Ciclo) {
+    const todos = await ler<Ciclo[]>(CHAVES.ciclos, []);
+    await gravar(CHAVES.ciclos, [...todos.filter((x) => x.id !== c.id), c]);
+  },
+
+  listarAtividades: async (criancaId: string) => {
+    const todas = await ler<AtividadeCasa[]>(CHAVES.atividades, []);
+    return todas.filter((a) => a.criancaId === criancaId).sort((a, b) => a.criadaEm.localeCompare(b.criadaEm));
+  },
+
+  async salvarAtividade(a: AtividadeCasa) {
+    const todas = await ler<AtividadeCasa[]>(CHAVES.atividades, []);
+    await gravar(CHAVES.atividades, [...todas.filter((x) => x.id !== a.id), a]);
+  },
+
+  /** Tira a atividade da lista. Os "Fizemos!" já anotados ficam no Diário. */
+  async removerAtividade(id: string) {
+    const todas = await ler<AtividadeCasa[]>(CHAVES.atividades, []);
+    await gravar(CHAVES.atividades, todas.filter((x) => x.id !== id));
+  },
+
   /** Fases em que a família pediu aviso do kit (lista de espera local; a contagem anônima vai pela telemetria). */
   listarKitInteresse: () => ler<number[]>(CHAVES.kitInteresse, []),
 
@@ -152,13 +183,15 @@ export const repositorio = {
 
   /** Tudo o que é da família, para a cópia (sem chave, fila de eventos ou id da instalação). */
   async exportar(): Promise<ConteudoBackup> {
-    const [criancas, triagens, conclusoes, diario] = await Promise.all([
+    const [criancas, triagens, conclusoes, diario, ciclos, atividades] = await Promise.all([
       repositorio.listarCriancas(),
       ler<TriagemSalva[]>(CHAVES.triagens, []),
       ler<Conclusao[]>(CHAVES.conclusoes, []),
       ler<RegistroDiario[]>(CHAVES.diario, []),
+      ler<Ciclo[]>(CHAVES.ciclos, []),
+      ler<AtividadeCasa[]>(CHAVES.atividades, []),
     ]);
-    return { criancas, triagens, conclusoes, diario };
+    return { criancas, triagens, conclusoes, diario, ciclos, atividades };
   },
 
   /** Restaura uma cópia já conferida (lerBackup), somando ao que existe. Idempotente. */
@@ -169,6 +202,8 @@ export const repositorio = {
       gravar(CHAVES.triagens, mesclar(atual.triagens, c.triagens)),
       gravar(CHAVES.conclusoes, mesclar(atual.conclusoes, c.conclusoes)),
       gravar(CHAVES.diario, mesclar(atual.diario, c.diario)),
+      gravar(CHAVES.ciclos, mesclar(atual.ciclos ?? [], c.ciclos ?? [])),
+      gravar(CHAVES.atividades, mesclar(atual.atividades ?? [], c.atividades ?? [])),
     ]);
   },
 
@@ -189,13 +224,17 @@ export const repositorio = {
 
   /** Remove uma criança e tudo dela (triagens, missões e Diário). */
   async removerCrianca(id: string) {
-    const [criancas, triagens, conclusoes, diario] = await Promise.all([
+    const [criancas, triagens, conclusoes, diario, ciclos, atividades] = await Promise.all([
       repositorio.listarCriancas(),
       ler<TriagemSalva[]>(CHAVES.triagens, []),
       ler<Conclusao[]>(CHAVES.conclusoes, []),
       ler<RegistroDiario[]>(CHAVES.diario, []),
+      ler<Ciclo[]>(CHAVES.ciclos, []),
+      ler<AtividadeCasa[]>(CHAVES.atividades, []),
     ]);
     await Promise.all([
+      gravar(CHAVES.ciclos, ciclos.filter((c) => c.criancaId !== id)),
+      gravar(CHAVES.atividades, atividades.filter((a) => a.criancaId !== id)),
       gravar(CHAVES.criancas, criancas.filter((c) => c.id !== id)),
       gravar(CHAVES.triagens, triagens.filter((t) => t.criancaId !== id)),
       gravar(CHAVES.conclusoes, conclusoes.filter((c) => c.criancaId !== id)),

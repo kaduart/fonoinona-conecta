@@ -10,8 +10,11 @@ import { Texto } from '@/components/texto';
 import { Botao, Card, Chip } from '@/components/ui';
 import { TEXTOS_RESULTADO } from '@/content/resultados';
 import { contarHabilidades } from '@/domain/triagem';
-import { IlustracaoViva } from '@/components/animacao';
-import { chaveDaArea, ilustracaoDaArea, PROPORCAO, videoDaArea } from '@/content/ilustracoes';
+import { CenaAnimada } from '@/components/animacoes/CenaAnimada';
+import { CardRenovacao } from '@/components/CardRenovacao';
+import { TherapyTrail } from '@/components/TherapyTrail';
+import { feitasNaSemana, progressoCiclo } from '@/domain/casa';
+import { cenaDaArea } from '@/content/ilustracoes';
 import { ROTULO_AREA } from '@/content/perguntas';
 import { formatarDataCurta, proximaTriagem } from '@/domain/acompanhamento';
 import { codigoContato, linkWhatsApp, linkWhatsAppGeral } from '@/domain/contato';
@@ -75,6 +78,11 @@ export default function Inicio() {
     Linking.openURL(url).catch((e) => console.error('[inicio] WhatsApp', e));
   }
   const indice = criancas.findIndex((c) => c.id === criancaAtual.id);
+  const ciclo = dados?.ciclo ?? null;
+  const pCiclo = ciclo ? progressoCiclo(ciclo) : null;
+  const atividadesCasa = dados?.atividades ?? [];
+  const casaFeitas = atividadesCasa.reduce((n, a) => n + Math.min(feitasNaSemana(a.id, dados?.diario ?? [], hoje), a.vezesSemana), 0);
+  const casaMeta = atividadesCasa.reduce((n, a) => n + a.vezesSemana, 0);
 
   return (
     <Tela rodape={<BarraInferior />}>
@@ -90,9 +98,12 @@ export default function Inicio() {
         <Texto style={s.manchete}>Hoje é dia de brincar e conversar juntos.</Texto>
       </View>
 
+      {/* gatilho de 80%: salta no topo quando faltam até 20% das sessões do ciclo */}
+      {pCiclo?.estagio === 'quase' ? <CardRenovacao restantes={pCiclo.restantes} /> : null}
+
       {doDia ? (
         <View style={s.heroi}>
-          <IlustracaoViva fonte={ilustracaoDaArea(doDia.areas[0])} proporcao={PROPORCAO[chaveDaArea(doDia.areas[0])]} video={videoDaArea(doDia.areas[0])} style={{ marginTop: 18 }} />
+          <CenaAnimada cena={cenaDaArea(doDia.areas[0])} fundo={false} style={{ marginTop: 18 }} />
           <View style={[s.selo, { left: 14 }]}>
             <Icone nome="estrela" cor={cores.marca} tamanho={12} cheio />
             <Texto style={{ fontFamily: fonte.semi, fontSize: 12, color: cores.marca }}>Missão do dia</Texto>
@@ -223,6 +234,41 @@ export default function Inicio() {
           ) : null}
         </View>
       </Card>
+
+      <Pressable accessibilityRole="button" accessibilityLabel="Abrir o ciclo de sessões" onPress={() => router.push('/ciclo')} style={({ pressed }) => [s.resultado, pressed && toque]}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
+          <Texto variante="rotulo" style={{ fontSize: 14 }}>
+            Ciclo de sessões{ciclo ? ` · fase ${ciclo.fase}` : ''}
+          </Texto>
+          {pCiclo ? (
+            <Texto style={{ fontFamily: fonte.negrito, fontSize: 13, color: cores.marca }}>
+              {pCiclo.feitas}/{pCiclo.total}
+            </Texto>
+          ) : null}
+        </View>
+        {pCiclo ? (
+          <TherapyTrail total={pCiclo.total} feitas={pCiclo.feitas} compacto />
+        ) : (
+          <Texto variante="legenda">Marque cada sessão na clínica e acompanhe a trilha do pacote.</Texto>
+        )}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <Texto style={{ fontFamily: fonte.negrito, fontSize: 14, color: cores.marca }}>{pCiclo ? (pCiclo.estagio === 'completo' ? 'Ver fase concluída' : 'Marcar sessão') : 'Começar a trilha'}</Texto>
+          <Icone nome="seta" cor={cores.marca} tamanho={14} espessura={2.6} />
+        </View>
+      </Pressable>
+
+      <Pressable accessibilityRole="button" accessibilityLabel="Abrir as atividades de casa" onPress={() => router.push('/casa')} style={({ pressed }) => [s.triagem, pressed && toque]}>
+        <View style={[s.triagemIcone, { backgroundColor: cores.marcaSuave }]}>
+          <Icone nome="casa" cor={cores.marca} tamanho={20} />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Texto variante="rotulo" style={{ fontSize: 14 }}>
+            Para fazer em casa
+          </Texto>
+          <Texto variante="legenda">{atividadesCasa.length ? `${casaFeitas} de ${casaMeta} nesta semana` : 'Anote o que a terapeuta pediu e marque “Fizemos!”'}</Texto>
+        </View>
+        <Icone nome="seta" cor={cores.texto3} tamanho={16} espessura={2.4} />
+      </Pressable>
 
       {dificeis.length ? (
         <Card style={{ padding: 16, gap: 8, borderWidth: 1, borderColor: cores.observarFundo }}>

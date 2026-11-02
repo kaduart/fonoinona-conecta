@@ -90,6 +90,8 @@ export default function DiarioAnotar() {
     conquista,
     nota,
     ...(missao ? { missaoId: missao.id } : {}),
+    // "Fizemos!" aberto para acrescentar como foi: continua ligado à atividade de casa
+    ...(existente?.atividadeId ? { atividadeId: existente.atividadeId, atividadeTitulo: existente.atividadeTitulo } : {}),
     criadoEm: existente?.criadoEm ?? agoraIso,
     editadoEm: agoraIso,
   };
