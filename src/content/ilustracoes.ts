@@ -1,40 +1,19 @@
-import type { ImageSourcePropType } from 'react-native';
-
+import type { NomeCena } from '@/components/animacoes/cenas';
 import type { Area } from '@/content/perguntas';
 
-/** Ilustrações 3D do app, no estilo e nas cores da logo (fundo #F6F9FA). */
-export const ILUSTRACOES = {
-  brincar: require('../../assets/images/ilustracoes/pai-vaca.png'),
-  imitar: require('../../assets/images/ilustracoes/espelho.png'),
-  ler: require('../../assets/images/ilustracoes/mae-livro.png'),
-  falar: require('../../assets/images/ilustracoes/cabeca.png'),
-} satisfies Record<string, ImageSourcePropType>;
-
-/** Proporção (largura / altura) de cada ilustração. */
-export const PROPORCAO: Record<keyof typeof ILUSTRACOES, number> = { brincar: 1168 / 880, imitar: 1168 / 880, ler: 1168 / 880, falar: 1 };
-
-const POR_AREA: Partial<Record<Area, keyof typeof ILUSTRACOES>> = {
-  fala: 'imitar',
-  imitacao: 'imitar',
-  motricidade_oral: 'imitar',
-  compreensao: 'ler',
-  narrativa: 'ler',
-  consciencia_fonologica: 'ler',
+/**
+ * Qual cena flat 2D (src/components/animacoes) ilustra cada área da missão.
+ * Fala, imitação e motricidade oral: espelho. Compreensão e narrativa: leitura. O resto: brincar.
+ */
+const POR_AREA: Partial<Record<Area, NomeCena>> = {
+  fala: 'espelho',
+  imitacao: 'espelho',
+  motricidade_oral: 'espelho',
+  compreensao: 'leitura',
+  narrativa: 'leitura',
+  consciencia_fonologica: 'leitura',
 };
 
-export function chaveDaArea(area: Area | undefined): keyof typeof ILUSTRACOES {
+export function cenaDaArea(area: Area | undefined): NomeCena {
   return (area && POR_AREA[area]) || 'brincar';
-}
-
-export function ilustracaoDaArea(area: Area | undefined): ImageSourcePropType {
-  return ILUSTRACOES[chaveDaArea(area)];
-}
-
-/** Cenas com vídeo em loop (mudo). As demais usam só a imagem animada. */
-export const VIDEOS: Partial<Record<keyof typeof ILUSTRACOES, number>> = {
-  imitar: require('../../assets/videos/espelho.mp4'),
-};
-
-export function videoDaArea(area: Area | undefined) {
-  return VIDEOS[chaveDaArea(area)] ?? null;
 }

@@ -120,6 +120,15 @@ export default function Diario() {
         <Texto variante="legenda">Vale missão feita ou dia anotado no Diário.</Texto>
       </Card>
 
+      <Pressable accessibilityRole="button" onPress={() => router.push('/casa')} style={({ pressed }) => [s.lembrete, { marginTop: 0 }, pressed && toque]}>
+        <Icone nome="casa" cor={cores.marca} tamanho={18} />
+        <View style={{ flex: 1 }}>
+          <Texto style={{ fontFamily: fonte.negrito, fontSize: 14, color: cores.texto }}>Para fazer em casa</Texto>
+          <Texto variante="legenda">{dados?.atividades.length ? 'Marque “Fizemos!” nas atividades da semana.' : 'Anote o que a terapeuta pediu.'}</Texto>
+        </View>
+        <Icone nome="seta" cor={cores.texto3} tamanho={16} />
+      </Pressable>
+
       {missaoSugerida ? (
         <Card style={{ padding: 16, gap: 10, borderWidth: 1.5, borderColor: cores.marcaSuave }}>
           <Texto variante="legenda">Anotado. Uma brincadeira que pode ajudar:</Texto>
@@ -157,7 +166,7 @@ export default function Diario() {
       {!registros.length && dados ? (
         <Card style={{ padding: 20, alignItems: 'center', gap: 10 }}>
           <View style={s.ilustracao}>
-            <Image source={require('../../assets/images/ilustracoes/mae-livro.png')} style={{ width: 200, height: 160 }} resizeMode="contain" accessibilityIgnoresInvertColors />
+            <Image source={require('../../assets/images/ilustracoes/leitura.png')} style={{ width: 220, height: 138 }} resizeMode="contain" accessibilityIgnoresInvertColors />
           </View>
           <Texto variante="rotulo" style={{ textAlign: 'center' }}>
             Sua cápsula do tempo
@@ -225,7 +234,7 @@ function CartaoRegistro({ registro: r, destaque, onPress }: { registro: Registro
       </View>
       <View style={{ flex: 1, gap: 4 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-          <Texto variante="rotulo">{r.conquista ? 'Conquista!' : ROTULO_CONTEXTO[r.contexto]}</Texto>
+          <Texto variante="rotulo">{r.conquista ? 'Conquista!' : r.atividadeId ? 'Fizemos!' : ROTULO_CONTEXTO[r.contexto]}</Texto>
           {r.humor ? (
             <View style={[s.humor, r.humor === 'dificil' ? { backgroundColor: cores.observarFundo } : r.humor === 'normal' ? { backgroundColor: cores.neutroFundo } : null]}>
               <Texto style={{ fontFamily: fonte.negrito, fontSize: 12, color: r.humor === 'dificil' ? cores.observarTexto : r.humor === 'normal' ? cores.texto2 : cores.marca }}>{ROTULO_HUMOR[r.humor]}</Texto>
@@ -238,6 +247,7 @@ function CartaoRegistro({ registro: r, destaque, onPress }: { registro: Registro
           </Texto>
         ) : null}
         {missao ? <Texto variante="legenda">Missão: {missao.titulo}</Texto> : null}
+        {r.atividadeTitulo ? <Texto variante="legenda">Atividade de casa: {r.atividadeTitulo}</Texto> : null}
         {r.areas.length || r.conquista ? (
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 2 }}>
             {r.conquista ? (

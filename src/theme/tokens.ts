@@ -13,7 +13,7 @@ const claro = {
   /** trilhos de barras e casas vazias */
   fundo2: '#EDF3F2',
   /** fundo das ilustrações 3D (igual ao delas) */
-  ilustracao: '#F6F9FA',
+  ilustracao: '#F7F5F0',
   superficie: '#FFFFFF',
   /** grafite clínico: títulos e textos fortes */
   texto: '#1F2C2D',
@@ -50,7 +50,7 @@ const noEscuro: Paleta = {
   fundo: '#0E1516',
   fundo2: '#1E2A2B',
   // as ilustrações 3D têm fundo claro embutido: o quadro delas continua claro
-  ilustracao: '#F6F9FA',
+  ilustracao: '#F7F5F0',
   superficie: '#162021',
   texto: '#E9F1F0',
   texto2: '#B3C2C1',
