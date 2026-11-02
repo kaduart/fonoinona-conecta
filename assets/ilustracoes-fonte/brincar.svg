@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="90 160 1020 640" width="1020" height="640">
+  <defs>
+    <g id="folha"><path d="M0 0 C18 -26 56 -28 84 0 C56 28 18 26 0 0 Z"/><path d="M4 0 L76 0" fill="none"/></g>
+    <path id="brilho" d="M0 -16 C2 -5 5 -2 16 0 C5 2 2 5 0 16 C-2 5 -5 2 -16 0 C-5 -2 -2 -5 0 -16 Z"/>
+  </defs>
+  
+  <g stroke="#1D4F48" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M340 760 V520 A260 260 0 0 1 860 520 V760 Z" fill="#E3ECE7" stroke="none"/>
+    <path d="M395 760 V540 A205 205 0 0 1 805 540 V760" fill="none" stroke="#1F7A6B" stroke-width="1.6" opacity=".55"/>
+    <path d="M170 760 V640 A110 110 0 0 1 390 640 V760 Z" fill="#1F7A6B" opacity=".12" stroke="none"/>
+    <circle cx="930" cy="250" r="44" fill="#EADFC8" stroke="none"/>
+    <circle cx="930" cy="250" r="60" fill="none" stroke-width="1.4" opacity=".5"/>
+    <!-- plantas -->
+    <path d="M990 760 C1000 650 975 560 960 470" fill="none"/>
+    <path d="M215 760 C208 710 222 660 232 620" fill="none"/>
+    <path d="M120 760 H1080" fill="none"/>
+    <!-- tapete -->
+    <rect x="330" y="732" width="560" height="28" rx="14" fill="#EADFC8"/>
+
+    <!-- PAI (sentado de pernas cruzadas) -->
+    <path d="M384 704 Q480 680 576 704 Q596 744 552 748 H408 Q364 744 384 704 Z" fill="#2F5D57"/>
+    <ellipse cx="420" cy="742" rx="20" ry="9" fill="#F7F5F0"/>
+    <ellipse cx="540" cy="742" rx="20" ry="9" fill="#F7F5F0"/>
+    <path d="M430 482 Q480 462 530 482 L548 708 H412 Z" fill="#CFE0D8"/>
+    <rect x="469" y="452" width="22" height="30" rx="8" fill="#E8C3A0"/>
+    <circle cx="474" cy="426" r="42" fill="#2B3A38"/>
+    <circle cx="488" cy="436" r="36" fill="#E8C3A0"/>
+    <path d="M452 420 Q470 392 512 404" fill="none" stroke="#2B3A38" stroke-width="12"/>
+    <path d="M466 452 Q488 478 516 456 Q514 470 490 474 Q470 472 466 452 Z" fill="#2B3A38" stroke="none"/>
+    <path d="M500 436 q6 5 12 0" fill="none" stroke-width="2.4"/>
+    <circle cx="512" cy="452" r="5" fill="#E7A98C" stroke="none" opacity=".7"/>
+    <!-- braço apoiado no joelho -->
+    <path d="M440 492 L420 590 L436 676" fill="none" stroke-width="27"/>
+    <path d="M440 492 L420 590 L436 676" fill="none" stroke="#CFE0D8" stroke-width="22"/>
+    <circle cx="438" cy="682" r="12" fill="#E8C3A0"/>
+
+    <!-- blocos -->
+    <rect x="592" y="672" width="62" height="60" rx="6" fill="#1F7A6B"/>
+    <rect x="600" y="620" width="48" height="52" rx="6" fill="#EADFC8"/>
+    <circle cx="624" cy="646" r="10" fill="none" stroke-width="2"/>
+    <path d="M598 610 L648 610 L623 566 Z" fill="#CFE0D8"/>
+    <rect x="684" y="708" width="30" height="24" rx="5" fill="#D9CBB0"/>
+    <!-- braço que coloca o bloco -->
+    <path d="M522 492 L572 560 L598 598" fill="none" stroke-width="27"/>
+    <path d="M522 492 L572 560 L598 598" fill="none" stroke="#CFE0D8" stroke-width="22"/>
+    <circle cx="600" cy="600" r="12" fill="#E8C3A0"/>
+
+    <!-- CRIANÇA -->
+    <path d="M690 706 H796 Q804 744 784 746 H702 Q682 744 690 706 Z" fill="#D9CBB0"/>
+    <circle cx="704" cy="738" r="13" fill="#B07A57"/>
+    <circle cx="782" cy="738" r="13" fill="#B07A57"/>
+    <path d="M704 576 Q743 562 782 576 L796 712 H690 Z" fill="#1F7A6B"/>
+    <rect x="734" y="550" width="18" height="24" rx="7" fill="#B07A57"/>
+    <g fill="#2B3A38"><circle cx="746" cy="520" r="32"/><circle cx="712" cy="500" r="16"/><circle cx="782" cy="504" r="16"/></g>
+    <circle cx="736" cy="530" r="27" fill="#B07A57"/>
+    <path d="M719 526 q5 -5 10 0" fill="none" stroke-width="2.4"/>
+    <path d="M722 545 q6 5 12 0" fill="none" stroke-width="2.2"/>
+    <circle cx="722" cy="540" r="5" fill="#E7A98C" stroke="none" opacity=".7"/>
+    <!-- braço apontando -->
+    <path d="M710 588 L684 548 L668 524" fill="none" stroke-width="23"/>
+    <path d="M710 588 L684 548 L668 524" fill="none" stroke="#1F7A6B" stroke-width="18"/>
+    <circle cx="665" cy="520" r="10" fill="#B07A57"/>
+    <path d="M778 588 L796 644 L780 694" fill="none" stroke-width="23"/>
+    <path d="M778 588 L796 644 L780 694" fill="none" stroke="#1F7A6B" stroke-width="18"/>
+    <circle cx="778" cy="698" r="10" fill="#B07A57"/>
+
+    <!-- brilhos do tesouro -->
+    
+    
+    
+    <circle cx="300" cy="420" r="6" fill="none"/>
+    <path d="M1040 380 l10 -10 M1050 380 l-10 -10"/>
+  </g>
+</svg>

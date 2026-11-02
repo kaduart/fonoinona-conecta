@@ -10,11 +10,11 @@ import { Texto } from '@/components/texto';
 import { Botao, Card, Chip } from '@/components/ui';
 import { TEXTOS_RESULTADO } from '@/content/resultados';
 import { contarHabilidades } from '@/domain/triagem';
-import { IlustracaoViva } from '@/components/animacao';
+import { CenaAnimada } from '@/components/animacoes/CenaAnimada';
 import { CardRenovacao } from '@/components/CardRenovacao';
 import { TherapyTrail } from '@/components/TherapyTrail';
 import { feitasNaSemana, progressoCiclo } from '@/domain/casa';
-import { chaveDaArea, ilustracaoDaArea, PROPORCAO, videoDaArea } from '@/content/ilustracoes';
+import { cenaDaArea } from '@/content/ilustracoes';
 import { ROTULO_AREA } from '@/content/perguntas';
 import { formatarDataCurta, proximaTriagem } from '@/domain/acompanhamento';
 import { codigoContato, linkWhatsApp, linkWhatsAppGeral } from '@/domain/contato';
@@ -103,7 +103,7 @@ export default function Inicio() {
 
       {doDia ? (
         <View style={s.heroi}>
-          <IlustracaoViva fonte={ilustracaoDaArea(doDia.areas[0])} proporcao={PROPORCAO[chaveDaArea(doDia.areas[0])]} video={videoDaArea(doDia.areas[0])} style={{ marginTop: 18 }} />
+          <CenaAnimada cena={cenaDaArea(doDia.areas[0])} fundo={false} style={{ marginTop: 18 }} />
           <View style={[s.selo, { left: 14 }]}>
             <Icone nome="estrela" cor={cores.marca} tamanho={12} cheio />
             <Texto style={{ fontFamily: fonte.semi, fontSize: 12, color: cores.marca }}>Missão do dia</Texto>

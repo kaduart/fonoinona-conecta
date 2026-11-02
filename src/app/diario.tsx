@@ -166,7 +166,7 @@ export default function Diario() {
       {!registros.length && dados ? (
         <Card style={{ padding: 20, alignItems: 'center', gap: 10 }}>
           <View style={s.ilustracao}>
-            <Image source={require('../../assets/images/ilustracoes/mae-livro.png')} style={{ width: 200, height: 160 }} resizeMode="contain" accessibilityIgnoresInvertColors />
+            <Image source={require('../../assets/images/ilustracoes/leitura.png')} style={{ width: 220, height: 138 }} resizeMode="contain" accessibilityIgnoresInvertColors />
           </View>
           <Texto variante="rotulo" style={{ textAlign: 'center' }}>
             Sua cápsula do tempo

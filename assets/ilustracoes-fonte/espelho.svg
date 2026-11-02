@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="90 160 1020 640" width="1020" height="640">
+  <defs><g id="folha"><path d="M0 0 C18 -26 56 -28 84 0 C56 28 18 26 0 0 Z"/><path d="M4 0 L76 0" fill="none"/></g></defs>
+  
+  <g stroke="#1D4F48" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M330 760 V500 A270 270 0 0 1 870 500 V760 Z" fill="#E3ECE7" stroke="none"/>
+    <path d="M800 760 V610 A110 110 0 0 1 1020 610 V760 Z" fill="#1F7A6B" opacity=".12" stroke="none"/>
+    <circle cx="270" cy="270" r="42" fill="#EADFC8" stroke="none"/>
+    <circle cx="270" cy="270" r="58" fill="none" stroke-width="1.4" opacity=".5"/>
+    <!-- espelho na parede -->
+    <ellipse cx="600" cy="360" rx="78" ry="98" fill="#F7F5F0"/>
+    <ellipse cx="600" cy="360" rx="64" ry="84" fill="#CFE0D8" opacity=".7"/>
+    <path d="M566 330 L596 296 M570 360 L612 312" fill="none" stroke="#F7F5F0" stroke-width="5"/>
+    <!-- plantas -->
+    <path d="M200 760 C192 670 214 590 226 520" fill="none"/>
+    <path d="M1010 760 C1018 700 1002 640 990 590" fill="none"/>
+    <path d="M120 760 H1080" fill="none"/>
+    <rect x="320" y="732" width="560" height="28" rx="14" fill="#EADFC8"/>
+
+    <!-- MÃE -->
+    <path d="M374 704 Q470 680 566 704 Q586 744 542 748 H398 Q354 744 374 704 Z" fill="#D9CBB0"/>
+    <ellipse cx="410" cy="742" rx="20" ry="9" fill="#2B3A38"/>
+    <ellipse cx="530" cy="742" rx="20" ry="9" fill="#2B3A38"/>
+    <rect x="424" y="420" width="70" height="104" rx="30" fill="#5A3B2E"/>
+    <path d="M420 484 Q470 464 520 484 L538 708 H402 Z" fill="#1F7A6B"/>
+    <rect x="459" y="454" width="22" height="30" rx="8" fill="#9C6A4E"/>
+    <circle cx="460" cy="428" r="44" fill="#5A3B2E"/>
+    <circle cx="476" cy="440" r="36" fill="#9C6A4E"/>
+    <path d="M442 418 Q466 392 508 410" fill="none" stroke="#5A3B2E" stroke-width="12"/>
+    <path d="M488 436 q6 -5 12 0" fill="none" stroke-width="2.4"/>
+    <ellipse cx="504" cy="458" rx="5" ry="6" fill="#1D4F48" stroke="none"/>
+    <circle cx="492" cy="454" r="5" fill="#E7A98C" stroke="none" opacity=".7"/>
+    <path d="M430 494 L410 590 L426 676" fill="none" stroke-width="27"/>
+    <path d="M430 494 L410 590 L426 676" fill="none" stroke="#1F7A6B" stroke-width="22"/>
+    <circle cx="428" cy="682" r="12" fill="#9C6A4E"/>
+    <path d="M512 494 L560 566 L600 604" fill="none" stroke-width="27"/>
+    <path d="M512 494 L560 566 L600 604" fill="none" stroke="#1F7A6B" stroke-width="22"/>
+    <circle cx="604" cy="606" r="12" fill="#9C6A4E"/>
+
+    <!-- BEBÊ -->
+    <path d="M700 712 H788 Q796 746 778 748 H710 Q692 746 700 712 Z" fill="#CFE0D8"/>
+    <circle cx="712" cy="740" r="12" fill="#E8C3A0"/>
+    <circle cx="776" cy="740" r="12" fill="#E8C3A0"/>
+    <path d="M708 604 Q744 592 780 604 L790 716 H698 Z" fill="#EADFC8"/>
+    <rect x="735" y="580" width="16" height="22" rx="6" fill="#E8C3A0"/>
+    <circle cx="742" cy="550" r="33" fill="#E8C3A0"/>
+    <path d="M744 518 q10 -14 22 -4" fill="none" stroke="#2B3A38" stroke-width="5"/>
+    <path d="M722 548 q5 -5 10 0" fill="none" stroke-width="2.4"/>
+    <ellipse cx="718" cy="568" rx="4" ry="5" fill="#1D4F48" stroke="none"/>
+    <circle cx="730" cy="564" r="5" fill="#E7A98C" stroke="none" opacity=".7"/>
+    <path d="M714 616 L688 640 L672 630" fill="none" stroke-width="22"/>
+    <path d="M714 616 L688 640 L672 630" fill="none" stroke="#EADFC8" stroke-width="17"/>
+    <circle cx="668" cy="628" r="10" fill="#E8C3A0"/>
+    <path d="M776 616 L794 664 L780 704" fill="none" stroke-width="22"/>
+    <path d="M776 616 L794 664 L780 704" fill="none" stroke="#EADFC8" stroke-width="17"/>
+    <circle cx="778" cy="708" r="10" fill="#E8C3A0"/>
+
+    <!-- onda de som e balões -->
+    
+    
+    
+    <circle cx="905" cy="430" r="6" fill="none"/>
+    <path d="M140 410 l10 -10 M150 410 l-10 -10"/>
+  </g>
+</svg>
