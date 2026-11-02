@@ -48,6 +48,20 @@
       "typedRoutes": true,
       "reactCompiler": true
     },
-    "description": "Triagem do desenvolvimento da fala e missões para fazer em casa, da Clínica Fono Inova."
+    "description": "Triagem do desenvolvimento da fala e missões para fazer em casa, da Clínica Fono Inova.",
+    "runtimeVersion": {
+      "policy": "fingerprint"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/bc4efe17-b61f-4ed5-a368-819a3bb605a6",
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
+    },
+    "extra": {
+      "eas": {
+        "projectId": "bc4efe17-b61f-4ed5-a368-819a3bb605a6"
+      }
+    },
+    "owner": "kaduart"
   }
 }

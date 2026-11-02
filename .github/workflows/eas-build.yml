@@ -1,9 +1,13 @@
 name: Build EAS (loja)
 
-# Botão manual: Actions › "Build EAS (loja)" › Run workflow.
+# Botão manual (ou automático, ver push abaixo): Actions › "Build EAS (loja)" › Run workflow.
 # Precisa do secret EXPO_TOKEN (expo.dev › Account settings › Access tokens).
 # O build roda nos servidores da Expo; o link aparece no log e em expo.dev.
 on:
+  # Automático: merge na main que muda dependência ou config nativa (precisa de app novo na loja).
+  push:
+    branches: [main]
+    paths: [package.json, app.json, eas.json]
   workflow_dispatch:
     inputs:
       platform:
@@ -18,12 +22,12 @@ on:
         default: production
 
 concurrency:
-  group: eas-build-${{ inputs.platform }}-${{ inputs.profile }}
+  group: eas-build-${{ inputs.platform || 'android' }}-${{ inputs.profile || 'production' }}
   cancel-in-progress: false
 
 jobs:
   build:
-    name: EAS ${{ inputs.platform }} (${{ inputs.profile }})
+    name: EAS ${{ inputs.platform || 'android' }} (${{ inputs.profile || 'production' }})
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -60,4 +64,4 @@ jobs:
           fi
 
       - name: eas build
-        run: eas build --platform ${{ inputs.platform }} --profile ${{ inputs.profile }} --non-interactive --no-wait
+        run: eas build --platform ${{ inputs.platform || 'android' }} --profile ${{ inputs.profile || 'production' }} --non-interactive --no-wait
