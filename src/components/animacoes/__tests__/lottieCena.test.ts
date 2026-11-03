@@ -1,4 +1,4 @@
-import { animado, composicao, folha, QUADROS } from '../lottieCena';
+import { animado, composicao, folha, ondas, QUADROS } from '../lottieCena';
 
 describe('microanimações em código', () => {
   it('fecha o loop: primeiro e último quadro iguais', () => {
@@ -18,5 +18,17 @@ describe('microanimações em código', () => {
     const json = composicao('teste', [folha(0, 0, 0, 1, '#1F7A6B'), folha(10, 10, 0, 1, '#1F7A6B')]);
     expect((json.layers as { ind: number }[]).map((l) => l.ind)).toEqual([1, 2]);
     expect(JSON.stringify(json).length).toBeLessThan(10_000);
+  });
+});
+
+describe('ondas de som', () => {
+  it('cria 3 arcos que somem e voltam no mesmo ponto do ciclo', () => {
+    const camadas = ondas(100, 100, 0, '#1F7A6B') as unknown as { ks: { o: { k: { s: number[] }[] } } }[];
+    expect(camadas).toHaveLength(3);
+    for (const c of camadas) {
+      const op = c.ks.o.k.map((q) => q.s[0]);
+      expect(op[0]).toBeCloseTo(op[op.length - 1], 3);
+      expect(Math.min(...op)).toBe(0);
+    }
   });
 });

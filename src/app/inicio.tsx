@@ -92,9 +92,12 @@ export default function Inicio() {
       </View>
 
       <View>
-        <Texto style={{ fontFamily: fonte.media, fontSize: 14, color: cores.texto2 }}>
-          {saudacao(hoje.getHours())}, família de {nome} ☀️
-        </Texto>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <Texto style={{ fontFamily: fonte.media, fontSize: 14, color: cores.texto2 }}>
+            {saudacao(hoje.getHours())}, família de {nome}
+          </Texto>
+          <Icone nome="sol" cor={cores.sol} tamanho={16} />
+        </View>
         <Texto style={s.manchete}>Hoje é dia de brincar e conversar juntos.</Texto>
       </View>
 
@@ -110,7 +113,8 @@ export default function Inicio() {
           </View>
           {seguidos > 0 ? (
             <View style={[s.selo, { right: 14, backgroundColor: vidro(0.9) }]}>
-              <Texto style={{ fontFamily: fonte.negrito, fontSize: 12, color: cores.terraTexto }}>🔥 {seguidos === 1 ? '1 dia' : `${seguidos} dias`}</Texto>
+              <Icone nome="fogo" cor={cores.terraTexto} tamanho={13} espessura={2.2} />
+              <Texto style={{ fontFamily: fonte.negrito, fontSize: 12, color: cores.terraTexto }}>{seguidos === 1 ? '1 dia' : `${seguidos} dias`}</Texto>
             </View>
           ) : null}
           <Pressable
@@ -185,8 +189,8 @@ export default function Inicio() {
             Sua semana
           </Texto>
           <View style={[s.chama, seguidos === 0 && { backgroundColor: cores.fundo2 }]} accessibilityLabel={`${seguidos} dias seguidos`}>
+            {seguidos ? <Icone nome="fogo" cor={cores.terraTexto} tamanho={13} espessura={2.2} /> : null}
             <Texto style={{ fontFamily: fonte.negrito, fontSize: 12, color: seguidos ? cores.terraTexto : cores.texto3 }}>
-              {seguidos ? '🔥 ' : ''}
               {seguidos === 1 ? '1 dia seguido' : `${seguidos} dias seguidos`}
             </Texto>
           </View>
@@ -213,7 +217,7 @@ export default function Inicio() {
         <View style={s.meta}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
             <Texto style={{ fontFamily: fonte.semi, fontSize: 13, color: cores.texto }}>
-              {metaBatida ? 'Meta da semana batida! 🎉' : `Meta: ${META_SEMANAL} dias na semana`}
+              {metaBatida ? 'Meta da semana batida!' : `Meta: ${META_SEMANAL} dias na semana`}
             </Texto>
             <View style={{ flexDirection: 'row' }} accessible accessibilityLabel={`${Math.min(feitosNaSemana, META_SEMANAL)} de ${META_SEMANAL}`}>
               <Numero valor={Math.min(feitosNaSemana, META_SEMANAL)} style={{ fontFamily: fonte.negrito, fontSize: 12.5, lineHeight: 18, color: metaBatida ? cores.marca : cores.texto2 }} />
@@ -235,40 +239,70 @@ export default function Inicio() {
         </View>
       </Card>
 
-      <Pressable accessibilityRole="button" accessibilityLabel="Abrir o ciclo de sessões" onPress={() => router.push('/ciclo')} style={({ pressed }) => [s.resultado, pressed && toque]}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
-          <Texto variante="rotulo" style={{ fontSize: 14 }}>
-            Ciclo de sessões{ciclo ? ` · fase ${ciclo.fase}` : ''}
-          </Texto>
-          {pCiclo ? (
-            <Texto style={{ fontFamily: fonte.negrito, fontSize: 13, color: cores.marca }}>
-              {pCiclo.feitas}/{pCiclo.total}
+      {/* atalhos secundários num bloco só: a missão do dia é o destaque da tela */}
+      <View style={s.grupo}>
+        <Pressable accessibilityRole="button" accessibilityLabel="Abrir o ciclo de sessões" onPress={() => router.push('/ciclo')} style={({ pressed }) => [s.item, { flexDirection: 'column', alignItems: 'stretch', gap: 8 }, pressed && toque]}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
+            <Texto variante="rotulo" style={{ fontSize: 14 }}>
+              Ciclo de sessões{ciclo ? ` · fase ${ciclo.fase}` : ''}
             </Texto>
-          ) : null}
-        </View>
-        {pCiclo ? (
-          <TherapyTrail total={pCiclo.total} feitas={pCiclo.feitas} compacto />
-        ) : (
-          <Texto variante="legenda">Marque cada sessão na clínica e acompanhe a trilha do pacote.</Texto>
-        )}
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-          <Texto style={{ fontFamily: fonte.negrito, fontSize: 14, color: cores.marca }}>{pCiclo ? (pCiclo.estagio === 'completo' ? 'Ver fase concluída' : 'Marcar sessão') : 'Começar a trilha'}</Texto>
-          <Icone nome="seta" cor={cores.marca} tamanho={14} espessura={2.6} />
-        </View>
-      </Pressable>
+            {pCiclo ? (
+              <Texto style={{ fontFamily: fonte.negrito, fontSize: 13, color: cores.marca }}>
+                {pCiclo.feitas}/{pCiclo.total}
+              </Texto>
+            ) : null}
+          </View>
+          {pCiclo ? (
+            <TherapyTrail total={pCiclo.total} feitas={pCiclo.feitas} compacto />
+          ) : (
+            <Texto variante="legenda">Marque cada sessão na clínica e acompanhe a trilha do pacote.</Texto>
+          )}
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <Texto style={{ fontFamily: fonte.negrito, fontSize: 14, color: cores.marca }}>{pCiclo ? (pCiclo.estagio === 'completo' ? 'Ver fase concluída' : 'Marcar sessão') : 'Começar a trilha'}</Texto>
+            <Icone nome="seta" cor={cores.marca} tamanho={14} espessura={2.6} />
+          </View>
+        </Pressable>
 
-      <Pressable accessibilityRole="button" accessibilityLabel="Abrir as atividades de casa" onPress={() => router.push('/casa')} style={({ pressed }) => [s.triagem, pressed && toque]}>
-        <View style={[s.triagemIcone, { backgroundColor: cores.marcaSuave }]}>
-          <Icone nome="casa" cor={cores.marca} tamanho={20} />
-        </View>
-        <View style={{ flex: 1 }}>
-          <Texto variante="rotulo" style={{ fontSize: 14 }}>
-            Para fazer em casa
-          </Texto>
-          <Texto variante="legenda">{atividadesCasa.length ? `${casaFeitas} de ${casaMeta} nesta semana` : 'Anote o que a terapeuta pediu e marque “Fizemos!”'}</Texto>
-        </View>
-        <Icone nome="seta" cor={cores.texto3} tamanho={16} espessura={2.4} />
-      </Pressable>
+        <Pressable accessibilityRole="button" accessibilityLabel="Abrir as atividades de casa" onPress={() => router.push('/casa')} style={({ pressed }) => [s.item, s.divisor, pressed && toque]}>
+          <View style={[s.triagemIcone, { backgroundColor: cores.marcaSuave }]}>
+            <Icone nome="casa" cor={cores.marca} tamanho={20} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Texto variante="rotulo" style={{ fontSize: 14 }}>
+              Para fazer em casa
+            </Texto>
+            <Texto variante="legenda">{atividadesCasa.length ? `${casaFeitas} de ${casaMeta} nesta semana` : 'Anote o que a terapeuta pediu e marque “Fizemos!”'}</Texto>
+          </View>
+          <Icone nome="seta" cor={cores.texto3} tamanho={16} espessura={2.4} />
+        </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => (proxima.disponivel ? router.push('/triagem') : irPara(router, '/historico'))}
+          style={({ pressed }) => [s.item, s.divisor, pressed && toque]}
+        >
+          <View style={s.triagemIcone}>
+            <Icone nome="relogio" cor="#C98A12" tamanho={20} />
+          </View>
+          <View style={{ flex: 1 }}>
+            {proxima.disponivel ? (
+              <>
+                <Texto variante="rotulo" style={{ fontSize: 14 }}>
+                  {proxima.motivo === 'primeira' ? 'Faça a primeira triagem' : 'Nova triagem disponível'}
+                </Texto>
+                <Texto variante="legenda">{proxima.motivo === 'nova_faixa' ? `${nome} entrou numa nova faixa de idade.` : 'Leva uns 3 minutos.'}</Texto>
+              </>
+            ) : (
+              <>
+                <Texto variante="rotulo" style={{ fontSize: 14 }}>
+                  Nova triagem em {diasAte(proxima.data, hoje)} dias
+                </Texto>
+                <Texto variante="legenda">{proxima.motivo === 'observar' ? `Em ${formatarDataCurta(proxima.data)}, para ver a evolução.` : `Em ${formatarDataCurta(proxima.data)}, quando ${nome} mudar de faixa.`}</Texto>
+              </>
+            )}
+          </View>
+          <Icone nome="seta" cor={cores.texto3} tamanho={16} espessura={2.4} />
+        </Pressable>
+      </View>
 
       {dificeis.length ? (
         <Card style={{ padding: 16, gap: 8, borderWidth: 1, borderColor: cores.observarFundo }}>
@@ -287,33 +321,6 @@ export default function Inicio() {
         </Card>
       ) : null}
 
-      <Pressable
-        accessibilityRole="button"
-        onPress={() => (proxima.disponivel ? router.push('/triagem') : irPara(router, '/historico'))}
-        style={({ pressed }) => [s.triagem, pressed && toque]}
-      >
-        <View style={s.triagemIcone}>
-          <Icone nome="relogio" cor="#C98A12" tamanho={20} />
-        </View>
-        <View style={{ flex: 1 }}>
-          {proxima.disponivel ? (
-            <>
-              <Texto variante="rotulo" style={{ fontSize: 14 }}>
-                {proxima.motivo === 'primeira' ? 'Faça a primeira triagem' : 'Nova triagem disponível'}
-              </Texto>
-              <Texto variante="legenda">{proxima.motivo === 'nova_faixa' ? `${nome} entrou numa nova faixa de idade.` : 'Leva uns 3 minutos.'}</Texto>
-            </>
-          ) : (
-            <>
-              <Texto variante="rotulo" style={{ fontSize: 14 }}>
-                Nova triagem em {diasAte(proxima.data, hoje)} dias
-              </Texto>
-              <Texto variante="legenda">{proxima.motivo === 'observar' ? `Em ${formatarDataCurta(proxima.data)}, para ver a evolução.` : `Em ${formatarDataCurta(proxima.data)}, quando ${nome} mudar de faixa.`}</Texto>
-            </>
-          )}
-        </View>
-        <Icone nome="seta" cor={cores.texto3} tamanho={16} espessura={2.4} />
-      </Pressable>
     </Tela>
   );
 }
@@ -321,7 +328,7 @@ export default function Inicio() {
 const s = StyleSheet.create({
   cabecalho: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginTop: 4 },
   manchete: { fontFamily: fonte.extra, fontSize: 25, lineHeight: 30, letterSpacing: -0.6, color: cores.texto, marginTop: 2 },
-  heroi: { borderRadius: raio.xxl, backgroundColor: cores.ilustracao, overflow: 'hidden', boxShadow: sombra.card },
+  heroi: { borderRadius: raio.xxl, backgroundColor: cores.superficie, overflow: 'hidden', boxShadow: sombra.card },
   selo: { position: 'absolute', top: 14, flexDirection: 'row', alignItems: 'center', gap: 6, height: 26, paddingHorizontal: 11, borderRadius: raio.pill, backgroundColor: cores.marcaSuave },
   heroiCartao: {
     marginTop: -34,
@@ -344,6 +351,8 @@ const s = StyleSheet.create({
   diaHoje: { backgroundColor: 'transparent', borderWidth: 2, borderStyle: 'dashed', borderColor: cores.marca },
   resultado: { gap: 8, padding: 16, borderRadius: raio.lg, backgroundColor: cores.superficie, boxShadow: sombra.card },
   foco: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 10, borderRadius: 12, backgroundColor: cores.marcaSuave },
-  triagem: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: raio.lg, backgroundColor: cores.superficie, boxShadow: sombra.card },
+  grupo: { borderRadius: raio.lg, backgroundColor: cores.superficie, boxShadow: sombra.card, overflow: 'hidden' },
+  item: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingVertical: 14 },
+  divisor: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: cores.linha },
   triagemIcone: { width: 40, height: 40, borderRadius: 13, backgroundColor: cores.solFundo, alignItems: 'center', justifyContent: 'center' },
 });

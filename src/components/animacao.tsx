@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Image, type ImageSourcePropType, View } from 'react-native';
+import Svg, { Path, Polygon } from 'react-native-svg';
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -13,31 +14,60 @@ import Animated, {
 } from 'react-native-reanimated';
 
 type Sprite = { fonte: ImageSourcePropType; x: number; y: number; w: number; h: number };
+type Caixa = { x: number; y: number; w: number; h: number };
 
 /**
- * Peças de quebra-cabeça recortadas da ilustração da conquista, com a posição
- * original na arte de 1024x1024. A estrela fica numa imagem separada.
+ * Peças de quebra-cabeça da conquista, em flat 2D com o mesmo traço das ilustrações.
+ * Posição na arte de 1024x1024 (a mesma da versão antiga, para o arranjo não mudar).
  */
-const PECAS: Sprite[] = [
-  { fonte: require('../../assets/images/ilustracoes/conquista/peca1.png'), x: 192, y: 116, w: 176, h: 170 },
-  { fonte: require('../../assets/images/ilustracoes/conquista/peca2.png'), x: 753, y: 592, w: 161, h: 157 },
-  { fonte: require('../../assets/images/ilustracoes/conquista/peca3.png'), x: 80, y: 390, w: 147, h: 150 },
-  { fonte: require('../../assets/images/ilustracoes/conquista/peca4.png'), x: 810, y: 386, w: 141, h: 156 },
-  { fonte: require('../../assets/images/ilustracoes/conquista/peca5.png'), x: 145, y: 651, w: 138, h: 149 },
-  { fonte: require('../../assets/images/ilustracoes/conquista/peca6.png'), x: 713, y: 149, w: 122, h: 142 },
-  { fonte: require('../../assets/images/ilustracoes/conquista/peca7.png'), x: 536, y: 68, w: 110, h: 121 },
-  { fonte: require('../../assets/images/ilustracoes/conquista/peca8.png'), x: 705, y: 722, w: 106, h: 110 },
-  { fonte: require('../../assets/images/ilustracoes/conquista/peca9.png'), x: 828, y: 277, w: 99, h: 86 },
-  { fonte: require('../../assets/images/ilustracoes/conquista/peca10.png'), x: 115, y: 282, w: 93, h: 81 },
-  { fonte: require('../../assets/images/ilustracoes/conquista/peca11.png'), x: 201, y: 538, w: 89, h: 71 },
-  { fonte: require('../../assets/images/ilustracoes/conquista/peca12.png'), x: 638, y: 234, w: 48, h: 77 },
-  { fonte: require('../../assets/images/ilustracoes/conquista/peca13.png'), x: 425, y: 163, w: 64, h: 61 },
-  { fonte: require('../../assets/images/ilustracoes/conquista/peca14.png'), x: 725, y: 533, w: 60, h: 64 },
-  { fonte: require('../../assets/images/ilustracoes/conquista/peca15.png'), x: 102, y: 585, w: 60, h: 56 },
+const PECAS: Caixa[] = [
+  { x: 192, y: 116, w: 176, h: 170 },
+  { x: 753, y: 592, w: 161, h: 157 },
+  { x: 80, y: 390, w: 147, h: 150 },
+  { x: 810, y: 386, w: 141, h: 156 },
+  { x: 145, y: 651, w: 138, h: 149 },
+  { x: 713, y: 149, w: 122, h: 142 },
+  { x: 536, y: 68, w: 110, h: 121 },
+  { x: 705, y: 722, w: 106, h: 110 },
+  { x: 828, y: 277, w: 99, h: 86 },
+  { x: 115, y: 282, w: 93, h: 81 },
+  { x: 201, y: 538, w: 89, h: 71 },
+  { x: 638, y: 234, w: 48, h: 77 },
+  { x: 425, y: 163, w: 64, h: 61 },
+  { x: 725, y: 533, w: 60, h: 64 },
+  { x: 102, y: 585, w: 60, h: 56 },
 ];
-const ESTRELA = { fonte: require('../../assets/images/ilustracoes/conquista/estrela.png'), x: 240, y: 190, w: 550, h: 750 };
+const ESTRELA: Caixa = { x: 240, y: 190, w: 550, h: 750 };
 const ARTE = 1024;
 const CENTRO = { x: 512, y: 560 };
+
+const TRACO = '#1D4F48';
+const CORES_PECA = ['#1F7A6B', '#CFE0D8', '#EADFC8', '#2E9C87', '#F2B84B'];
+/** Peça com encaixe em cima e à direita e recorte à esquerda. */
+const PECA_D = 'M20 32 H40 C38 18 60 18 58 32 H78 V50 C92 48 92 70 78 68 V86 H20 V68 C32 70 32 48 20 50 Z';
+
+function PecaFlat({ cor }: { cor: string }) {
+  return (
+    <Svg width="100%" height="100%" viewBox="10 14 88 78">
+      <Path d={PECA_D} fill={cor} stroke={TRACO} strokeWidth={3} strokeLinejoin="round" />
+    </Svg>
+  );
+}
+
+const PONTAS_ESTRELA = Array.from({ length: 10 }, (_, i) => {
+  const a = -Math.PI / 2 + (i * Math.PI) / 5;
+  const r = i % 2 ? 19 : 44;
+  return `${(50 + r * Math.cos(a)).toFixed(1)},${(54 + r * Math.sin(a)).toFixed(1)}`;
+}).join(' ');
+
+function EstrelaFlat() {
+  return (
+    <Svg width="100%" height="100%" viewBox="0 0 100 100">
+      <Polygon points={PONTAS_ESTRELA} fill="#F2B84B" stroke={TRACO} strokeWidth={2.6} strokeLinejoin="round" />
+      <Path d="M38 44 L46 36" stroke="#FFF6DE" strokeWidth={3} strokeLinecap="round" />
+    </Svg>
+  );
+}
 
 /** Flutua devagar para cima e para baixo, sem fim. */
 function useFlutuar(amplitude: number, duracao: number, atraso = 0) {
@@ -53,7 +83,7 @@ function useFlutuar(amplitude: number, duracao: number, atraso = 0) {
   return y;
 }
 
-function Peca({ peca, escala, indice }: { peca: (typeof PECAS)[number]; escala: number; indice: number }) {
+function Peca({ peca, escala, indice }: { peca: Caixa; escala: number; indice: number }) {
   const reduzir = useReducedMotion();
   const p = useSharedValue(reduzir ? 1 : 0);
   const giro0 = (indice % 2 ? 1 : -1) * (90 + indice * 17);
@@ -75,7 +105,7 @@ function Peca({ peca, escala, indice }: { peca: (typeof PECAS)[number]; escala: 
   }));
   return (
     <Animated.View style={[{ position: 'absolute', left: peca.x * escala, top: peca.y * escala, width: peca.w * escala, height: peca.h * escala }, estilo]}>
-      <Image source={peca.fonte} style={{ width: '100%', height: '100%' }} />
+      <PecaFlat cor={CORES_PECA[indice % CORES_PECA.length]} />
     </Animated.View>
   );
 }
@@ -99,7 +129,7 @@ export function CelebracaoConquista({ tamanho = 260 }: { tamanho?: number }) {
   return (
     <View style={{ width: tamanho, height: tamanho, alignSelf: 'center' }} accessibilityLabel="Estrela de conquista" accessibilityRole="image">
       <Animated.View style={[{ position: 'absolute', left: ESTRELA.x * escala, top: ESTRELA.y * escala, width: ESTRELA.w * escala, height: ESTRELA.h * escala }, estilo]}>
-        <Image source={ESTRELA.fonte} style={{ width: '100%', height: '100%' }} />
+        <EstrelaFlat />
       </Animated.View>
       {PECAS.map((peca, i) => (
         <Peca key={i} peca={peca} escala={escala} indice={i} />
@@ -228,7 +258,7 @@ function Confete({ largura, altura, indice }: { largura: number; altura: number;
   }));
   return (
     <Animated.View pointerEvents="none" style={[{ position: 'absolute', left: largura * c.x, top: altura * c.y, width: lado, height: (lado * peca.h) / peca.w }, estilo]}>
-      <Image source={peca.fonte} style={{ width: '100%', height: '100%' }} />
+      <PecaFlat cor={CORES_PECA[c.peca % CORES_PECA.length]} />
     </Animated.View>
   );
 }

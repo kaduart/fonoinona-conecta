@@ -141,7 +141,7 @@ function CartaoAtividade({ atividade: a, registros, onFeito, onRemover }: { ativ
 
       <View style={{ gap: 6 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
-          <Texto style={{ fontFamily: fonte.semi, fontSize: 13, color: cores.texto }}>{bateu ? 'Meta da semana feita! 🎉' : 'Nos últimos 7 dias'}</Texto>
+          <Texto style={{ fontFamily: fonte.semi, fontSize: 13, color: cores.texto }}>{bateu ? 'Meta da semana feita!' : 'Nos últimos 7 dias'}</Texto>
           <View style={{ flexDirection: 'row' }} accessible accessibilityLabel={`${Math.min(feitas, meta)} de ${meta} nesta semana`}>
             <Numero valor={Math.min(feitas, meta)} style={{ fontFamily: fonte.negrito, fontSize: 13, lineHeight: 18, color: bateu ? cores.marca : cores.texto2 }} />
             <Texto variante="legenda" style={{ fontFamily: fonte.negrito, color: bateu ? cores.marca : cores.texto2 }}>

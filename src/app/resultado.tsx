@@ -95,7 +95,7 @@ function CardFoco({ a, animar = false, atraso = 0 }: { a: ResultadoArea; animar?
       {DICA_AREA[a.area] ? (
         <View style={s.dica}>
           <Texto style={{ fontSize: 13, lineHeight: 19, color: cores.texto }}>
-            <Texto style={{ fontFamily: fonte.extra, fontSize: 13, color: cores.solTexto }}>💡 Dica da Fono: </Texto>
+            <Texto style={{ fontFamily: fonte.extra, fontSize: 13, color: cores.solTexto }}>Dica da Fono: </Texto>
             {DICA_AREA[a.area]}
           </Texto>
         </View>
@@ -292,7 +292,7 @@ export default function ResultadoTela() {
 
       {/* 4. Ponte para a clínica: quem responde e o que acontece ao tocar no botão */}
       <Animated.View style={s.ponte} entering={revelar ? FadeInUp.delay(2800).duration(450) : undefined}>
-        <Texto style={s.ponteRotulo}>{PONTE_CLINICA.rotulo.toUpperCase()}</Texto>
+        <Texto style={s.ponteRotulo}>{PONTE_CLINICA.rotulo}</Texto>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
           <View>
             <View style={s.rtAvatar}>
@@ -385,7 +385,7 @@ const s = StyleSheet.create({
   trilho: { height: 8, borderRadius: 4, backgroundColor: cores.fundo2, overflow: 'hidden' },
   dica: { backgroundColor: tema('#FFF9EC', '#2A2414'), borderRadius: 14, paddingVertical: 12, paddingHorizontal: 14, borderWidth: 1, borderColor: 'rgba(242,184,75,0.22)' },
   ponte: { backgroundColor: cores.superficie, borderRadius: 24, padding: 20, gap: 14, borderWidth: 1, borderColor: 'rgba(31,122,107,0.12)', boxShadow: sombra.card },
-  ponteRotulo: { fontFamily: fonte.extra, fontSize: 11, letterSpacing: 1.2, color: cores.marca },
+  ponteRotulo: { fontFamily: fonte.extra, fontSize: 12.5, color: cores.marca },
   pediatra: { flexDirection: 'row', gap: 10, alignItems: 'flex-start', padding: 12, borderRadius: raio.md, backgroundColor: cores.fundo2 },
   ponteDivisor: { height: 1, backgroundColor: cores.fundo2 },
   luzAvatar: { position: 'absolute', right: -2, bottom: -2, width: 14, height: 14, borderRadius: 7, borderWidth: 2.5, borderColor: cores.superficie },

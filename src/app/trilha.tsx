@@ -79,9 +79,9 @@ export default function Trilha() {
               >
                 <Medalha tom={fase.medalha.tom} trancada={!fase.completa} tamanho={38} />
                 <View style={{ flex: 1 }}>
-                  <Texto variante="legenda" style={{ fontFamily: fonte.negrito, letterSpacing: 0.5, color: fase.completa ? cores.marca : cores.texto2 }}>
-                    FASE {fase.numero}
-                    {fase.completa ? ' · CONQUISTADA' : ''}
+                  <Texto variante="legenda" style={{ fontFamily: fonte.negrito, color: fase.completa ? cores.marca : cores.texto2 }}>
+                    Fase {fase.numero}
+                    {fase.completa ? ', conquistada' : ''}
                   </Texto>
                   <Texto variante="rotulo" style={{ fontSize: 14.5 }}>
                     {tema.titulo}
@@ -185,7 +185,7 @@ function CartaoMissao({ item, numero, recemAberta, onPress }: { item: ItemTrilha
         </View>
         <View style={{ flex: 1 }}>
           {ativo ? (
-            <Texto style={{ fontFamily: fonte.negrito, fontSize: 11, letterSpacing: 0.5, color: cores.solTexto }}>NOVA MISSÃO LIBERADA</Texto>
+            <Texto style={{ fontFamily: fonte.negrito, fontSize: 12, color: cores.solTexto }}>Nova missão liberada</Texto>
           ) : null}
           <Texto variante="rotulo" style={!liberada && { color: cores.texto3 }}>
             {missao.titulo}

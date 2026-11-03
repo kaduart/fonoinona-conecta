@@ -10,7 +10,7 @@ const estilos: Record<Variante, TextStyle> = {
   corpo: { fontFamily: fonte.regular, fontSize: 15, lineHeight: 22, color: cores.texto2 },
   legenda: { fontFamily: fonte.regular, fontSize: 12.5, lineHeight: 18, color: cores.texto3 },
   rotulo: { fontFamily: fonte.semi, fontSize: 15, lineHeight: 20, color: cores.texto },
-  sobretitulo: { fontFamily: fonte.negrito, fontSize: 12, letterSpacing: 1, color: cores.marca },
+  sobretitulo: { fontFamily: fonte.negrito, fontSize: 13, color: cores.marca },
 };
 
 export function Texto({ variante = 'corpo', style, ...props }: TextProps & { variante?: Variante }) {

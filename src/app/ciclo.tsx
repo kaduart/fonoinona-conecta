@@ -2,7 +2,7 @@ import { Redirect, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { CelebracaoConquista, ConfeteAoRedor } from '@/components/animacao';
+import { CelebracaoConquista } from '@/components/animacao';
 import { CardRenovacao } from '@/components/CardRenovacao';
 import { Icone } from '@/components/navegacao';
 import { Numero } from '@/components/numero';
@@ -25,8 +25,6 @@ export default function TelaCiclo() {
   const dados = useDadosCrianca(criancaAtual?.id);
   const [tamanho, setTamanho] = useState<number>(4);
   const [salvando, setSalvando] = useState(false);
-  const [comemorar, setComemorar] = useState(false);
-  const [largura, setLargura] = useState(0);
 
   if (!criancaAtual) return <Redirect href="/" />;
   const nome = criancaAtual.apelido;
@@ -53,7 +51,6 @@ export default function TelaCiclo() {
     marcar();
     const completo = progressoCiclo(novo).estagio === 'completo';
     void tocar(completo ? 'completo' : 'missao');
-    if (completo) setComemorar(true);
     await gravar(novo);
   }
 
@@ -97,9 +94,9 @@ export default function TelaCiclo() {
 
   return (
     <Tela topo={voltar}>
-      <View onLayout={(e) => setLargura(e.nativeEvent.layout.width)} style={{ gap: 2 }}>
-        <Texto variante="legenda" style={{ fontFamily: fonte.negrito, letterSpacing: 0.6, color: cores.marca }}>
-          FASE {ciclo.fase}
+      <View style={{ gap: 2 }}>
+        <Texto variante="legenda" style={{ fontFamily: fonte.negrito, color: cores.marca }}>
+          Fase {ciclo.fase}
         </Texto>
         <Texto variante="titulo">Ciclo de sessões de {nome}</Texto>
       </View>
@@ -140,11 +137,6 @@ export default function TelaCiclo() {
         Você marca as sessões aqui e elas ficam só no seu celular.
       </Texto>
 
-      {comemorar ? (
-        <View pointerEvents="none" style={StyleSheet.absoluteFill}>
-          <ConfeteAoRedor largura={largura} altura={360} />
-        </View>
-      ) : null}
     </Tela>
   );
 }

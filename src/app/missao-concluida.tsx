@@ -89,7 +89,7 @@ export default function MissaoConcluida() {
       </View>
 
       <View style={s.ponte}>
-        <Texto style={{ fontFamily: fonte.extra, fontSize: 15, lineHeight: 21, color: cores.texto }}>🎉 {ponte.feedback}</Texto>
+        <Texto style={{ fontFamily: fonte.extra, fontSize: 15, lineHeight: 21, color: cores.texto }}>{ponte.feedback}</Texto>
         {ponte.motivo ? (
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
             <View style={s.ponteSeta}>

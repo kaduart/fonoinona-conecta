@@ -113,7 +113,7 @@ export default function MissaoTela() {
 
       <Card style={s.material}>
         <View style={s.materialIcone}>
-          <Icone nome="livro" cor={cores.terra} tamanho={20} />
+          <Icone nome="livro" cor={cores.marca} tamanho={20} />
         </View>
         <View style={{ flex: 1 }}>
           <Texto variante="legenda" style={{ fontFamily: fonte.semi }}>
@@ -156,7 +156,7 @@ export default function MissaoTela() {
           style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}
         >
           <View style={s.dicaIcone}>
-            <Texto style={{ fontSize: 16 }}>💡</Texto>
+            <Icone nome="lampada" cor={cores.solTexto} tamanho={18} />
           </View>
           <View style={{ flex: 1 }}>
             <Texto style={{ fontFamily: fonte.extra, fontSize: 15, color: cores.solTexto }}>Dica da Fono</Texto>
@@ -173,7 +173,7 @@ export default function MissaoTela() {
             <Texto style={{ color: cores.texto, fontSize: 13.5, lineHeight: 20 }}>{missao.dica}</Texto>
             {missao.observar ? (
               <View style={s.observar}>
-                <Texto style={{ fontFamily: fonte.negrito, fontSize: 12, letterSpacing: 0.4, color: cores.solTexto }}>O QUE OBSERVAR</Texto>
+                <Texto style={{ fontFamily: fonte.negrito, fontSize: 13, color: cores.solTexto }}>O que observar</Texto>
                 <Texto style={{ color: cores.texto, fontSize: 13.5, lineHeight: 20 }}>{missao.observar}</Texto>
               </View>
             ) : null}
@@ -202,7 +202,7 @@ const s = StyleSheet.create({
   capaTopo: { position: 'absolute', top: 10, left: 18, right: 18, flexDirection: 'row', justifyContent: 'space-between' },
   flutuante: { height: 44, borderRadius: raio.md, backgroundColor: vidro(0.9), flexDirection: 'row', alignItems: 'center', boxShadow: sombra.card },
   material: { padding: 20, flexDirection: 'row', gap: 12, alignItems: 'center', borderRadius: raio.lg },
-  materialIcone: { width: 42, height: 42, borderRadius: 14, backgroundColor: tema('#FBE9E2', '#3A221B'), alignItems: 'center', justifyContent: 'center' },
+  materialIcone: { width: 42, height: 42, borderRadius: 14, backgroundColor: cores.marcaSuave, alignItems: 'center', justifyContent: 'center' },
   passo: { flexDirection: 'row', gap: 14, alignItems: 'flex-start', paddingVertical: 15 },
   passoLinha: { borderBottomWidth: 1, borderBottomColor: cores.linha },
   caixa: { width: 26, height: 26, borderRadius: 9, borderWidth: 2, borderColor: tema('#D3DEDD', '#3A4849'), alignItems: 'center', justifyContent: 'center', marginTop: -1 },
