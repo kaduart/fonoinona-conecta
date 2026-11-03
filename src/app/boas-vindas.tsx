@@ -6,8 +6,7 @@ import { irPara, Marca } from '@/components/navegacao';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
 import { Botao, BotaoVoltar, Campo, Interruptor, SetaDireita } from '@/components/ui';
-import { IlustracaoViva } from '@/components/animacao';
-import { ILUSTRACOES, PROPORCAO } from '@/content/ilustracoes';
+import { CenaLeitura } from '@/components/animacoes/CenaAnimada';
 import { idadeParaTriagem, lerData, mascararData } from '@/domain/idade';
 import { faixaPara } from '@/domain/triagem';
 import { useApp } from '@/state/app';
@@ -62,7 +61,7 @@ export default function BoasVindas() {
     >
       {adicionando ? null : <Marca />}
       <View style={{ borderRadius: 28, overflow: 'hidden', backgroundColor: cores.ilustracao }}>
-        <IlustracaoViva fonte={ILUSTRACOES.ler} proporcao={PROPORCAO.ler} rotulo="Mãe lendo um livro com o filho" />
+        <CenaLeitura />
       </View>
       <View style={{ gap: 10 }}>
         {adicionando ? (

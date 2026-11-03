@@ -64,7 +64,7 @@ export default function Sobre() {
       </View>
 
       <Card style={{ padding: 18, gap: 12 }}>
-        <Texto variante="sobretitulo">RESPONSÁVEL TÉCNICA</Texto>
+        <Texto variante="sobretitulo">Responsável técnica</Texto>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           <View style={s.iniciais}>
             <Texto style={{ fontFamily: fonte.extra, color: cores.marca, fontSize: 16 }}>{iniciais}</Texto>

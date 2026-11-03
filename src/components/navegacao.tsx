@@ -7,7 +7,7 @@ import { Texto } from '@/components/texto';
 import { toqueLeve } from '@/servicos/sons';
 import { cores, fonte, raio, sombra, toque } from '@/theme/tokens';
 
-type NomeIcone = 'casa' | 'grafico' | 'pessoa' | 'seta' | 'cadeado' | 'check' | 'mais' | 'escudo' | 'info' | 'relogio' | 'chat' | 'lixo' | 'livro' | 'estrela' | 'fogo' | 'equipe' | 'play' | 'cronometro' | 'baixo' | 'lapis' | 'compartilhar' | 'presente' | 'escola' | 'terapia' | 'sol' | 'nuvem' | 'chuva' | 'ouvido' | 'musica' | 'boca' | 'colher' | 'espelho' | 'mao' | 'blocos' | 'letras';
+type NomeIcone = 'casa' | 'grafico' | 'pessoa' | 'seta' | 'cadeado' | 'check' | 'mais' | 'escudo' | 'info' | 'relogio' | 'chat' | 'lixo' | 'livro' | 'estrela' | 'fogo' | 'equipe' | 'play' | 'cronometro' | 'baixo' | 'lapis' | 'compartilhar' | 'presente' | 'escola' | 'terapia' | 'sol' | 'nuvem' | 'chuva' | 'ouvido' | 'musica' | 'boca' | 'colher' | 'espelho' | 'mao' | 'blocos' | 'letras' | 'lampada';
 
 const TRACOS: Record<NomeIcone, ReactNode> = {
   casa: <Path d="M4 11l8-7 8 7v8a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1z" />,
@@ -27,6 +27,7 @@ const TRACOS: Record<NomeIcone, ReactNode> = {
   ),
   check: <Path d="M5 12.5l4.5 4.5L19 7.5" />,
   mais: <Path d="M12 5v14M5 12h14" />,
+  lampada: <Path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.7.5 1.1 1.3 1.1 2.2h5c0-.9.4-1.7 1.1-2.2A6 6 0 0 0 12 3z" />,
   escudo: <Path d="M12 3l7 3v5c0 5-3 8.5-7 10-4-1.5-7-5-7-10V6z" />,
   info: (
     <>

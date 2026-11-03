@@ -80,7 +80,7 @@ export default function Conquistas() {
       {grupos.map((g) => (
         <View key={g.mes} style={{ gap: 10 }}>
           <Texto variante="sobretitulo" style={{ color: cores.texto3 }}>
-            {g.mes.toUpperCase()}
+            {g.mes.charAt(0).toUpperCase() + g.mes.slice(1)}
           </Texto>
           {g.marcos.map((m, i) => (
             <Animated.View key={m.id} entering={FadeInDown.delay(Math.min(ordem++, 8) * 50).duration(280)}>

@@ -11,7 +11,6 @@ import { Stack } from 'expo-router/stack';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
-import { Appearance, Platform } from 'react-native';
 
 import { atualizarConteudo, registrarEvento } from '@/api/cliente';
 import { AvisoProvider } from '@/components/aviso';
@@ -36,13 +35,6 @@ function Navegacao() {
     return () => desfazer?.();
   }, [pronto, router]);
 
-  // os estilos usam o tema lido ao abrir; no navegador, trocar o tema do sistema recarrega a página
-  useEffect(() => {
-    if (Platform.OS !== 'web') return;
-    const sub = Appearance.addChangeListener(() => window.location.reload());
-    return () => sub.remove();
-  }, []);
-
   useEffect(() => {
     if (!pronto) return;
     SplashScreen.hideAsync();
@@ -54,7 +46,7 @@ function Navegacao() {
   if (!pronto) return null;
   return (
     <>
-      <StatusBar style="auto" />
+      <StatusBar style="dark" />
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: cores.fundo } }} />
     </>
   );

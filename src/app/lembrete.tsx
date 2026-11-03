@@ -94,8 +94,8 @@ export default function TelaLembrete() {
       ) : null}
 
       <Card style={{ padding: 16, gap: 8 }}>
-        <Texto variante="legenda" style={{ fontFamily: fonte.negrito, letterSpacing: 0.5 }}>
-          COMO O AVISO APARECE
+        <Texto variante="legenda" style={{ fontFamily: fonte.negrito }}>
+          Como o aviso aparece
         </Texto>
         <View style={s.notificacao}>
           <View style={s.notificacaoIcone}>

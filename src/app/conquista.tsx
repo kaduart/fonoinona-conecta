@@ -88,7 +88,7 @@ export default function Conquista() {
 
       <Animated.View entering={reduzir ? undefined : FadeInUp.delay(650).duration(450)} style={{ alignItems: 'center', gap: 6 }}>
         <View style={s.selo}>
-          <Texto style={{ fontFamily: fonte.negrito, fontSize: 12, color: cores.marca, letterSpacing: 0.6 }}>FASE {fase.numero} COMPLETA</Texto>
+          <Texto style={{ fontFamily: fonte.negrito, fontSize: 12, color: cores.marca }}>Fase {fase.numero} completa</Texto>
         </View>
         <Texto variante="titulo" style={{ textAlign: 'center' }}>
           Medalha {fase.medalha.nome}!

@@ -95,9 +95,12 @@ export default function Diario() {
 
       <Card style={{ padding: 16, gap: 12 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Texto variante="rotulo" style={{ fontSize: 14 }}>
-            Sequência desta semana 🔥
-          </Texto>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <Texto variante="rotulo" style={{ fontSize: 14 }}>
+              Sequência desta semana
+            </Texto>
+            <Icone nome="fogo" cor={cores.terraTexto} tamanho={15} espessura={2.2} />
+          </View>
           <Texto style={{ fontFamily: fonte.negrito, fontSize: 12.5, color: seguidos ? cores.terraTexto : cores.texto3 }}>
             {seguidos === 1 ? '1 dia seguido' : `${seguidos} dias seguidos`}
           </Texto>
@@ -120,10 +123,19 @@ export default function Diario() {
         <Texto variante="legenda">Vale missão feita ou dia anotado no Diário.</Texto>
       </Card>
 
+      <Pressable accessibilityRole="button" onPress={() => router.push('/casa')} style={({ pressed }) => [s.lembrete, { marginTop: 0 }, pressed && toque]}>
+        <Icone nome="casa" cor={cores.marca} tamanho={18} />
+        <View style={{ flex: 1 }}>
+          <Texto style={{ fontFamily: fonte.negrito, fontSize: 14, color: cores.texto }}>Para fazer em casa</Texto>
+          <Texto variante="legenda">{dados?.atividades.length ? 'Marque “Fizemos!” nas atividades da semana.' : 'Anote o que a terapeuta pediu.'}</Texto>
+        </View>
+        <Icone nome="seta" cor={cores.texto3} tamanho={16} />
+      </Pressable>
+
       {missaoSugerida ? (
         <Card style={{ padding: 16, gap: 10, borderWidth: 1.5, borderColor: cores.marcaSuave }}>
           <Texto variante="legenda">Anotado. Uma brincadeira que pode ajudar:</Texto>
-          <Texto variante="rotulo">🎯 {missaoSugerida.titulo}</Texto>
+          <Texto variante="rotulo">{missaoSugerida.titulo}</Texto>
           <Texto variante="legenda">
             {missaoSugerida.duracao} · {missaoSugerida.rotuloArea}
           </Texto>
@@ -157,7 +169,7 @@ export default function Diario() {
       {!registros.length && dados ? (
         <Card style={{ padding: 20, alignItems: 'center', gap: 10 }}>
           <View style={s.ilustracao}>
-            <Image source={require('../../assets/images/ilustracoes/mae-livro.png')} style={{ width: 200, height: 160 }} resizeMode="contain" accessibilityIgnoresInvertColors />
+            <Image source={require('../../assets/images/ilustracoes/leitura.png')} style={{ width: 220, height: 138 }} resizeMode="contain" accessibilityIgnoresInvertColors />
           </View>
           <Texto variante="rotulo" style={{ textAlign: 'center' }}>
             Sua cápsula do tempo
@@ -176,7 +188,7 @@ export default function Diario() {
       {grupos.map((g) => (
         <Animated.View key={g.data} style={{ gap: 10 }} entering={FadeIn.duration(220)} layout={LinearTransition.duration(220)}>
           <Texto variante="legenda" style={s.data}>
-            {rotuloDia(g.data, hoje).toUpperCase()}
+            {rotuloDia(g.data, hoje)}
           </Texto>
           {g.registros.map((r) => (
             <CartaoRegistro key={r.id} registro={r} destaque={r.id === conquista} onPress={() => router.push({ pathname: '/diario-anotar', params: { id: r.id } })} />
@@ -225,7 +237,7 @@ function CartaoRegistro({ registro: r, destaque, onPress }: { registro: Registro
       </View>
       <View style={{ flex: 1, gap: 4 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-          <Texto variante="rotulo">{r.conquista ? 'Conquista!' : ROTULO_CONTEXTO[r.contexto]}</Texto>
+          <Texto variante="rotulo">{r.conquista ? 'Conquista!' : r.atividadeId ? 'Fizemos!' : ROTULO_CONTEXTO[r.contexto]}</Texto>
           {r.humor ? (
             <View style={[s.humor, r.humor === 'dificil' ? { backgroundColor: cores.observarFundo } : r.humor === 'normal' ? { backgroundColor: cores.neutroFundo } : null]}>
               <Texto style={{ fontFamily: fonte.negrito, fontSize: 12, color: r.humor === 'dificil' ? cores.observarTexto : r.humor === 'normal' ? cores.texto2 : cores.marca }}>{ROTULO_HUMOR[r.humor]}</Texto>
@@ -238,6 +250,7 @@ function CartaoRegistro({ registro: r, destaque, onPress }: { registro: Registro
           </Texto>
         ) : null}
         {missao ? <Texto variante="legenda">Missão: {missao.titulo}</Texto> : null}
+        {r.atividadeTitulo ? <Texto variante="legenda">Atividade de casa: {r.atividadeTitulo}</Texto> : null}
         {r.areas.length || r.conquista ? (
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 2 }}>
             {r.conquista ? (
@@ -274,7 +287,7 @@ const s = StyleSheet.create({
   diaHoje: { backgroundColor: cores.superficie, borderWidth: 2, borderColor: cores.marca },
   filtro: { paddingHorizontal: 13, height: 36, borderRadius: raio.pill, backgroundColor: cores.superficie, borderWidth: 1, borderColor: cores.linha, justifyContent: 'center' },
   filtroAtivo: { backgroundColor: cores.marca, borderColor: cores.marca },
-  data: { fontFamily: fonte.negrito, letterSpacing: 0.6, color: cores.texto3, marginTop: 4 },
+  data: { fontFamily: fonte.negrito, color: cores.texto3, marginTop: 4 },
   registro: { flexDirection: 'row', gap: 12, padding: 16, borderRadius: raio.xl, backgroundColor: cores.superficie, boxShadow: sombra.card },
   registroConquista: { borderWidth: 1.5, borderColor: tema('#F6DFA6', '#4A3A14') },
   registroDestaque: { boxShadow: '0px 0px 24px rgba(242,184,75,0.45)' },

@@ -8,15 +8,28 @@ import { ARQUIVOS_LOTTIE as ARQUIVOS, type NomeLottie } from '@/components/lotti
  * Lottie no celular (lottie-react-native, nativo). No navegador entra lottie.web.tsx (lottie-web light, ~45 KB gzip).
  * Com "reduzir movimento" ligado, mostra o quadro final parado.
  */
-export function Lottie({ nome, tamanho, loop = true, style }: { nome: NomeLottie; tamanho: number; loop?: boolean; style?: StyleProp<ViewStyle> }) {
+export type PropsLottie = {
+  /** animação registrada em lottieArquivos.ts */
+  nome?: NomeLottie;
+  /** ou a animação montada em código (ex.: as cenas de src/components/animacoes) */
+  dados?: object;
+  /** lado do quadrado; sem ele, ocupa 100% do pai */
+  tamanho?: number;
+  loop?: boolean;
+  style?: StyleProp<ViewStyle>;
+};
+
+export function Lottie({ nome, dados, tamanho, loop = true, style }: PropsLottie) {
   const reduzir = useReducedMotion();
+  const fonte = dados ?? (nome ? ARQUIVOS[nome] : null);
+  if (!fonte) return null;
   return (
     <LottieView
-      source={ARQUIVOS[nome]}
+      source={fonte}
       autoPlay={!reduzir}
       loop={loop && !reduzir}
       progress={reduzir ? 1 : undefined}
-      style={[{ width: tamanho, height: tamanho }, style]}
+      style={[tamanho ? { width: tamanho, height: tamanho } : { width: '100%', height: '100%' }, style]}
       resizeMode="contain"
     />
   );

@@ -18,6 +18,10 @@ export type RegistroDiario = {
   nota: string;
   /** quando o registro nasceu ao concluir uma missão */
   missaoId?: string;
+  /** quando o registro nasceu do "Fizemos!" de uma atividade de casa (src/domain/casa.ts) */
+  atividadeId?: string;
+  /** título da atividade no dia, para a linha do tempo seguir legível se a atividade sair da lista */
+  atividadeTitulo?: string;
   /** ISO */
   criadoEm: string;
   /** ISO */
@@ -72,7 +76,7 @@ export function normalizarRegistro(r: RegistroDiario, hoje: Date): { ok: true; r
   const nota = r.nota.trim();
   if (nota.length > NOTA_MAX) return { ok: false, erro: 'nota_longa' };
   const areas = [...new Set(r.areas)].filter((a) => a in ROTULO_AREA);
-  if (!r.humor && !areas.length && !nota && !r.conquista) return { ok: false, erro: 'vazio' };
+  if (!r.humor && !areas.length && !nota && !r.conquista && !r.atividadeId) return { ok: false, erro: 'vazio' };
   return { ok: true, registro: { ...r, nota, areas } };
 }
 
@@ -120,6 +124,8 @@ export type ResumoDiario = {
   areasMaisMarcadas: Area[];
   conquistas: number;
   missoesFeitas: number;
+  /** "Fizemos!" das atividades de casa no período */
+  atividadesFeitas: number;
 };
 
 /** Contagens neutras do período (últimos `dias`, incluindo hoje). Humor conta um por dia: o último registro do dia. */
@@ -148,6 +154,7 @@ export function resumir(registros: RegistroDiario[], dias: number, hoje: Date, m
       .map(([a]) => a),
     conquistas: noPeriodo.filter((r) => r.conquista).length,
     missoesFeitas,
+    atividadesFeitas: noPeriodo.filter((r) => r.atividadeId).length,
   };
 }
 
@@ -167,6 +174,7 @@ export function textoResumo(resumo: ResumoDiario, codigo: string, notas?: { data
   linhas.push(`• ${resumo.diasAnotados} ${resumo.diasAnotados === 1 ? 'dia anotado' : 'dias anotados'}${partesHumor.length ? ` (${partesHumor.join(', ')})` : ''}`);
   if (resumo.areasMaisMarcadas.length) linhas.push(`• Mais observado: ${lista(resumo.areasMaisMarcadas.map((a) => rotuloAreaDiario(a).toLowerCase()))}`);
   if (resumo.conquistas) linhas.push(`• ${resumo.conquistas} ${resumo.conquistas === 1 ? 'conquista registrada' : 'conquistas registradas'}`);
+  if (resumo.atividadesFeitas) linhas.push(`• ${resumo.atividadesFeitas} ${resumo.atividadesFeitas === 1 ? 'atividade de casa feita' : 'atividades de casa feitas'}`);
   if (resumo.missoesFeitas) linhas.push(`• ${resumo.missoesFeitas} ${resumo.missoesFeitas === 1 ? 'missão feita' : 'missões feitas'} em casa`);
   if (notas?.length) {
     linhas.push('', 'Minhas anotações:');
