@@ -52,7 +52,7 @@ export function CenaAnimada({ cena, style, titulo, legenda, fundo = true }: Prop
 
 export const CenaLeitura = (p: Omit<Props, 'cena'>) => <CenaAnimada cena="leitura" {...p} />;
 export const CenaBrincar = (p: Omit<Props, 'cena'>) => <CenaAnimada cena="brincar" {...p} />;
-export const CenaMovimento = (p: Omit<Props, 'cena'>) => <CenaAnimada cena="movimento" {...p} />;
+export const CenaEspelho = (p: Omit<Props, 'cena'>) => <CenaAnimada cena="espelho" {...p} />;
 
 const s = StyleSheet.create({
   palco: { width: '100%', overflow: 'hidden' },

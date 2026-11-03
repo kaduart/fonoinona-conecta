@@ -9,8 +9,11 @@ export const FPS = 60;
 /** 3 s por ciclo, lento como Calm/Headspace */
 export const QUADROS = 180;
 
-/** Recorte da arte (viewBox do SVG original): a camada Lottie usa o mesmo quadro. */
-export const RECORTE = { x: 90, y: 160, largura: 1020, altura: 640 } as const;
+/** Quadro das artes (PNG 1500x1000): a camada Lottie usa as mesmas coordenadas em pixels. */
+export const RECORTE = { x: 0, y: 0, largura: 1500, altura: 1000 } as const;
+
+/** Espessura do traço, igual ao line art das artes nesse quadro. */
+const TRACO = 3.5;
 
 const LINHA = '#1D4F48';
 
@@ -44,7 +47,7 @@ export function animado(f: (t: number) => Valor, passos = 12) {
 
 const TRANSFORMACAO = { ty: 'tr', p: fixo([0, 0]), a: fixo([0, 0]), s: fixo([100, 100]), r: fixo(0), o: fixo(100), sk: fixo(0), sa: fixo(0) };
 
-function traco(largura = 2.5, c = LINHA, tracejado?: unknown[]) {
+function traco(largura = TRACO, c = LINHA, tracejado?: unknown[]) {
   return { ty: 'st', c: fixo(cor(c)), o: fixo(100), w: fixo(largura), lc: 2, lj: 2, ml: 4, ...(tracejado ? { d: tracejado } : {}) };
 }
 const preenchimento = (c: string, opacidade = 100) => ({ ty: 'fl', c: fixo(cor(c)), o: fixo(opacidade), r: 1 });
@@ -59,7 +62,7 @@ function camada(nome: string, formas: unknown[], ks: Ks) {
     shapes: formas,
   };
 }
-/** Coordenada da arte (SVG de 1200x900) para o quadro recortado. */
+/** Coordenada da arte para o quadro da camada. */
 const pos = (x: number, y: number) => [x - RECORTE.x, y - RECORTE.y, 0];
 const TAU = Math.PI * 2;
 
@@ -79,13 +82,13 @@ export function folha(x: number, y: number, angulo: number, escala: number, c: s
 }
 
 /** Balão em pílula: aparece, sobe alguns pixels e some. `fase` (0..1) desloca no ciclo. */
-export function pilula(x: number, y: number, w: number, h: number, c: string, o: { fase?: number; rotacao?: number; sobe?: number } = {}) {
-  const { fase = 0, rotacao = 0, sobe = 22 } = o;
+export function pilula(x: number, y: number, w: number, h: number, c: string, o: { fase?: number; rotacao?: number; sobe?: number; anda?: number } = {}) {
+  const { fase = 0, rotacao = 0, sobe = 22, anda = 0 } = o;
   const cx = x + w / 2;
   const cy = y + h / 2;
   const u = (t: number) => (t + fase) % 1;
   return camada('balao', [grupo({ ty: 'rc', p: fixo([0, 0]), s: fixo([w, h]), r: fixo(h / 2), d: 1 }, traco(), preenchimento(c))], {
-    p: animado((t) => pos(cx, cy + sobe / 2 - sobe * u(t)), 24),
+    p: animado((t) => pos(cx - anda / 2 + anda * u(t), cy + sobe / 2 - sobe * u(t)), 24),
     r: fixo(rotacao),
     o: animado((t) => 100 * Math.max(0, Math.min(1, u(t) / 0.3, (0.92 - u(t)) / 0.25)), 24),
   });
@@ -118,6 +121,31 @@ export function ondaDeSom(pontos: [number, number][], entrada: number[][], saida
     { n: 'o', nm: 'deslocamento', v: { a: 1, k: [{ t: 0, s: [0], i: { x: [1], y: [1] }, o: { x: [0], y: [0] } }, { t: QUADROS, s: [-44] }] } },
   ];
   return camada('onda', [grupo(caminho(v, entrada, saida, false), traco(3, c, tracejado))], { p: fixo([0, 0, 0]) });
+}
+
+const arco = (raio: number, abertura: number) => {
+  // arco de circunferência centrado no eixo x, aproximado por bezier cúbica
+  const a = (abertura * Math.PI) / 360;
+  const k = (4 / 3) * Math.tan(a / 2) * raio;
+  const p0 = [raio * Math.cos(-a), raio * Math.sin(-a)];
+  const p1 = [raio * Math.cos(a), raio * Math.sin(a)];
+  const t0 = [-Math.sin(-a) * k, Math.cos(-a) * k];
+  const t1 = [Math.sin(a) * k, -Math.cos(a) * k];
+  return caminho([p0, p1], [[0, 0], t1], [t0, [0, 0]], false);
+};
+
+/** Ondas de som ")))" saindo de um ponto (boca), uma depois da outra. `angulo` em graus (0 = para a direita). */
+export function ondas(x: number, y: number, angulo: number, c: string, o: { escala?: number; fase?: number } = {}) {
+  const { escala = 1, fase = 0 } = o;
+  return [0, 1, 2].map((n) => {
+    const u = (t: number) => (t + fase - n * 0.16 + 1) % 1;
+    return camada('onda', [grupo(arco(22 + n * 18, 70), traco(TRACO, c))], {
+      p: fixo(pos(x, y)),
+      r: fixo(angulo),
+      s: fixo([escala * 100, escala * 100, 100]),
+      o: animado((t) => 100 * Math.max(0, Math.min(1, u(t) / 0.2, (0.7 - u(t)) / 0.25)), 24),
+    });
+  });
 }
 
 export function composicao(nome: string, camadas: Record<string, unknown>[]): LottieJson {
