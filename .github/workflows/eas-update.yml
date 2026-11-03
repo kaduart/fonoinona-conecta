@@ -1,0 +1,49 @@
+name: Atualização OTA (EAS Update)
+
+# Merge na main que muda só tela, texto ou imagem (src/ e assets/) vai direto
+# para o celular de quem já tem o app, sem passar pela loja.
+# O runtime é por fingerprint: a atualização só chega em builds com o mesmo
+# código nativo; mudança nativa dispara o "Build EAS (loja)".
+on:
+  push:
+    branches: [main]
+    paths: ['src/**', 'assets/**']
+  workflow_dispatch:
+
+concurrency:
+  group: eas-update-production
+  cancel-in-progress: true
+
+jobs:
+  update:
+    name: EAS Update (production)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Conferir EXPO_TOKEN
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "::error title=EXPO_TOKEN ausente::Salve o token da Expo em Settings › Secrets › Actions como EXPO_TOKEN."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - run: npm ci
+
+      - name: eas update
+        env:
+          MSG: ${{ github.event.head_commit.message || 'manual' }}
+        run: eas update --channel production --platform android --message "$MSG" --non-interactive
