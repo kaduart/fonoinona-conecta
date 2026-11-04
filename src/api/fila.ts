@@ -1,7 +1,15 @@
 // Fila local de eventos anônimos. Funções puras: quem grava e envia é o cliente.
 
+/** instalado = PWA aberto da tela inicial; navegador = aba comum; nativo = app de loja */
+export type ModoUso = 'instalado' | 'navegador' | 'nativo';
+export type Plataforma = 'android' | 'ios' | 'desktop' | 'outro';
+
 export type EventoApp =
-  | { id: string; em: string; tipo: 'app_aberto' }
+  | { id: string; em: string; tipo: 'app_aberto'; modo?: ModoUso; plataforma?: Plataforma }
+  /** o navegador ofereceu instalar (beforeinstallprompt, só Chrome/Android) */
+  | { id: string; em: string; tipo: 'instalacao_oferecida'; plataforma?: Plataforma }
+  /** a família instalou o PWA (appinstalled) */
+  | { id: string; em: string; tipo: 'app_instalado'; plataforma?: Plataforma }
   | { id: string; em: string; tipo: 'triagem_concluida'; faixaId: string }
   | { id: string; em: string; tipo: 'missao_concluida'; missaoId: string; como: 'facil' | 'com_ajuda' | 'dificil' }
   | { id: string; em: string; tipo: 'whatsapp_aberto'; origem: 'resultado' | 'missoes' | 'geral' | 'diario' }

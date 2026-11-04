@@ -39,6 +39,28 @@ describe.skipIf(!process.env.TESTE_MONGO)('repositórios Mongo', () => {
     expect(await repos.eventos.inserir('inst-1', '1.0.0', [ev])).toEqual({ novos: 0, duplicados: 1 });
   });
 
+  it('resumo de métricas: instalações, ativos por dia e plataforma mais recente', async () => {
+    const agora = Date.now();
+    const haDias = (d: number) => new Date(agora - d * 86_400_000).toISOString();
+    await repos.eventos.inserir('inst-m1', '1.1.0', [
+      { id: 'ev-m-1', em: haDias(2), tipo: 'app_aberto', modo: 'navegador', plataforma: 'android' },
+      { id: 'ev-m-2', em: haDias(1), tipo: 'app_instalado', plataforma: 'android' },
+      { id: 'ev-m-3', em: haDias(1), tipo: 'diario_registro', contexto: 'casa' },
+      { id: 'ev-m-4', em: haDias(1), tipo: 'instalacao_oferecida', plataforma: 'android' },
+    ]);
+    const r = await repos.eventos.resumo(new Date(agora - 7 * 86_400_000));
+    const m1 = r.instalacoes.find((i) => i.instalacaoId === 'inst-m1')!;
+    expect(m1.plataforma).toBe('android');
+    expect(m1.instaladoEm?.toISOString()).toBe(haDias(1));
+    expect(r.instalacoes.find((i) => i.instalacaoId === 'inst-1')?.instaladoEm).toBeNull();
+    expect(r.convidadas).toBe(1);
+    expect(r.porTipo.find((t) => t.tipo === 'diario_registro')?.total).toBe(1);
+    expect(r.ativosPorDia.reduce((s, d) => s + d.ativos, 0)).toBeGreaterThanOrEqual(2);
+    // campos que antes o Mongoose descartava
+    const salvo = await mongoose.connection.db!.collection('eventos').findOne({ _id: 'ev-m-3' as never });
+    expect(salvo?.contexto).toBe('casa');
+  });
+
   it('lead conta repetições sem duplicar', async () => {
     const a = await repos.leads.registrar({ codigo: 'CONECTA-MNG2', origem: 'resultado' });
     const b = await repos.leads.registrar({ codigo: 'CONECTA-MNG2', origem: 'resultado' });

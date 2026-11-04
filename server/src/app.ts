@@ -8,6 +8,8 @@ import { z } from 'zod';
 
 import { LoteEventos, NovoLead, PreCadastro } from './esquemas.js';
 import { log } from './log.js';
+import { montarMetricas } from './metricas.js';
+import { PAINEL_HTML, PAINEL_JS } from './painel.js';
 import type { Repos } from './repos.js';
 
 export type OpcoesApp = { adminApiKey: string; corsOrigens?: string[]; limitePorMinuto?: number };
@@ -89,6 +91,23 @@ export function criarApp(repos: Repos, opcoes: OpcoesApp) {
     if (!lead) return res.status(404).json({ erro: 'nao_encontrado' });
     res.json(lead);
   });
+
+  /** Instalações e uso do app (números agregados, sem dado pessoal). Protegida por chave. ?dias=1..90 (padrão 30). */
+  app.get('/v1/metricas', limite, async (req, res) => {
+    if (!chaveConfere(req.header('x-api-key'), opcoes.adminApiKey)) return res.status(401).json({ erro: 'nao_autorizado' });
+    const dias = Math.min(90, Math.max(1, Math.trunc(Number(req.query.dias)) || 30));
+    const agora = new Date();
+    const resumo = await repos.eventos.resumo(new Date(agora.getTime() - dias * 86_400_000));
+    res.setHeader('Cache-Control', 'no-store');
+    res.json(montarMetricas(resumo, dias, agora));
+  });
+
+  /** Painel da equipe para ver as métricas no celular. A página não traz dado: pede a chave e chama /v1/metricas. */
+  app.get('/painel', (_req, res) => {
+    res.setHeader('Cache-Control', 'no-store');
+    res.type('html').send(PAINEL_HTML);
+  });
+  app.get('/painel.js', (_req, res) => res.type('js').send(PAINEL_JS));
 
   app.use((_req, res) => res.status(404).json({ erro: 'rota_inexistente' }));
 

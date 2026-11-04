@@ -6,6 +6,7 @@ import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import { Tela } from '@/components/tela';
 import { Texto } from '@/components/texto';
 import { Botao, BotaoVoltar, Card, Interruptor, SetaDireita } from '@/components/ui';
+import { registrarAbertura } from '@/servicos/instalacao';
 import { useApp } from '@/state/app';
 import { novoId, repositorio } from '@/storage/repositorio';
 import { cores, tema } from '@/theme/tokens';
@@ -57,6 +58,7 @@ export default function ConsentimentoTela() {
     setSalvando(true);
     try {
       const agora = new Date().toISOString();
+      const primeiroAceite = !(await repositorio.lerConsentimento());
       await repositorio.salvarConsentimento({ versaoTermo: VERSAO_TERMO, aceitoEm: agora });
       if (params.apelido && params.nascimento) {
         const id = novoId();
@@ -70,6 +72,8 @@ export default function ConsentimentoTela() {
         selecionar(id);
       }
       await recarregar();
+      // a abertura de hoje não foi contada (antes do termo nada sai do aparelho): conta agora, em segundo plano
+      if (primeiroAceite) void registrarAbertura();
       // tira o cadastro da pilha: depois do termo, "voltar" não retorna ao início do onboarding
       if (router.canDismiss()) router.dismissAll();
       router.replace('/triagem');
