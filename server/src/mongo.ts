@@ -2,6 +2,7 @@ import mongoose, { Schema } from 'mongoose';
 
 import type { Evento, NovoLead, PreCadastro } from './esquemas.js';
 import { log } from './log.js';
+import { FUSO, type ResumoEventos } from './metricas.js';
 import type { Conteudo, Lead, PreCadastroSalvo, Repos } from './repos.js';
 
 const ConteudoModelo = mongoose.model(
@@ -22,6 +23,10 @@ const EventoModelo = mongoose.model(
       missaoId: String,
       como: String,
       origem: String,
+      contexto: String,
+      fase: Number,
+      modo: String,
+      plataforma: String,
       recebidoEm: { type: Date, default: Date.now },
     },
     { collection: 'eventos', versionKey: false },
@@ -97,6 +102,51 @@ export function reposMongo(): Repos {
           { ordered: false },
         );
         return { novos: r.upsertedCount, duplicados: eventos.length - r.upsertedCount };
+      },
+      async resumo(desde: Date): Promise<ResumoEventos> {
+        const virouInstalado = { $or: [{ $eq: ['$tipo', 'app_instalado'] }, { $and: [{ $eq: ['$tipo', 'app_aberto'] }, { $eq: ['$modo', 'instalado'] }] }] };
+        const [r] = await EventoModelo.aggregate<{
+          instalacoes: { _id: string; primeiroEm: Date; ultimoEm: Date; instaladoEm: Date | null; plataformas: { em: Date; p: string }[] }[];
+          ativosPorDia: { _id: string; ativos: number }[];
+          porTipo: { _id: string; total: number }[];
+          convidadas: { n: number }[];
+        }>([
+          {
+            $facet: {
+              instalacoes: [
+                {
+                  $group: {
+                    _id: '$instalacaoId',
+                    primeiroEm: { $min: '$em' },
+                    ultimoEm: { $max: '$em' },
+                    instaladoEm: { $min: { $cond: [virouInstalado, '$em', null] } },
+                    plataformas: { $push: { $cond: [{ $ifNull: ['$plataforma', false] }, { em: '$em', p: '$plataforma' }, '$$REMOVE'] } },
+                  },
+                },
+              ],
+              ativosPorDia: [
+                { $match: { em: { $gte: desde } } },
+                { $group: { _id: { dia: { $dateToString: { format: '%Y-%m-%d', date: '$em', timezone: FUSO } }, i: '$instalacaoId' } } },
+                { $group: { _id: '$_id.dia', ativos: { $sum: 1 } } },
+              ],
+              porTipo: [{ $match: { em: { $gte: desde } } }, { $group: { _id: '$tipo', total: { $sum: 1 } } }],
+              convidadas: [{ $match: { em: { $gte: desde }, tipo: 'instalacao_oferecida' } }, { $group: { _id: '$instalacaoId' } }, { $count: 'n' }],
+            },
+          },
+        ]).allowDiskUse(true);
+        return {
+          instalacoes: r.instalacoes.map((i) => ({
+            instalacaoId: i._id,
+            primeiroEm: i.primeiroEm,
+            ultimoEm: i.ultimoEm,
+            instaladoEm: i.instaladoEm ?? null,
+            // a plataforma mais recente informada
+            plataforma: i.plataformas.reduce<{ em: Date; p: string } | null>((m, x) => (!m || x.em > m.em ? x : m), null)?.p ?? null,
+          })),
+          ativosPorDia: r.ativosPorDia.map((d) => ({ dia: d._id, ativos: d.ativos })),
+          porTipo: r.porTipo.map((t) => ({ tipo: t._id, total: t.total })),
+          convidadas: r.convidadas[0]?.n ?? 0,
+        };
       },
     },
     leads: {

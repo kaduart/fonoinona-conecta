@@ -12,13 +12,16 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
-import { atualizarConteudo, registrarEvento } from '@/api/cliente';
+import { atualizarConteudo } from '@/api/cliente';
 import { AvisoProvider } from '@/components/aviso';
+import { monitorarInstalacao, registrarAbertura } from '@/servicos/instalacao';
 import { prepararNotificacoes } from '@/servicos/lembrete';
 import { AppProvider, useApp } from '@/state/app';
 import { cores } from '@/theme/tokens';
 
 SplashScreen.preventAutoHideAsync();
+// PWA: o aviso de instalação do navegador pode chegar antes da primeira tela
+monitorarInstalacao();
 
 function Navegacao() {
   const { carregando } = useApp();
@@ -39,7 +42,7 @@ function Navegacao() {
     if (!pronto) return;
     SplashScreen.hideAsync();
     // em segundo plano: nada aqui bloqueia o app
-    registrarEvento({ tipo: 'app_aberto' });
+    registrarAbertura();
     atualizarConteudo();
   }, [pronto]);
 

@@ -22,6 +22,8 @@ npm test                  # testes da API (TESTE_MONGO=1 para incluir o Mongo re
 | POST | `/v1/eventos` | Eventos anônimos de uso, até 50 por lote | `202 {novos, duplicados}` |
 | POST | `/v1/leads` | Código CONECTA-XXXX quando a família abre o WhatsApp | `201` novo, `200` repetido |
 | GET | `/v1/leads/:codigo` | Equipe confere se um código veio do app (header `x-api-key`) | `200`, `401` ou `404` |
+| GET | `/v1/metricas?dias=30` | Instalações, famílias ativas e uso, agregados (header `x-api-key`, 1–90 dias) | `200` ou `401` |
+| GET | `/painel` | Página para a equipe ver as métricas no celular (pede a `ADMIN_API_KEY`) | `200` |
 
 Exemplo de evento:
 
@@ -36,6 +38,14 @@ Exemplo de evento:
 ```
 
 Tipos aceitos: `app_aberto`, `triagem_concluida` (com `faixaId`), `missao_concluida` (com `missaoId` e `como`) e `whatsapp_aberto` (com `origem`). Campos fora do contrato são descartados.
+
+## Métricas de instalação e uso
+
+- **Famílias usando**: instalações (aparelho/navegador) que aceitaram o termo e mandaram algum evento.
+- **Instalaram na tela inicial**: mandaram `app_instalado` (Chrome/Android) ou abriram em modo instalado (`app_aberto` com `modo: instalado`, único sinal possível no iPhone).
+- **Ativas**: com algum evento hoje / nos últimos 7 / 30 dias (dias no fuso America/Sao_Paulo).
+- Antes do aceite do termo nada sai do aparelho; o aviso de instalação fica guardado e é enviado depois do aceite.
+- No iPhone o app instalado tem armazenamento separado do Safari: a mesma família pode contar 2 vezes (navegador + instalado).
 
 ## Garantias
 
