@@ -81,7 +81,7 @@ function mostrar(m){
   var max=Math.max.apply(null,m.porDia.map(function(d){return d.ativos}).concat([1]));
   var gr=$('grafico');gr.innerHTML='';m.porDia.forEach(function(d){var b=document.createElement('div');b.style.height=(d.ativos/max*100)+'%';b.title=br(d.dia)+': '+d.ativos+' ativas, '+d.novos+' novas, '+d.instalacoes+' instalações';gr.appendChild(b)});
   $('ini').textContent=br(m.porDia[0].dia);$('fim').textContent=br(m.porDia[m.porDia.length-1].dia);
-  var u=m.uso;linhas($('uso'),[['Aberturas do app',u.aberturas],['Triagens concluídas',u.triagens],['Missões concluídas',u.missoes],['Registros no diário',u.diario],['Cliques no WhatsApp',u.whatsapp],['Interesse em kit',u.kitInteresse],['Convidadas a instalar (Android)',m.totais.convidadosAInstalar]]);
+  var u=m.uso;linhas($('uso'),[['Aberturas do app',u.aberturas],['Triagens concluídas',u.triagens],['Missões concluídas',u.missoes],['Registros no diário',u.diario],['Cliques no WhatsApp',u.whatsapp],['Interesse em kit',u.kitInteresse],['Indicações a outras famílias',u.indicacoes],['Convidadas a instalar (Android)',m.totais.convidadosAInstalar]]);
   linhas($('plataformas'),Object.keys(m.totais.porPlataforma).map(function(k){return[NOMES[k]||k,m.totais.porPlataforma[k]]}));
   $('rodape').textContent='Atualizado '+new Date(m.geradoEm).toLocaleString('pt-BR')+'. Conta só quem aceitou o termo do app.';
 }

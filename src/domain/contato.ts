@@ -56,3 +56,20 @@ export function linkWhatsAppGeral(motivo: 'geral' | 'missoes' = 'geral', idade =
 export function linkWhatsAppTexto(texto: string, numero = numeroClinica()): string {
   return `https://wa.me/${numero.replace(/\D/g, '')}?text=${encodeURIComponent(texto)}`;
 }
+
+/** Endereço público do app (PWA). Vale quando EXPO_PUBLIC_URL_APP não está definido no build. */
+export const URL_APP_PADRAO = 'https://conecta.clinicafonoinova.com.br';
+const urlApp = () => (process.env.EXPO_PUBLIC_URL_APP || URL_APP_PADRAO).replace(/\/$/, '');
+
+const MENSAGEM_INDICACAO =
+  'Oi! Estou usando o FonoInova Conecta, um app gratuito da Clínica Fono Inova com triagem do desenvolvimento e brincadeiras diárias para crianças de 0 a 6 anos. Acho que vai gostar: {link}';
+
+/** Texto de indicação para outra família, com o link do app marcado como vindo de indicação. Sem nada da criança. */
+export function textoIndicacao(): string {
+  return MENSAGEM_INDICACAO.replace('{link}', `${urlApp()}/?origem=indicacao`);
+}
+
+/** Abre o WhatsApp sem destinatário: a família escolhe para quem mandar. */
+export function linkIndicacao(): string {
+  return `https://wa.me/?text=${encodeURIComponent(textoIndicacao())}`;
+}

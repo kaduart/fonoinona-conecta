@@ -26,6 +26,7 @@ Variáveis de ambiente: copie `.env.example` para `.env` (que não vai para o Gi
 ```
 EXPO_PUBLIC_WHATSAPP_CLINICA=5562XXXXXXXXX
 EXPO_PUBLIC_API_URL=            # vazio = app 100% offline
+EXPO_PUBLIC_URL_APP=            # link do app no botão de indicação (padrão: conecta.clinicafonoinova.com.br)
 ```
 
 A API fica em [`server/`](server/README.md).
