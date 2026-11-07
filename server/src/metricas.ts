@@ -79,6 +79,7 @@ export function montarMetricas(resumo: ResumoEventos, dias: number, agora = new 
       diario: eventos.diario_registro ?? 0,
       whatsapp: eventos.whatsapp_aberto ?? 0,
       kitInteresse: eventos.kit_interesse ?? 0,
+      indicacoes: eventos.app_indicado ?? 0,
     },
     porDia: serie,
   };

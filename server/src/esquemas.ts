@@ -27,6 +27,8 @@ export const Evento = z.discriminatedUnion('tipo', [
   // Diário: só o contexto. A nota, as áreas e o humor ficam no aparelho.
   z.object({ id: Id, em: z.iso.datetime(), tipo: z.literal('diario_registro'), contexto: z.enum(['casa', 'escola', 'terapia']) }),
   z.object({ id: Id, em: z.iso.datetime(), tipo: z.literal('kit_interesse'), fase: z.number().int().min(1).max(10) }),
+  // Indicação do app a outra família (botão no Início). Só o clique: nada de contato ou destinatário.
+  z.object({ id: Id, em: z.iso.datetime(), tipo: z.literal('app_indicado') }),
 ]);
 export type Evento = z.infer<typeof Evento>;
 

@@ -214,6 +214,7 @@ describe('métricas de instalação e uso', () => {
       ev('ev-a00002', haDias(3), { tipo: 'app_instalado', plataforma: 'android' }),
       ev('ev-a00003', haDias(0), { tipo: 'app_aberto', modo: 'instalado', plataforma: 'android' }),
       ev('ev-a00004', haDias(0), { tipo: 'missao_concluida', missaoId: 'm06-conversa-bebe', como: 'facil' }),
+      ev('ev-a00005', haDias(0), { tipo: 'app_indicado' }),
     ]);
     // iPhone: não existe appinstalled; conta pela abertura em modo instalado
     await enviar('inst-ios001', [ev('ev-i00001', haDias(10), { tipo: 'app_aberto', modo: 'instalado', plataforma: 'ios' })]);
@@ -230,7 +231,7 @@ describe('métricas de instalação e uso', () => {
     expect(m.totais).toEqual({ usuarios: 4, instalados: 2, convidadosAInstalar: 1, porPlataforma: { android: 1, ios: 1, desktop: 1, desconhecida: 1 } });
     expect(m.periodo).toEqual({ novosUsuarios: 2, novasInstalacoes: 1 });
     expect(m.ativos).toEqual({ hoje: 1, ultimos7dias: 2, ultimos30dias: 3 });
-    expect(m.uso).toMatchObject({ aberturas: 2, triagens: 1, missoes: 1 });
+    expect(m.uso).toMatchObject({ aberturas: 2, triagens: 1, missoes: 1, indicacoes: 1 });
     expect(m.porDia).toHaveLength(7);
     expect(m.porDia.at(-1)).toMatchObject({ ativos: 1 });
     expect(m.porDia.reduce((s: number, d: { novos: number }) => s + d.novos, 0)).toBe(2);

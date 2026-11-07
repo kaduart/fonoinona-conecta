@@ -15,6 +15,8 @@ export type EventoApp =
   | { id: string; em: string; tipo: 'whatsapp_aberto'; origem: 'resultado' | 'missoes' | 'geral' | 'diario' }
   /** só o contexto: nunca a nota, as áreas ou o humor */
   | { id: string; em: string; tipo: 'diario_registro'; contexto: 'casa' | 'escola' | 'terapia' }
+  /** a família abriu o WhatsApp para indicar o app a outra família */
+  | { id: string; em: string; tipo: 'app_indicado' }
   /** interesse no kit da fase (lista de espera anônima) */
   | { id: string; em: string; tipo: 'kit_interesse'; fase: number };
 
