@@ -31,24 +31,27 @@ export function sincronizar(): Promise<void> {
   if (!apiAtiva()) return Promise.resolve();
   enviando ??= (async () => {
     try {
-      const fila = await repositorio.lerFila();
-      const lote = proximoLote(fila, Date.now());
-      if (!lote.length) return;
-      try {
-        const r = await chamar('/v1/eventos', {
-          method: 'POST',
-          body: JSON.stringify({ instalacaoId: await repositorio.instalacaoId(), versaoApp: VERSAO_APP, eventos: lote }),
-        });
-        // 400 = lote fora do contrato: descarta para não travar a fila para sempre
-        if (r.ok || r.status === 400) {
-          if (!r.ok) console.warn('[api] lote recusado pela API e descartado');
-          await repositorio.salvarFila(confirmar(await repositorio.lerFila(), lote.map((e) => e.id)));
-        } else {
-          throw new Error(`HTTP ${r.status}`);
+      // repete enquanto houver fila: eventos que chegaram durante um envio também saem agora
+      for (;;) {
+        const lote = proximoLote(await repositorio.lerFila(), Date.now());
+        if (!lote.length) return;
+        try {
+          const r = await chamar('/v1/eventos', {
+            method: 'POST',
+            body: JSON.stringify({ instalacaoId: await repositorio.instalacaoId(), versaoApp: VERSAO_APP, eventos: lote }),
+          });
+          // 400 = lote fora do contrato: descarta para não travar a fila para sempre
+          if (r.ok || r.status === 400) {
+            if (!r.ok) console.warn('[api] lote recusado pela API e descartado');
+            await repositorio.salvarFila(confirmar(await repositorio.lerFila(), lote.map((e) => e.id)));
+          } else {
+            throw new Error(`HTTP ${r.status}`);
+          }
+        } catch (e) {
+          console.warn('[api] envio de eventos falhou, nova tentativa depois', String(e));
+          await repositorio.salvarFila(falhou(await repositorio.lerFila(), Date.now()));
+          return;
         }
-      } catch (e) {
-        console.warn('[api] envio de eventos falhou, nova tentativa depois', String(e));
-        await repositorio.salvarFila(falhou(await repositorio.lerFila(), Date.now()));
       }
     } finally {
       enviando = null;
@@ -57,16 +60,18 @@ export function sincronizar(): Promise<void> {
   return enviando;
 }
 
-/** Registra um evento de uso (só com o termo aceito) e tenta enviar. Nunca lança. */
-export async function registrarEvento(evento: SemId<EventoApp>): Promise<void> {
-  if (!apiAtiva()) return;
+/** Registra um evento de uso (só com o termo aceito) e tenta enviar. Nunca lança. true = entrou na fila. */
+export async function registrarEvento(evento: SemId<EventoApp>): Promise<boolean> {
+  if (!apiAtiva()) return false;
   try {
-    if (!(await repositorio.lerConsentimento())) return;
+    if (!(await repositorio.lerConsentimento())) return false;
     const completo = { ...evento, id: `ev-${novoId()}`, em: new Date().toISOString() } as EventoApp;
     await repositorio.salvarFila(enfileirar(await repositorio.lerFila(), completo));
     sincronizar();
+    return true;
   } catch (e) {
     console.warn('[api] não registrou o evento', e);
+    return false;
   }
 }
 

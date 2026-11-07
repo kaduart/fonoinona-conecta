@@ -11,6 +11,7 @@ import { Botao, Card, Chip } from '@/components/ui';
 import { TEXTOS_RESULTADO } from '@/content/resultados';
 import { contarHabilidades } from '@/domain/triagem';
 import { CenaAnimada } from '@/components/animacoes/CenaAnimada';
+import { CardIndicar } from '@/components/CardIndicar';
 import { CardRenovacao } from '@/components/CardRenovacao';
 import { TherapyTrail } from '@/components/TherapyTrail';
 import { feitasNaSemana, progressoCiclo } from '@/domain/casa';
@@ -321,6 +322,7 @@ export default function Inicio() {
         </Card>
       ) : null}
 
+      <CardIndicar />
     </Tela>
   );
 }

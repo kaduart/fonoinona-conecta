@@ -182,3 +182,66 @@ describe('config', () => {
     expect(() => lerConfig({})).toThrow(/MONGODB_URI/);
   });
 });
+
+describe('métricas de instalação e uso', () => {
+  const ev = (id: string, em: string, extra: Record<string, unknown>) => ({ id, em, ...extra });
+  const enviar = (instalacaoId: string, eventos: Record<string, unknown>[]) =>
+    request(app).post('/v1/eventos').send({ instalacaoId, versaoApp: '1.1.0', eventos }).expect(202);
+
+  it('exige a chave', async () => {
+    await request(app).get('/v1/metricas').expect(401);
+  });
+
+  it('aceita os eventos novos de instalação e o contexto da abertura', async () => {
+    const hoje = new Date().toISOString();
+    await enviar('inst-novo01', [
+      ev('ev-cv0001', hoje, { tipo: 'instalacao_oferecida', plataforma: 'android' }),
+      ev('ev-in0001', hoje, { tipo: 'app_instalado', plataforma: 'android' }),
+      ev('ev-ab0001', hoje, { tipo: 'app_aberto', modo: 'instalado', plataforma: 'android' }),
+    ]);
+    await request(app)
+      .post('/v1/eventos')
+      .send({ instalacaoId: 'inst-novo01', versaoApp: '1.1.0', eventos: [ev('ev-ab0002', hoje, { tipo: 'app_aberto', modo: 'foguete' })] })
+      .expect(400);
+  });
+
+  it('conta usuários, instalações, ativos e uso', async () => {
+    const agora = Date.now();
+    const haDias = (d: number) => new Date(agora - d * 86_400_000).toISOString();
+    // Android: navegador convidou, instalou e abriu instalado
+    await enviar('inst-andr01', [
+      ev('ev-a00001', haDias(3), { tipo: 'instalacao_oferecida', plataforma: 'android' }),
+      ev('ev-a00002', haDias(3), { tipo: 'app_instalado', plataforma: 'android' }),
+      ev('ev-a00003', haDias(0), { tipo: 'app_aberto', modo: 'instalado', plataforma: 'android' }),
+      ev('ev-a00004', haDias(0), { tipo: 'missao_concluida', missaoId: 'm06-conversa-bebe', como: 'facil' }),
+      ev('ev-a00005', haDias(0), { tipo: 'app_indicado' }),
+    ]);
+    // iPhone: não existe appinstalled; conta pela abertura em modo instalado
+    await enviar('inst-ios001', [ev('ev-i00001', haDias(10), { tipo: 'app_aberto', modo: 'instalado', plataforma: 'ios' })]);
+    // usa só no navegador
+    await enviar('inst-nav001', [
+      ev('ev-n00001', haDias(1), { tipo: 'app_aberto', modo: 'navegador', plataforma: 'desktop' }),
+      ev('ev-n00002', haDias(1), { tipo: 'triagem_concluida', faixaId: 'f2a' }),
+    ]);
+    // versão antiga do app (sem modo/plataforma), antiga demais para o período de 7 dias
+    await enviar('inst-velho1', [ev('ev-v00001', haDias(40), { tipo: 'app_aberto' })]);
+
+    const r = await request(app).get('/v1/metricas?dias=7').set('x-api-key', CHAVE).expect(200);
+    const m = r.body;
+    expect(m.totais).toEqual({ usuarios: 4, instalados: 2, convidadosAInstalar: 1, porPlataforma: { android: 1, ios: 1, desktop: 1, desconhecida: 1 } });
+    expect(m.periodo).toEqual({ novosUsuarios: 2, novasInstalacoes: 1 });
+    expect(m.ativos).toEqual({ hoje: 1, ultimos7dias: 2, ultimos30dias: 3 });
+    expect(m.uso).toMatchObject({ aberturas: 2, triagens: 1, missoes: 1, indicacoes: 1 });
+    expect(m.porDia).toHaveLength(7);
+    expect(m.porDia.at(-1)).toMatchObject({ ativos: 1 });
+    expect(m.porDia.reduce((s: number, d: { novos: number }) => s + d.novos, 0)).toBe(2);
+  });
+
+  it('limita o período e serve o painel', async () => {
+    const r = await request(app).get('/v1/metricas?dias=999').set('x-api-key', CHAVE).expect(200);
+    expect(r.body.periodoDias).toBe(90);
+    const p = await request(app).get('/painel').expect(200);
+    expect(p.text).toContain('/painel.js');
+    await request(app).get('/painel.js').expect(200).expect('Content-Type', /javascript/);
+  });
+});

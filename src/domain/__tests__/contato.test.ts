@@ -1,4 +1,4 @@
-import { codigoContato, linkWhatsApp, resumoTriagem } from '@/domain/contato';
+import { codigoContato, linkIndicacao, linkWhatsApp, resumoTriagem, textoIndicacao } from '@/domain/contato';
 
 it('codigoContato é estável e no formato CONECTA-XXXX', () => {
   const c = codigoContato('abc-123');
@@ -35,4 +35,16 @@ test('resumo da triagem é neutro e só entra na mensagem quando os pais escolhe
   const com = decodeURIComponent(linkWhatsApp('observar', '3 anos', 'CONECTA-AAAA', undefined, resumo));
   expect(com).toContain('CONECTA-AAAA');
   expect(com).toContain('Ainda em desenvolvimento: fala e compreensão.');
+});
+
+describe('indicação a outra família', () => {
+  it('abre o WhatsApp sem destinatário, com o link do app marcado como indicação e sem dado da criança', () => {
+    const url = linkIndicacao();
+    expect(url.startsWith('https://wa.me/?text=')).toBe(true);
+    const texto = decodeURIComponent(url.split('text=')[1]);
+    expect(texto).toBe(textoIndicacao());
+    expect(texto).toContain('https://conecta.clinicafonoinova.com.br/?origem=indicacao');
+    expect(texto).toContain('gratuito');
+    expect(texto).not.toMatch(/CONECTA-|triagem concluída|atraso/i);
+  });
 });
