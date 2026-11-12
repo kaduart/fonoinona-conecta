@@ -1,6 +1,6 @@
 import Constants from 'expo-constants';
 
-import { confirmar, enfileirar, falhou, proximoLote, type EventoApp } from '@/api/fila';
+import { atrasoMs, confirmar, enfileirar, falhou, liberar, proximoLote, type EventoApp } from '@/api/fila';
 import { novoId, repositorio } from '@/storage/repositorio';
 
 // Comunicação com a API da clínica. Sem EXPO_PUBLIC_API_URL tudo vira no-op e o app funciona 100% offline.
@@ -9,12 +9,14 @@ import { novoId, repositorio } from '@/storage/repositorio';
 const base = () => (process.env.EXPO_PUBLIC_API_URL ?? '').replace(/\/$/, '');
 const VERSAO_APP = Constants.expoConfig?.version ?? '0.0.0';
 const TIMEOUT_MS = 8_000;
+/** Eventos esperam mais: a API no Render grátis leva 30–60 s para acordar e, com 8 s, nenhum envio chegava. */
+const TIMEOUT_EVENTOS_MS = 60_000;
 
 export const apiAtiva = () => base().length > 0;
 
-export async function chamar(caminho: string, init: RequestInit = {}): Promise<Response> {
+export async function chamar(caminho: string, init: RequestInit = {}, timeoutMs = TIMEOUT_MS): Promise<Response> {
   const controle = new AbortController();
-  const timer = setTimeout(() => controle.abort(), TIMEOUT_MS);
+  const timer = setTimeout(() => controle.abort(), timeoutMs);
   try {
     return await fetch(`${base()}${caminho}`, { ...init, signal: controle.signal, headers: { 'Content-Type': 'application/json', ...init.headers } });
   } finally {
@@ -25,6 +27,26 @@ export async function chamar(caminho: string, init: RequestInit = {}): Promise<R
 type SemId<T> = T extends unknown ? Omit<T, 'id' | 'em'> : never;
 
 let enviando: Promise<void> | null = null;
+let reenvio: ReturnType<typeof setTimeout> | null = null;
+
+/** Com o app aberto, tenta de novo sozinho depois do backoff (antes só tentava no próximo evento). */
+function agendarReenvio(tentativas: number) {
+  if (reenvio) return;
+  reenvio = setTimeout(() => {
+    reenvio = null;
+    void sincronizar();
+  }, atrasoMs(Math.max(tentativas - 1, 0)) + 1_000);
+  (reenvio as { unref?: () => void }).unref?.();
+}
+
+/** Zera a espera da fila. Chamado ao abrir o app. Nunca lança. */
+export async function liberarFila(): Promise<void> {
+  try {
+    await repositorio.salvarFila(liberar(await repositorio.lerFila()));
+  } catch (e) {
+    console.warn('[api] não liberou a fila', e);
+  }
+}
 
 /** Envia o que estiver na fila. Uma execução por vez; falha agenda nova tentativa com backoff. */
 export function sincronizar(): Promise<void> {
@@ -36,10 +58,11 @@ export function sincronizar(): Promise<void> {
         const lote = proximoLote(await repositorio.lerFila(), Date.now());
         if (!lote.length) return;
         try {
-          const r = await chamar('/v1/eventos', {
-            method: 'POST',
-            body: JSON.stringify({ instalacaoId: await repositorio.instalacaoId(), versaoApp: VERSAO_APP, eventos: lote }),
-          });
+          const r = await chamar(
+            '/v1/eventos',
+            { method: 'POST', body: JSON.stringify({ instalacaoId: await repositorio.instalacaoId(), versaoApp: VERSAO_APP, eventos: lote }) },
+            TIMEOUT_EVENTOS_MS,
+          );
           // 400 = lote fora do contrato: descarta para não travar a fila para sempre
           if (r.ok || r.status === 400) {
             if (!r.ok) console.warn('[api] lote recusado pela API e descartado');
@@ -49,7 +72,9 @@ export function sincronizar(): Promise<void> {
           }
         } catch (e) {
           console.warn('[api] envio de eventos falhou, nova tentativa depois', String(e));
-          await repositorio.salvarFila(falhou(await repositorio.lerFila(), Date.now()));
+          const fila = falhou(await repositorio.lerFila(), Date.now());
+          await repositorio.salvarFila(fila);
+          agendarReenvio(fila.tentativas);
           return;
         }
       }

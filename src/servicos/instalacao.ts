@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 
-import { registrarEvento } from '@/api/cliente';
+import { liberarFila, registrarEvento } from '@/api/cliente';
 import type { ModoUso, Plataforma } from '@/api/fila';
 
 // Mede quantas famílias instalam o app (PWA na tela inicial) e de onde usam.
@@ -89,6 +89,8 @@ export function enviarPendentes(): Promise<void> {
 
 /** Registra a abertura com o modo e a plataforma, e envia o que estava pendente. Nunca lança. */
 export async function registrarAbertura(): Promise<void> {
+  // abriu o app: tenta enviar já, sem esperar o backoff de falhas antigas
+  await liberarFila();
   await registrarEvento({ tipo: 'app_aberto', modo: modoAtual(), plataforma: plataformaAtual() });
   await enviarPendentes();
 }
