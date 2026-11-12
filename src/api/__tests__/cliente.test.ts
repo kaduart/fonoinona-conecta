@@ -8,7 +8,7 @@ jest.mock('@/storage/chave', () => ({
   novoNonce: () => globalThis.crypto.getRandomValues(new Uint8Array(24)),
 }));
 
-import { registrarEvento, registrarLead, sincronizar } from '@/api/cliente';
+import { liberarFila, registrarEvento, registrarLead, sincronizar } from '@/api/cliente';
 import { repositorio } from '@/storage/repositorio';
 
 const fetchMock = jest.fn();
@@ -52,6 +52,21 @@ describe('cliente da API', () => {
     expect(fila.eventos).toHaveLength(1);
     expect(fila.tentativas).toBe(1);
     expect(fila.proximaTentativaEm).toBeGreaterThan(Date.now());
+  });
+
+  it('ao abrir o app, a fila presa no backoff sai na hora', async () => {
+    await aceitarTermo();
+    fetchMock.mockRejectedValueOnce(new Error('timeout'));
+    await registrarEvento({ tipo: 'app_aberto' });
+    await sincronizar();
+    expect((await repositorio.lerFila()).proximaTentativaEm).toBeGreaterThan(Date.now());
+    fetchMock.mockResolvedValue({ ok: true, status: 202 });
+    await liberarFila();
+    await registrarEvento({ tipo: 'app_aberto' });
+    await sincronizar();
+    expect((await repositorio.lerFila()).eventos).toEqual([]);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(JSON.parse(fetchMock.mock.calls[1][1].body).eventos).toHaveLength(2);
   });
 
   it('lead envia só código, origem e faixa', async () => {
