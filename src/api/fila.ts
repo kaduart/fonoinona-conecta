@@ -42,9 +42,17 @@ export function confirmar(fila: Fila, enviados: string[]): Fila {
   return { eventos: fila.eventos.filter((e) => !ok.has(e.id)), tentativas: 0, proximaTentativaEm: 0 };
 }
 
-/** Backoff exponencial: 30 s, 1 min, 2 min… até 1 h. */
+/** Teto do backoff. Curto de propósito: a API (Render grátis) dorme e um teto de 1 h travava a fila para sempre. */
+export const ATRASO_MAX_MS = 5 * 60_000;
+
+/** Backoff exponencial: 30 s, 1 min, 2 min, 4 min… até 5 min. */
 export function atrasoMs(tentativas: number): number {
-  return Math.min(30_000 * 2 ** tentativas, 60 * 60_000);
+  return Math.min(30_000 * 2 ** tentativas, ATRASO_MAX_MS);
+}
+
+/** Zera a espera (usado ao abrir o app: a família está aqui, vale tentar já). */
+export function liberar(fila: Fila): Fila {
+  return { ...fila, tentativas: 0, proximaTentativaEm: 0 };
 }
 
 export function falhou(fila: Fila, agora: number): Fila {

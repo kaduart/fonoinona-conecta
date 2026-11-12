@@ -1,4 +1,4 @@
-import { atrasoMs, confirmar, enfileirar, falhou, FILA_VAZIA, MAX_FILA, proximoLote, type EventoApp } from '@/api/fila';
+import { atrasoMs, confirmar, enfileirar, falhou, FILA_VAZIA, liberar, MAX_FILA, proximoLote, type EventoApp } from '@/api/fila';
 
 const ev = (id: string): EventoApp => ({ id, em: '2026-10-31T10:00:00.000Z', tipo: 'app_aberto' });
 
@@ -38,6 +38,14 @@ describe('fila de eventos', () => {
   it('backoff cresce e para em 1 hora', () => {
     expect(atrasoMs(0)).toBe(30_000);
     expect(atrasoMs(1)).toBe(60_000);
-    expect(atrasoMs(20)).toBe(3_600_000);
+    expect(atrasoMs(20)).toBe(300_000);
+  });
+});
+
+describe('liberar', () => {
+  it('zera a espera e as tentativas, mantendo os eventos', () => {
+    const f = liberar(falhou(falhou(enfileirar(FILA_VAZIA, ev('a')), 0), 0));
+    expect(f).toMatchObject({ tentativas: 0, proximaTentativaEm: 0 });
+    expect(proximoLote(f, 0)).toHaveLength(1);
   });
 });
